@@ -1,4 +1,5 @@
 # lms-web
+<<<<<<< HEAD
 
 This template should help get you started developing with Vue 3 in Vite.
 
@@ -42,3 +43,6 @@ npm run build
 ```sh
 npm run lint
 ```
+=======
+Web Application for Leave Management System ( Vue.js ) 
+>>>>>>> 15a3fde44c9391dbe7d78d6e514899333cae4988

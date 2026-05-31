@@ -1,10 +1,7 @@
 <template>
   <div>
     <!-- Back Button -->
-    <button @click="router.push('/employees')" class="text-blue-600 text-sm mb-4">
-      ← Back to Employees
-    </button>
-
+    <button @click="goBack" class="text-blue-600 text-sm mb-4">← Back to Employees</button>
     <!-- Loading -->
     <div v-if="loading" class="text-center py-10 text-gray-500">Loading...</div>
 
@@ -130,4 +127,8 @@ onMounted(async () => {
     loading.value = false
   }
 })
+
+function goBack() {
+  router.push('/employees')
+}
 </script>

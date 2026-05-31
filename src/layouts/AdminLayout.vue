@@ -33,13 +33,25 @@
       </nav>
 
       <!-- User Info + Logout -->
-      <div class="p-4 border-t">
-        <p class="text-sm font-medium text-gray-700">{{ authStore.user?.username }}</p>
-        <p class="text-xs text-gray-500 mb-3">{{ authStore.user?.role }}</p>
+      <div class="p-4 border-t border-gray-200">
+        <div class="flex items-center gap-3 mb-3">
+          <div
+            class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm font-bold"
+          >
+            {{ authStore.user?.username?.charAt(0).toUpperCase() }}
+          </div>
+          <div>
+            <p class="text-sm font-semibold text-gray-800">{{ authStore.user?.username }}</p>
+            <p class="text-xs text-gray-400 capitalize">
+              {{ authStore.user?.role?.replace('_', ' ') }}
+            </p>
+          </div>
+        </div>
         <button
           @click="handleLogout"
-          class="w-full text-sm text-red-600 hover:text-red-700 text-left"
+          class="w-full flex items-center gap-2 px-3 py-2 rounded text-sm text-red-500 hover:bg-red-50 hover:text-red-600 transition-colors"
         >
+          <span>→</span>
           Logout
         </button>
       </div>

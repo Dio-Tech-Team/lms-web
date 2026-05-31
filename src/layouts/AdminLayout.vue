@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen bg-gray-100 flex">
     <!-- Sidebar -->
-    <aside class="w-64 bg-white shadow-md flex flex-col">
+    <aside class="w-64 bg-white shadow-md flex flex-col sticky top-0 h-screen overflow-y-auto">
       <!-- Logo -->
       <div class="p-6 border-b">
         <h1 class="text-xl font-bold text-blue-600">LeaveSync</h1>

@@ -1,7 +1,12 @@
 <template>
   <div>
     <!-- Back Button -->
-    <button @click="goBack" class="text-blue-600 text-sm mb-4">← Back to Employees</button>
+    <button
+      @click="goBack"
+      class="flex items-center gap-1 text-blue-600 text-sm mb-4 hover:text-blue-700"
+    >
+      ← Back to Employees
+    </button>
     <!-- Loading -->
     <div v-if="loading" class="text-center py-10 text-gray-500">Loading...</div>
 

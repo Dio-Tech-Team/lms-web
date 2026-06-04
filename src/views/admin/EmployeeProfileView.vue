@@ -3,10 +3,11 @@
     <!-- Back Button -->
     <button
       @click="goBack"
-      class="flex items-center gap-1 text-blue-600 text-sm mb-4 hover:text-blue-700"
+      class="flex items-center gap-1 text-gray-gray text-sm mb-4 hover:text-gray-700"
     >
       ← Back to Employees
     </button>
+
     <!-- Loading -->
     <div v-if="loading" class="text-center py-10 text-gray-500">Loading...</div>
 
@@ -22,12 +23,28 @@
             <p class="text-gray-500 text-sm mt-1">{{ employee.position }}</p>
             <span
               :class="
-                employee.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                employee.is_active ? 'bg-gray-100 text-gray-700' : 'bg-gray-100 text-gray-700'
               "
               class="px-2 py-1 rounded-full text-xs font-medium mt-2 inline-block"
             >
               {{ employee.is_active ? 'Active' : 'Inactive' }}
             </span>
+          </div>
+          <!-- Action Buttons -->
+          <div class="flex gap-2">
+            <button
+              @click="showEditModal = true"
+              class="bg-gray-600 text-white px-4 py-2 rounded text-sm hover:bg-gray-700"
+            >
+              Edit
+            </button>
+            <button
+              v-if="employee.is_active"
+              @click="handleDeactivate"
+              class="bg-gray-600 text-white px-4 py-2 rounded text-sm hover:bg-gray-700"
+            >
+              Deactivate
+            </button>
           </div>
         </div>
       </div>
@@ -107,7 +124,138 @@
     </div>
 
     <!-- Error -->
-    <div v-else class="text-center py-10 text-red-500">Employee not found.</div>
+    <div v-else class="text-center py-10 text-gray-500">Employee not found.</div>
+
+    <!-- Edit Employee Modal -->
+    <div
+      v-if="showEditModal"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+    >
+      <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl p-6 max-h-screen overflow-y-auto">
+        <!-- Modal Header -->
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-xl font-bold text-gray-800">Edit Employee</h2>
+          <button @click="showEditModal = false" class="text-gray-400 hover:text-gray-600 text-xl">
+            ✕
+          </button>
+        </div>
+
+        <!-- Error -->
+        <div
+          v-if="editError"
+          class="bg-gray-50 border border-gray-200 text-gray-600 px-4 py-3 rounded mb-4 text-sm"
+        >
+          {{ editError }}
+        </div>
+
+        <!-- Form -->
+        <form @submit.prevent="handleEditEmployee">
+          <!-- Personal Info -->
+          <h3 class="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">
+            Personal Information
+          </h3>
+          <div class="grid grid-cols-2 gap-4 mb-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+              <input
+                v-model="editForm.first_name"
+                type="text"
+                class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-500"
+                required
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Middle Name</label>
+              <input
+                v-model="editForm.middle_name"
+                type="text"
+                class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-500"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+              <input
+                v-model="editForm.last_name"
+                type="text"
+                class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-500"
+                required
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Birthdate</label>
+              <input
+                v-model="editForm.birthdate"
+                type="date"
+                class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-500"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Contact Number</label>
+              <input
+                v-model="editForm.contact_number"
+                type="text"
+                class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-500"
+              />
+            </div>
+          </div>
+
+          <!-- Employment Info -->
+          <h3 class="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">
+            Employment Information
+          </h3>
+          <div class="grid grid-cols-2 gap-4 mb-6">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Employment Status</label>
+              <select
+                v-model="editForm.employment_status"
+                class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-500"
+              >
+                <option value="permanent">Permanent</option>
+                <option value="casual">Casual</option>
+                <option value="elected">Elected</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Department</label>
+              <select
+                v-model="editForm.department_id"
+                class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-500"
+              >
+                <option v-for="dept in departments" :key="dept.id" :value="dept.id">
+                  {{ dept.name }}
+                </option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Date Hired</label>
+              <input
+                v-model="editForm.date_hired"
+                type="date"
+                class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-500"
+              />
+            </div>
+          </div>
+
+          <!-- Buttons -->
+          <div class="flex justify-end gap-3">
+            <button
+              type="button"
+              @click="showEditModal = false"
+              class="px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded hover:bg-gray-50"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              :disabled="editLoading"
+              class="px-4 py-2 text-sm bg-gray-600 text-white rounded hover:bg-gray-700 disabled:opacity-50"
+            >
+              {{ editLoading ? 'Saving...' : 'Save Changes' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -121,17 +269,74 @@ const route = useRoute()
 
 const employee = ref(null)
 const loading = ref(true)
+const showEditModal = ref(false)
+const editLoading = ref(false)
+const editError = ref('')
+const departments = ref([])
+
+const editForm = ref({
+  first_name: '',
+  middle_name: '',
+  last_name: '',
+  birthdate: '',
+  contact_number: '',
+  employment_status: '',
+  department_id: '',
+  date_hired: '',
+})
 
 onMounted(async () => {
   try {
     const response = await api.get(`/employees/${route.params.id}`)
     employee.value = response.data
+
+    const deptResponse = await api.get('/departments')
+    departments.value = deptResponse.data.data
+
+    // Pre-fill edit form with current data
+    editForm.value = {
+      first_name: employee.value.first_name,
+      middle_name: employee.value.middle_name,
+      last_name: employee.value.last_name,
+      birthdate: employee.value.birthdate,
+      contact_number: employee.value.contact_number,
+      employment_status: employee.value.employment_status,
+      department_id: employee.value.department_id,
+      date_hired: employee.value.date_hired,
+    }
   } catch (error) {
     console.error('Error fetching employee:', error)
   } finally {
     loading.value = false
   }
 })
+
+async function handleEditEmployee() {
+  editLoading.value = true
+  editError.value = ''
+  try {
+    await api.put(`/employees/${route.params.id}`, editForm.value)
+    const response = await api.get(`/employees/${route.params.id}`)
+    employee.value = response.data
+    showEditModal.value = false
+  } catch (err) {
+    editError.value = err.response?.data?.message || 'Failed to update employee'
+  } finally {
+    editLoading.value = false
+  }
+}
+
+async function handleDeactivate() {
+  if (confirm('Are you sure you want to deactivate this employee?')) {
+    try {
+      await api.delete(`/employees/${route.params.id}`)
+      const response = await api.get(`/employees/${route.params.id}`)
+      employee.value = response.data
+    } catch (err) {
+      console.error('Failed to deactivate employee', err)
+    }
+  }
+}
 
 function goBack() {
   router.push('/employees')

@@ -4,7 +4,7 @@
     <aside class="w-64 bg-white shadow-md flex flex-col sticky top-0 h-screen overflow-y-auto">
       <!-- Logo -->
       <div class="p-6 border-b">
-        <h1 class="text-xl font-bold text-blue-600">LeaveSync</h1>
+        <h1 class="text-xl font-bold text-gray-600">LeaveSync</h1>
         <p class="text-xs text-gray-500">LGU Echague, Isabela</p>
       </div>
 
@@ -14,8 +14,8 @@
           <li>
             <RouterLink
               to="/"
-              class="flex items-center gap-3 px-3 py-2 rounded text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600"
-              active-class="bg-blue-50 text-blue-600 font-medium"
+              class="flex items-center gap-3 px-3 py-2 rounded text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-600"
+              active-class="bg-gray-50 text-gray-600 font-medium"
             >
               Dashboard
             </RouterLink>
@@ -23,8 +23,8 @@
           <li>
             <RouterLink
               to="/employees"
-              class="flex items-center gap-3 px-3 py-2 rounded text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600"
-              active-class="bg-blue-50 text-blue-600 font-medium"
+              class="flex items-center gap-3 px-3 py-2 rounded text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-600"
+              active-class="bg-gray-50 text-gray-600 font-medium"
             >
               Employees
             </RouterLink>
@@ -36,7 +36,7 @@
       <div class="p-4 border-t border-gray-200">
         <div class="flex items-center gap-3 mb-3">
           <div
-            class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm font-bold"
+            class="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center text-white text-sm font-bold"
           >
             {{ authStore.user?.username?.charAt(0).toUpperCase() }}
           </div>

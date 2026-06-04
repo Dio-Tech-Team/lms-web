@@ -6,19 +6,19 @@
       <!-- Card 1 -->
       <div class="bg-white rounded-lg shadow p-6">
         <p class="text-sm text-gray-500">Total Employees</p>
-        <p class="text-3xl font-bold text-blue-600 mt-2">{{ totalEmployees }}</p>
+        <p class="text-3xl font-bold text-gray-600 mt-2">{{ totalEmployees }}</p>
       </div>
 
       <!-- Card 2 -->
       <div class="bg-white rounded-lg shadow p-6">
         <p class="text-sm text-gray-500">Active Employees</p>
-        <p class="text-3xl font-bold text-green-600 mt-2">{{ activeEmployees }}</p>
+        <p class="text-3xl font-bold text-gray-600 mt-2">{{ activeEmployees }}</p>
       </div>
 
       <!-- Card 3 -->
       <div class="bg-white rounded-lg shadow p-6">
         <p class="text-sm text-gray-500">Inactive Employees</p>
-        <p class="text-3xl font-bold text-red-600 mt-2">{{ inactiveEmployees }}</p>
+        <p class="text-3xl font-bold text-gray-600 mt-2">{{ inactiveEmployees }}</p>
       </div>
     </div>
   </div>

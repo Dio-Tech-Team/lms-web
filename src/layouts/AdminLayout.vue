@@ -1,5 +1,11 @@
 <template>
   <div class="min-h-screen bg-gray-100 flex">
+    <!-- Loading Bar -->
+    <div
+      v-if="isLoading"
+      class="fixed top-0 left-0 w-full h-1 bg-blue-500 z-50 animate-pulse"
+    ></div>
+
     <!-- Sidebar -->
     <aside class="w-64 bg-white shadow-md flex flex-col sticky top-0 h-screen overflow-y-auto">
       <!-- Logo -->
@@ -59,20 +65,48 @@
 
     <!-- Main Content -->
     <main class="flex-1 p-6">
-      <RouterView />
+      <RouterView v-slot="{ Component }">
+        <Transition name="fade" mode="out-in">
+          <component :is="Component" />
+        </Transition>
+      </RouterView>
     </main>
   </div>
 </template>
 
 <script setup>
+import { ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useRouter } from 'vue-router'
 
 const authStore = useAuthStore()
 const router = useRouter()
+const isLoading = ref(false)
+
+router.beforeEach(() => {
+  isLoading.value = true
+})
+
+router.afterEach(() => {
+  setTimeout(() => {
+    isLoading.value = false
+  }, 300)
+})
 
 async function handleLogout() {
   await authStore.logout()
   router.push('/login')
 }
-</script>
+</script>>
+
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>

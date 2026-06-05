@@ -1,6 +1,12 @@
 <template>
   <div>
-    <h1 class="text-2xl font-bold text-gray-800 mb-6">Dashboard</h1>
+    <h1 class="text-2xl font-bold text-gray-600 mb-6">Dashboard</h1>
+    <!-- Loading -->
+    <div v-if="loading" class="flex items-center justify-center py-20">
+      <div
+        class="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"
+      ></div>
+    </div>
 
     <div class="grid grid-cols-3 gap-6">
       <!-- Card 1 -->

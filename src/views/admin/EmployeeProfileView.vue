@@ -3,14 +3,17 @@
     <!-- Back Button -->
     <button
       @click="goBack"
-      class="flex items-center gap-1 text-gray-gray text-sm mb-4 hover:text-gray-700"
+      class="flex items-center gap-1 text-gray-500 text-sm mb-4 hover:text-gray-1200"
     >
       ← Back to Employees
     </button>
 
     <!-- Loading -->
-    <div v-if="loading" class="text-center py-10 text-gray-500">Loading...</div>
-
+    <div v-if="loading" class="flex items-center justify-center py-20">
+      <!-- <div
+        class="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"
+      ></div> -->
+    </div>
     <!-- Profile Content -->
     <div v-else-if="employee">
       <!-- Header -->
@@ -96,7 +99,15 @@
 
       <!-- Promotion History -->
       <div class="bg-white rounded-lg shadow p-6">
-        <h2 class="text-lg font-semibold text-gray-800 mb-4">Promotion History</h2>
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-semibold text-gray-800">Promotion History</h2>
+          <button
+            @click="openPromotionModal"
+            class="bg-gray-600 text-white px-3 py-1 rounded text-sm hover:bg-gray-700"
+          >
+            Add Promotion
+          </button>
+        </div>
         <div v-if="employee.promotion_history && employee.promotion_history.length > 0">
           <table class="w-full text-sm">
             <thead class="bg-gray-50 border-b">
@@ -256,6 +267,81 @@
         </form>
       </div>
     </div>
+
+    <!-- Add Promotion Modal -->
+    <div
+      v-if="showPromotionModal"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+    >
+      <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-xl font-bold text-gray-800">Add Promotion</h2>
+          <button
+            @click="showPromotionModal = false"
+            class="text-gray-400 hover:text-gray-600 text-xl"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div
+          v-if="promotionError"
+          class="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded mb-4 text-sm"
+        >
+          {{ promotionError }}
+        </div>
+
+        <form @submit.prevent="handleAddPromotion">
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Previous Position</label>
+              <input
+                v-model="promotionForm.previous_position"
+                type="text"
+                class="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50"
+                readonly
+                required
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">New Position</label>
+              <input
+                v-model="promotionForm.new_position"
+                type="text"
+                class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                required
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Promotion Date</label>
+              <input
+                v-model="promotionForm.promotion_date"
+                type="date"
+                class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="flex justify-end gap-3 mt-6">
+            <button
+              type="button"
+              @click="showPromotionModal = false"
+              class="px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded hover:bg-gray-50"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              :disabled="promotionloading"
+              class="px-4 py-2 text-sm bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
+            >
+              {{ promotionloading ? 'Saving...' : 'Save Promotion' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -273,6 +359,15 @@ const showEditModal = ref(false)
 const editLoading = ref(false)
 const editError = ref('')
 const departments = ref([])
+const showPromotionModal = ref(false)
+const promotionloading = ref(false)
+const promotionError = ref('')
+
+const promotionForm = ref({
+  previous_position: '',
+  new_position: '',
+  promotion_date: '',
+})
 
 const editForm = ref({
   first_name: '',
@@ -336,6 +431,31 @@ async function handleDeactivate() {
       console.error('Failed to deactivate employee', err)
     }
   }
+}
+
+async function handleAddPromotion() {
+  promotionloading.value = true
+  promotionError.value = ''
+  try {
+    await api.post(`/employees/${route.params.id}/promotions`, promotionForm.value)
+    const response = await api.get(`/employees/${route.params.id}`)
+    employee.value = response.data
+    showPromotionModal.value = false
+    promotionForm.value = {
+      previous_position: '',
+      new_position: '',
+      promotion_date: '',
+    }
+  } catch (err) {
+    promotionError.value = err.response?.data?.message || 'Failed to add promotion'
+  } finally {
+    promotionloading.value = false
+  }
+}
+
+function openPromotionModal() {
+  promotionForm.value.previous_position = employee.value.position
+  showPromotionModal.value = true
 }
 
 function goBack() {

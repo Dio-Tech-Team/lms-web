@@ -2,7 +2,7 @@
   <div>
     <!-- Header -->
     <div class="flex items-center justify-between mb-6">
-      <h1 class="text-2xl font-bold text-gray-800">Employees</h1>
+      <h1 class="text-2xl font-bold text-gray-600">Employees</h1>
       <button
         @click="showAddModal = true"
         class="bg-gray-600 text-white px-4 py-2 rounded text-sm hover:bg-gray-700"
@@ -340,7 +340,7 @@ onMounted(async () => {
     employees.value = response.data
 
     const deptResponse = await api.get('/departments')
-    departments.value = deptResponse.data
+    departments.value = deptResponse.data.data
   } catch (error) {
     console.error('Error fetching employees:', error)
   }

@@ -140,7 +140,7 @@
     <!-- Edit Employee Modal -->
     <div
       v-if="showEditModal"
-      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      class="fixed inset-0 bg-gray-200 bg-opacity-50 flex items-center justify-center z-50"
     >
       <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl p-6 max-h-screen overflow-y-auto">
         <!-- Modal Header -->
@@ -271,7 +271,7 @@
     <!-- Add Promotion Modal -->
     <div
       v-if="showPromotionModal"
-      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      class="fixed inset-0 bg-gray-200 bg-opacity-50 flex items-center justify-center z-50"
     >
       <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
         <div class="flex items-center justify-between mb-6">

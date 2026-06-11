@@ -35,6 +35,43 @@
               Employees
             </RouterLink>
           </li>
+
+          <li>
+            <RouterLink
+              to="/leave-configurations"
+              class="flex items-center gap-3 px-3 py-2 rounded text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-600"
+              active-class="bg-gray-50 text-gray-600 font-medium"
+            >
+              Leave Configurations
+            </RouterLink>
+          </li>
+          <li>
+            <RouterLink
+              to="/leave-applications"
+              class="flex items-center gap-3 px-3 py-2 rounded text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-600"
+              active-class="bg-gray-50 text-gray-600 font-medium"
+            >
+              Leave Records
+            </RouterLink>
+          </li>
+          <li>
+            <RouterLink
+              to="/leave-applications"
+              class="flex items-center gap-3 px-3 py-2 rounded text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-600"
+              active-class="bg-gray-50 text-gray-600 font-medium"
+            >
+              Leave Applications
+            </RouterLink>
+          </li>
+          <li>
+            <RouterLink
+              to="/leave-applications"
+              class="flex items-center gap-3 px-3 py-2 rounded text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-600"
+              active-class="bg-gray-50 text-gray-600 font-medium"
+            >
+              Settings
+            </RouterLink>
+          </li>
         </ul>
       </nav>
 

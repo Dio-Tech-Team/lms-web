@@ -30,6 +30,11 @@ const router = createRouter({
           name: 'employee-profile',
           component: () => import('@/views/admin/EmployeeProfileView.vue'),
         },
+        {
+          path: 'leave-configurations',
+          name: 'leave-configurations',
+          component: () => import('@/views/admin/LeaveConfigurationView.vue'),
+        },
       ],
     },
   ],

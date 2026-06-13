@@ -35,6 +35,11 @@ const router = createRouter({
           name: 'leave-configurations',
           component: () => import('@/views/admin/LeaveConfigurationView.vue'),
         },
+        {
+          path: 'leave-records',
+          name: 'leave-records',
+          component: () => import('@/views/admin/LeaveRecordsView.vue'),
+        },
       ],
     },
   ],

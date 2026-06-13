@@ -47,7 +47,7 @@
           </li>
           <li>
             <RouterLink
-              to="/leave-applications"
+              to="/leave-records"
               class="flex items-center gap-3 px-3 py-2 rounded text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-600"
               active-class="bg-gray-50 text-gray-600 font-medium"
             >

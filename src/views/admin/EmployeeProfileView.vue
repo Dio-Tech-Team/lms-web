@@ -134,8 +134,48 @@
       </div>
     </div>
 
+    <!-- Leave Balance -->
+    <div class="bg-white rounded-lg shadow p-6 mt-6">
+      <h2 class="text-lg font-semibold text-gray-800 mb-4">Leave Balance</h2>
+
+      <div v-if="leaveCredits.length > 0">
+        <div class="grid grid-cols-2 gap-4">
+          <div v-for="credit in leaveCredits" :key="credit.id" class="border rounded-lg p-4">
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-medium text-gray-800">{{ credit.leave_type }}</span>
+              <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-medium">
+                {{ credit.code }}
+              </span>
+            </div>
+            <div class="grid grid-cols-3 gap-2 text-center">
+              <div>
+                <p class="text-xs text-gray-500">Total</p>
+                <p class="text-lg font-bold text-gray-800">{{ credit.total_credits }}</p>
+              </div>
+              <div>
+                <p class="text-xs text-gray-500">Used</p>
+                <p class="text-lg font-bold text-red-600">{{ credit.used_credits }}</p>
+              </div>
+              <div>
+                <p class="text-xs text-gray-500">Remaining</p>
+                <p class="text-lg font-bold text-green-600">{{ credit.remaining_balance }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div v-else class="text-gray-500 text-sm">
+        No leave credits found.
+        <button @click="initializeCredits" class="text-blue-600 hover:underline ml-1">
+          Initialize Credits
+        </button>
+      </div>
+    </div>
+
     <!-- Error -->
-    <div v-else class="text-center py-10 text-gray-500">Employee not found.</div>
+    <!-- <div v-else class="text-center py-10 text-gray-500">
+      Employee not found.
+    </div> -->
 
     <!-- Edit Employee Modal -->
     <div
@@ -362,6 +402,7 @@ const departments = ref([])
 const showPromotionModal = ref(false)
 const promotionloading = ref(false)
 const promotionError = ref('')
+const leaveCredits = ref([])
 
 const promotionForm = ref({
   previous_position: '',
@@ -387,6 +428,10 @@ onMounted(async () => {
 
     const deptResponse = await api.get('/departments')
     departments.value = deptResponse.data.data
+
+    const creditsResponse = await api.get(`/employees/${route.params.id}/leave-credits`)
+    leaveCredits.value = creditsResponse.data.credits
+    initializeCredits()
 
     // Pre-fill edit form with current data
     editForm.value = {
@@ -450,6 +495,16 @@ async function handleAddPromotion() {
     promotionError.value = err.response?.data?.message || 'Failed to add promotion'
   } finally {
     promotionloading.value = false
+  }
+}
+
+async function initializeCredits() {
+  try {
+    await api.get(`/employees/${route.params.id}/leave-credits/initialize`)
+    const creditsResponse = await api.get(`/employees/${route.params.id}/leave-credits`)
+    leaveCredits.value = creditsResponse.data.credits
+  } catch (error) {
+    console.error('Failed to initialize credits', error)
   }
 }
 

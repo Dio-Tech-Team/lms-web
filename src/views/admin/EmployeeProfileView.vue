@@ -10,9 +10,9 @@
 
     <!-- Loading -->
     <div v-if="loading" class="flex items-center justify-center py-20">
-      <!-- <div
+      <div
         class="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"
-      ></div> -->
+      ></div>
     </div>
     <!-- Profile Content -->
     <div v-else-if="employee">
@@ -20,7 +20,7 @@
       <div class="bg-white rounded-lg shadow p-6 mb-6">
         <div class="flex items-center justify-between">
           <div>
-            <h1 class="text-2xl font-bold text-gray-800">
+            <h1 class="text-2xl font-bold text-gray-700">
               {{ employee.first_name }} {{ employee.middle_name }} {{ employee.last_name }}
             </h1>
             <p class="text-gray-500 text-sm mt-1">{{ employee.position }}</p>
@@ -132,46 +132,45 @@
         </div>
         <div v-else class="text-gray-500 text-sm">No promotion history yet.</div>
       </div>
-    </div>
 
-    <!-- Leave Balance -->
-    <div class="bg-white rounded-lg shadow p-6 mt-6">
-      <h2 class="text-lg font-semibold text-gray-800 mb-4">Leave Balance</h2>
+      <!-- Leave Balance -->
+      <div class="bg-white rounded-lg shadow p-6 mt-6">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">Leave Balance</h2>
 
-      <div v-if="leaveCredits.length > 0">
-        <div class="grid grid-cols-2 gap-4">
-          <div v-for="credit in leaveCredits" :key="credit.id" class="border rounded-lg p-4">
-            <div class="flex items-center justify-between mb-2">
-              <span class="font-medium text-gray-800">{{ credit.leave_type }}</span>
-              <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-medium">
-                {{ credit.code }}
-              </span>
-            </div>
-            <div class="grid grid-cols-3 gap-2 text-center">
-              <div>
-                <p class="text-xs text-gray-500">Total</p>
-                <p class="text-lg font-bold text-gray-800">{{ credit.total_credits }}</p>
+        <div v-if="leaveCredits.length > 0">
+          <div class="grid grid-cols-2 gap-4">
+            <div v-for="credit in leaveCredits" :key="credit.id" class="border rounded-lg p-4">
+              <div class="flex items-center justify-between mb-2">
+                <span class="font-medium text-gray-800">{{ credit.leave_type }}</span>
+                <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-medium">
+                  {{ credit.code }}
+                </span>
               </div>
-              <div>
-                <p class="text-xs text-gray-500">Used</p>
-                <p class="text-lg font-bold text-red-600">{{ credit.used_credits }}</p>
-              </div>
-              <div>
-                <p class="text-xs text-gray-500">Remaining</p>
-                <p class="text-lg font-bold text-green-600">{{ credit.remaining_balance }}</p>
+              <div class="grid grid-cols-3 gap-2 text-center">
+                <div>
+                  <p class="text-xs text-gray-500">Total</p>
+                  <p class="text-lg font-bold text-gray-800">{{ credit.total_credits }}</p>
+                </div>
+                <div>
+                  <p class="text-xs text-gray-500">Used</p>
+                  <p class="text-lg font-bold text-red-600">{{ credit.used_credits }}</p>
+                </div>
+                <div>
+                  <p class="text-xs text-gray-500">Remaining</p>
+                  <p class="text-lg font-bold text-green-600">{{ credit.remaining_balance }}</p>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-      <div v-else class="text-gray-500 text-sm">
-        No leave credits found.
-        <button @click="initializeCredits" class="text-blue-600 hover:underline ml-1">
-          Initialize Credits
-        </button>
+        <div v-else class="text-gray-500 text-sm">
+          No leave credits found.
+          <button @click="initializeCredits" class="text-blue-600 hover:underline ml-1">
+            Initialize Credits
+          </button>
+        </div>
       </div>
     </div>
-
     <!-- Error -->
     <!-- <div v-else class="text-center py-10 text-gray-500">
       Employee not found.
@@ -423,15 +422,21 @@ const editForm = ref({
 
 onMounted(async () => {
   try {
-    const response = await api.get(`/employees/${route.params.id}`)
-    employee.value = response.data
+    // FIXED: Fire all requests in parallel at the same time
+    const [empResponse, deptResponse, creditsResponse] = await Promise.all([
+      api.get(`/employees/${route.params.id}`),
+      api.get('/departments'),
+      api.get(`/employees/${route.params.id}/leave-credits`),
+    ])
 
-    const deptResponse = await api.get('/departments')
+    employee.value = empResponse.data
     departments.value = deptResponse.data.data
-
-    const creditsResponse = await api.get(`/employees/${route.params.id}/leave-credits`)
     leaveCredits.value = creditsResponse.data.credits
-    initializeCredits()
+
+    // FIXED: Eliminated the duplicate execution row. Only initialize if empty.
+    if (!leaveCredits.value || leaveCredits.value.length === 0) {
+      await initializeCredits()
+    }
 
     // Pre-fill edit form with current data
     editForm.value = {

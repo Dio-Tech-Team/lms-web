@@ -39,6 +39,14 @@ const totalEmployees = computed(() => employees.value.length)
 const activeEmployees = computed(() => employees.value.filter((emp) => emp.is_active).length)
 const inactiveEmployees = computed(() => employees.value.filter((emp) => !emp.is_active).length)
 
+const permanentEmployees = computed(
+  () => employees.value.filter((emp) => emp.employment_status === 'permanent').length
+)
+
+const casualEmployees = computed(
+  () => employees.value.filter((emp) => emp.employment_status === 'casual').length
+)
+
 onMounted(async () => {
   try {
     const response = await api.get('/employees')

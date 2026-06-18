@@ -40,6 +40,11 @@ const router = createRouter({
           name: 'leave-records',
           component: () => import('@/views/admin/LeaveRecordsView.vue'),
         },
+        {
+          path: 'leave-applications',
+          name: 'leave-applications',
+          component: () => import('@/views/admin/LeaveApplicationView.vue'),
+        },
       ],
     },
   ],

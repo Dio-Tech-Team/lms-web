@@ -7,7 +7,7 @@
     ></div>
 
     <!-- Sidebar -->
-    <aside class="w-64 bg-white shadow-md flex flex-col sticky top-0 h-screen overflow-y-auto">
+    <aside class="w-52 bg-white shadow-md flex flex-col sticky top-0 h-screen overflow-y-auto">
       <!-- Logo -->
       <div class="p-6 border-b">
         <h1 class="text-xl font-bold text-gray-600">LeaveSync</h1>
@@ -65,7 +65,7 @@
           </li>
           <li>
             <RouterLink
-              to="/leave-applications"
+              to="/leave-setting"
               class="flex items-center gap-3 px-3 py-2 rounded text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-600"
               active-class="bg-gray-50 text-gray-600 font-medium"
             >

@@ -1,5 +1,11 @@
 <template>
   <div>
+    <!-- Loading -->
+    <div v-if="loading" class="flex items-center justify-center py-20">
+      <div
+        class="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"
+      ></div>
+    </div>
     <!-- Header -->
     <div class="flex items-center justify-between mb-6">
       <h1 class="text-2xl font-bold text-gray-600">Employees</h1>

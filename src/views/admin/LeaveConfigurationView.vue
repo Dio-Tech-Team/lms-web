@@ -2,7 +2,7 @@
   <div>
     <!-- Header -->
     <div class="flex items-center justify-between mb-6">
-      <h1 class="text-2xl font-bold text-gray-800">Leave Configuration</h1>
+      <h1 class="text-2xl font-bold text-gray-700">Leave Configuration</h1>
       <button
         @click="showAddModal = true"
         class="bg-gray-600 text-white px-4 py-2 rounded text-sm hover:bg-gray-700"

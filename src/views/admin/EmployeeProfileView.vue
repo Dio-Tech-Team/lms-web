@@ -24,10 +24,9 @@
           <div>
             <h1 class="text-2xl font-bold text-gray-800">
               {{ employee.first_name }} {{ employee.middle_name }} {{ employee.surname }}
-            <h1 class="text-2xl font-bold text-gray-700">
-              {{ employee.first_name }} {{ employee.middle_name }} {{ employee.last_name }}
             </h1>
             <p class="text-gray-500 text-sm mt-1">{{ employee.position }}</p>
+
             <!-- <div class="flex gap-2 mt-2">
               <span
                 :class="

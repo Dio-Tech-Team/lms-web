@@ -45,6 +45,11 @@ const router = createRouter({
           name: 'leave-applications',
           component: () => import('@/views/admin/LeaveApplicationView.vue'),
         },
+        {
+          path: 'leave-credit-computation',
+          name: 'leave-credit-computation',
+          component: () => import('@/views/admin/LeaveCreditComputationView.vue'),
+        },
       ],
     },
   ],

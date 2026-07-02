@@ -17,7 +17,7 @@
           >
             <option value="">All Employees</option>
             <option v-for="emp in employees" :key="emp.id" :value="emp.id">
-              {{ emp.first_name }} {{ emp.last_name }}
+              {{ emp?.first_name }} {{ emp?.surname }}
             </option>
           </select>
         </div>
@@ -47,7 +47,7 @@
         </thead>
         <tbody>
           <tr v-for="record in records" :key="record.id" class="border-b hover:bg-gray-50">
-            <td class="px-4 py-3">{{ record.employee }}</td>
+            <td class="px-4 py-3">{{ record.first_name }} {{ record.surname }}</td>
             <td class="px-4 py-3">
               <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-medium">
                 {{ record.code }}
@@ -77,24 +77,52 @@ const employees = ref([])
 const loading = ref(true)
 const selectedEmployee = ref('')
 
+// onMounted(async () => {
+//   try {
+//     const empResponse = await api.get('/employees')
+//     employees.value = empResponse.data
+//     await fetchRecords()
+//   } catch (error) {
+//     console.error('Error:', error)
+//   }
+// })
 onMounted(async () => {
   try {
     const empResponse = await api.get('/employees')
-    employees.value = empResponse.data
+
+    // Target the paginated data array (.data) instead of the whole pagination object
+    employees.value = empResponse.data?.data || empResponse.data || []
+
     await fetchRecords()
   } catch (error) {
     console.error('Error:', error)
   }
 })
+// async function fetchRecords() {
+//   loading.value = true
+//   try {
+//     const params = selectedEmployee.value ? `?employee_id=${selectedEmployee.value}` : ''
+//     const response = await api.get(`/leave-records${params}`)
+//     // records.value = response.data
+//     records.value = response.data.data || []
+//   } catch (error) {
+//     console.error('Error fetching records:', error)
+//   } finally {
+//     loading.value = false
+//   }
+// }
 
 async function fetchRecords() {
   loading.value = true
   try {
     const params = selectedEmployee.value ? `?employee_id=${selectedEmployee.value}` : ''
     const response = await api.get(`/leave-records${params}`)
-    records.value = response.data
+
+    // Fallback chain: check if response.data.data exists, then response.data, otherwise default to an empty array []
+    records.value = response.data?.data || response.data || []
   } catch (error) {
     console.error('Error fetching records:', error)
+    records.value = [] // Fallback to empty array on error so the template doesn't crash
   } finally {
     loading.value = false
   }

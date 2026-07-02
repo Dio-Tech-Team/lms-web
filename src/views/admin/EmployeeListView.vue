@@ -1,11 +1,5 @@
 <template>
   <div>
-    <!-- Loading -->
-    <div v-if="loading" class="flex items-center justify-center py-20">
-      <div
-        class="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"
-      ></div>
-    </div>
     <!-- Header -->
     <div class="flex items-center justify-between mb-6">
       <h1 class="text-2xl font-bold text-gray-600">Employees</h1>
@@ -24,7 +18,6 @@
         <div
           class="bg-white rounded-lg shadow-lg w-full max-w-2xl p-6 max-h-screen overflow-y-auto"
         >
-          <!-- Modal Header -->
           <div class="flex items-center justify-between mb-6">
             <h2 class="text-xl font-bold text-gray-800">Add New Employee</h2>
             <button @click="showAddModal = false" class="text-gray-400 hover:text-gray-600 text-xl">
@@ -32,7 +25,6 @@
             </button>
           </div>
 
-          <!-- Error Message -->
           <div
             v-if="formError"
             class="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded mb-4 text-sm"
@@ -40,9 +32,7 @@
             {{ formError }}
           </div>
 
-          <!-- Form -->
           <form @submit.prevent="handleAddEmployee">
-            <!-- Account Info -->
             <h3 class="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">
               Account Information
             </h3>
@@ -52,7 +42,7 @@
                 <input
                   v-model="form.username"
                   type="text"
-                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
                   required
                 />
               </div>
@@ -61,7 +51,7 @@
                 <input
                   v-model="form.email"
                   type="email"
-                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
                   required
                 />
               </div>
@@ -70,7 +60,7 @@
                 <input
                   v-model="form.password"
                   type="password"
-                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
                   required
                 />
               </div>
@@ -79,13 +69,12 @@
                 <input
                   v-model="form.password_confirmation"
                   type="password"
-                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
                   required
                 />
               </div>
             </div>
 
-            <!-- Personal Info -->
             <h3 class="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">
               Personal Information
             </h3>
@@ -95,7 +84,7 @@
                 <input
                   v-model="form.first_name"
                   type="text"
-                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
                   required
                 />
               </div>
@@ -104,7 +93,7 @@
                 <input
                   v-model="form.middle_name"
                   type="text"
-                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
                 />
               </div>
               <div>
@@ -112,7 +101,7 @@
                 <input
                   v-model="form.surname"
                   type="text"
-                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
                   required
                 />
               </div>
@@ -121,7 +110,7 @@
                 <input
                   v-model="form.id_number"
                   type="text"
-                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
                   required
                 />
               </div>
@@ -130,10 +119,9 @@
                 <input
                   v-model="form.birthdate"
                   type="date"
-                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
                 />
               </div>
-
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Place of Birth</label>
                 <input
@@ -168,7 +156,6 @@
                   <option value="separated">Separated</option>
                 </select>
               </div>
-
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Height</label>
                 <input
@@ -213,83 +200,80 @@
                   <option value="graduated">Graduated</option>
                 </select>
               </div>
+            </div>
 
-              <!-- Contact and Address -->
-              <h3 class="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">
-                Contact & Address
-              </h3>
-              <div class="grid grid-cols-2 gap-4 mb-4">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1"
-                    >Residential Address</label
-                  >
-                  <input
-                    v-model="form.residential_address"
-                    type="text"
-                    class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
-                  />
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">Contact Number</label>
-                  <input
-                    v-model="form.contact_number"
-                    type="text"
-                    class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
-                  />
-                </div>
+            <h3 class="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">
+              Contact & Address
+            </h3>
+            <div class="grid grid-cols-2 gap-4 mb-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Residential Address</label
+                >
+                <input
+                  v-model="form.residential_address"
+                  type="text"
+                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                />
               </div>
-
-              <!-- Government IDs -->
-              <h3 class="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">
-                Government IDs
-              </h3>
-              <div class="grid grid-cols-2 gap-4 mb-4">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">UMID</label>
-                  <input
-                    v-model="form.umid_id"
-                    type="text"
-                    class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
-                  />
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">Pag-IBIG ID</label>
-                  <input
-                    v-model="form.pagibig_id"
-                    type="text"
-                    class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
-                  />
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1"
-                    >PhilHealth Number</label
-                  >
-                  <input
-                    v-model="form.philhealth_number"
-                    type="text"
-                    class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
-                  />
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">PSN Number</label>
-                  <input
-                    v-model="form.psn_number"
-                    type="text"
-                    class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
-                  />
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">TIN Number</label>
-                  <input
-                    v-model="form.tin_number"
-                    type="text"
-                    class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
-                  />
-                </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Contact Number</label>
+                <input
+                  v-model="form.contact_number"
+                  type="text"
+                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                />
               </div>
             </div>
 
-            <!-- Employment Info -->
+            <h3 class="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">
+              Government IDs
+            </h3>
+            <div class="grid grid-cols-2 gap-4 mb-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">UMID</label>
+                <input
+                  v-model="form.umid_id"
+                  type="text"
+                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Pag-IBIG ID</label>
+                <input
+                  v-model="form.pagibig_id"
+                  type="text"
+                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >PhilHealth Number</label
+                >
+                <input
+                  v-model="form.philhealth_number"
+                  type="text"
+                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">PSN Number</label>
+                <input
+                  v-model="form.psn_number"
+                  type="text"
+                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">TIN Number</label>
+                <input
+                  v-model="form.tin_number"
+                  type="text"
+                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                />
+              </div>
+            </div>
+
             <h3 class="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">
               Employment Information
             </h3>
@@ -343,7 +327,6 @@
               </div>
             </div>
 
-            <!-- Buttons -->
             <div class="flex justify-end gap-3">
               <button
                 type="button"
@@ -397,18 +380,8 @@
             <td class="px-4 py-3">{{ employee.id_number }}</td>
             <td class="px-4 py-3">{{ employee.first_name }} {{ employee.surname }}</td>
             <td class="px-4 py-3">{{ employee.position }}</td>
-            <td class="px-4 py-3">{{ employee.department }}</td>
+            <td class="px-4 py-3">{{ employee.department_name }}</td>
             <td class="px-4 py-3 capitalize">{{ employee.employment_status }}</td>
-            <!-- <td class="px-4 py-3">
-              <span
-                :class="
-                  employee.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-                "
-                class="px-2 py-1 rounded-full text-xs font-medium"
-              >
-                {{ employee.is_active ? 'Active' : 'Inactive' }}
-              </span>
-            </td> -->
             <td class="px-4 py-3">
               <button
                 @click="viewEmployee(employee.id)"
@@ -423,6 +396,29 @@
           </tr>
         </tbody>
       </table>
+
+      <!-- Pagination Controls -->
+      <div class="flex items-center justify-between px-4 py-3 border-t">
+        <p class="text-sm text-gray-500">
+          Showing page {{ currentPage }} of {{ lastPage }} ({{ total }} total employees)
+        </p>
+        <div class="flex gap-2">
+          <button
+            @click="fetchEmployees(currentPage - 1)"
+            :disabled="currentPage === 1"
+            class="px-3 py-1.5 text-sm border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50"
+          >
+            ← Previous
+          </button>
+          <button
+            @click="fetchEmployees(currentPage + 1)"
+            :disabled="currentPage === lastPage"
+            class="px-3 py-1.5 text-sm border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50"
+          >
+            Next →
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -436,6 +432,13 @@ const router = useRouter()
 const employees = ref([])
 const search = ref('')
 const showAddModal = ref(false)
+const currentPage = ref(1)
+const lastPage = ref(1)
+const total = ref(0)
+const departments = ref([])
+const formError = ref(null)
+const formLoading = ref(false)
+
 const form = ref({
   username: '',
   email: '',
@@ -454,34 +457,37 @@ const form = ref({
   highest_educational_attainment: '',
   residential_address: '',
   contact_number: '',
-
   id_number: '',
   position: '',
   department_id: '',
   employment_status: '',
   date_hired: '',
-
   umid_id: '',
   pagibig_id: '',
   philhealth_number: '',
   psn_number: '',
   tin_number: '',
 })
-const departments = ref([]) // Fixes line 162 warning and line 340 ReferenceError
-const formError = ref(null) // Fixes line 31 warning
-const formLoading = ref(false) // Fixes line 204 & 207 warnin
+
+async function fetchEmployees(page = 1) {
+  try {
+    const employeeResponse = await api.get(`/employees?page=${page}`)
+    employees.value = employeeResponse.data.data
+    currentPage.value = employeeResponse.data.current_page
+    lastPage.value = employeeResponse.data.last_page
+    total.value = employeeResponse.data.total
+  } catch (error) {
+    console.error('Error fetching employees:', error)
+  }
+}
 
 async function handleAddEmployee() {
   formLoading.value = true
   formError.value = ''
-
   try {
     await api.post('employees', form.value)
     showAddModal.value = false
-
-    const response = await api.get('/employees')
-    employees.value = response.data
-
+    await fetchEmployees(currentPage.value)
     Object.keys(form.value).forEach((key) => {
       form.value[key] = ''
     })
@@ -504,14 +510,12 @@ const filteredEmployees = computed(() => {
 })
 
 onMounted(async () => {
+  await fetchEmployees()
   try {
-    const response = await api.get('/employees')
-    employees.value = response.data
-
     const deptResponse = await api.get('/departments')
     departments.value = deptResponse.data.data
   } catch (error) {
-    console.error('Error fetching employees:', error)
+    console.error('Error fetching departments:', error)
   }
 })
 

@@ -50,7 +50,7 @@ const casualEmployees = computed(
 onMounted(async () => {
   try {
     const response = await api.get('/employees')
-    employees.value = response.data
+    employees.value = response.data.data
   } catch (error) {
     console.error('Error fetching employees:', error)
   }

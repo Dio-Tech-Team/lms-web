@@ -160,20 +160,20 @@
           <tr>
             <th class="text-left px-4 py-3 text-gray-600">Employee</th>
             <th class="text-left px-4 py-3 text-gray-600">VL Earned</th>
-            <th class="text-left px-4 py-3 text-gray-600">Tardiness Deducted</th>
-            <th class="text-left px-4 py-3 text-gray-600">Net VL</th>
             <th class="text-left px-4 py-3 text-gray-600">SL Earned</th>
+            <th class="text-left px-4 py-3 text-gray-600">Tardiness Deducted</th>
+            <th class="text-left px-4 py-3 text-gray-600">Total Earned VL Credits</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="(r, index) in results" :key="index" class="border-b hover:bg-gray-50">
             <td class="px-4 py-3 font-medium text-gray-900">{{ r.employee }}</td>
             <td class="px-4 py-3 text-gray-700">{{ r.vl_earned }}</td>
+            <td class="px-4 py-3 text-gray-700">{{ r.sl_earned }}</td>
             <td class="px-4 py-3 text-red-600">{{ r.tardiness_deducted }}</td>
             <td class="px-4 py-3 font-medium text-green-700">
               {{ (r.vl_earned - r.tardiness_deducted).toFixed(3) }}
             </td>
-            <td class="px-4 py-3 text-gray-700">{{ r.sl_earned }}</td>
           </tr>
         </tbody>
       </table>

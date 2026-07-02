@@ -210,13 +210,26 @@ onMounted(async () => {
   await fetchApplications()
 })
 
+// async function fetchApplications() {
+//   loading.value = true
+//   try {
+//     const response = await api.get('/leave-applications')
+//     applications.value = response.data
+//   } catch (error) {
+//     console.error('Error fetching applications:', error)
+//   } finally {
+//     loading.value = false
+//   }
+// }
 async function fetchApplications() {
   loading.value = true
   try {
     const response = await api.get('/leave-applications')
-    applications.value = response.data
+    // Target the inner data array from the pagination object safely
+    applications.value = response.data?.data || response.data || []
   } catch (error) {
     console.error('Error fetching applications:', error)
+    applications.value = []
   } finally {
     loading.value = false
   }

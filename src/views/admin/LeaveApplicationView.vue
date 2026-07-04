@@ -64,14 +64,14 @@
         </thead>
         <tbody>
           <tr v-for="app in filteredApplications" :key="app.id" class="border-b hover:bg-gray-50">
-            <td class="px-4 py-3">{{ app.employee }}</td>
+            <td class="px-4 py-3">{{ app.first_name }} {{ app.surname }}</td>
             <td class="px-4 py-3">
               <span class="bg-gray-100 text-white-700 px-2 py-1 rounded text-xs font-medium">
-                {{ app.code }}
+                {{ app.leave_type_code }}
               </span>
             </td>
-            <td class="px-4 py-3">{{ app.start_date }}</td>
-            <td class="px-4 py-3">{{ app.end_date }}</td>
+            <td class="px-4 py-3">{{ formatDate(app.start_date) }}</td>
+            <td class="px-4 py-3">{{ formatDate(app.end_date) }}</td>
             <td class="px-4 py-3">{{ app.days_applied }}</td>
             <td class="px-4 py-3">{{ app.reason || 'N/A' }}</td>
             <td class="px-4 py-3">
@@ -124,54 +124,6 @@
         </tbody>
       </table>
     </div>
-    <!-- <div
-      v-if="pdfModalOpen"
-      class="fixed inset-0 bg-white bg-opacity-50 z-50 flex items-center justify-center p-4"
-    >
-      <div class="bg-white rounded-lg shadow-xl w-full max-w-5xl h-[85vh] flex flex-col">
-        <div class="flex items-center justify-between px-6 py-4 border-b">
-          <h3 class="text-lg font-bold text-gray-700">Leave Form Preview</h3>
-          <button
-            @click="closePdfModal"
-            class="text-gray-400 hover:text-gray-600 text-2xl font-semibold"
-          >
-            &times;
-          </button>
-        </div>
-
-        <div class="flex-1 bg-gray-100 p-2 relative">
-          <iframe v-if="pdfUrl" :src="pdfUrl" class="w-full h-full rounded border-0"></iframe>
-          <div v-else class="flex items-center justify-center h-full text-gray-500">
-            Loading document...
-          </div>
-        </div>
-      </div>
-    </div> -->
-    <!-- <div
-      v-if="pdfModalOpen"
-      class="fixed inset-0 bg-black bg-opacity-40 z-50 flex items-center justify-center p-6 backdrop-blur-sm"
-      @click.self="closePdfModal"
-    >
-      <div
-        class="bg-white rounded-xl shadow-2xl w-full max-w-4xl h-[80vh] flex flex-col overflow-hidden border border-gray-200 animate-fade-in"
-      >
-        <div class="flex items-center justify-between px-6 py-4 bg-gray-50 border-b">
-          <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wider">
-            Leave Form Preview
-          </h3>
-          <button
-            @click="closePdfModal"
-            class="text-gray-400 hover:text-gray-600 text-2xl font-semibold transition-colors"
-          >
-            &times;
-          </button>
-        </div>
-
-        <div class="flex-1 bg-gray-100 relative">
-          <iframe v-if="pdfUrl" :src="pdfUrl" class="w-full h-full border-0"></iframe>
-        </div>
-      </div>
-    </div> -->
     <div
       v-if="pdfUrl"
       class="mt-8 bg-white rounded-lg shadow border border-gray-200 overflow-hidden"
@@ -255,26 +207,11 @@ async function handleCancel(id) {
     }
   }
 }
-// Add this method inside your <script setup> alongside your other async functions
-
-// async function viewLeaveForm(id) {
-//   try {
-//     // Requesting responseType: 'blob' is essential for processing PDF streams
-//     const response = await api.get(`/leave-applications/${id}/pdf`, {
-//       responseType: 'blob',
-//     })
-
-//     // Create an internal browser blob object pointing to the raw data
-//     const file = new Blob([response.data], { type: 'application/pdf' })
-//     const fileURL = URL.createObjectURL(file)
-
-//     // Open the compiled PDF document stream directly inside a separate new tab
-//     window.open(fileURL, '_blank')
-//   } catch (error) {
-//     console.error('Failed to load leave application PDF:', error)
-//     alert('Could not generate leave form. Please check backend records.')
-//   }
-// }
+function formatDate(dateString) {
+  if (!dateString) return 'N/A'
+  // Splits at 'T' to discard the timestamp portion safely
+  return dateString.split('T')[0]
+}
 
 // UPDATED: Fetches the PDF stream and displays it inline
 async function viewLeaveForm(id) {

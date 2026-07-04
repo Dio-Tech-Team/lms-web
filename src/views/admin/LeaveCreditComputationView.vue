@@ -64,6 +64,7 @@
               <th class="text-left px-4 py-3 text-gray-600">VL Earned</th>
               <th class="text-left px-4 py-3 text-gray-600">Tardiness</th>
               <th class="text-left px-4 py-3 text-gray-600">SL Earned</th>
+              <th class="text-left px-4 py-3 text-gray-600">Total Earned Leave Credits</th>
             </tr>
           </thead>
           <tbody>

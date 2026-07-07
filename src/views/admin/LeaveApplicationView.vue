@@ -239,6 +239,43 @@ async function viewLeaveForm(id) {
         {{ tab === '' ? 'All' : tab }}
       </button>
     </div>
+    <!-- Filters -->
+    <div class="bg-white rounded-lg shadow p-4 mb-6">
+      <div class="grid grid-cols-3 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Search Employee</label>
+          <input
+            v-model="search"
+            type="text"
+            placeholder="Type employee name..."
+            class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+            @input="debounceSearch"
+          />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Department</label>
+          <select
+            v-model="selectedDepartment"
+            class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+            @change="fetchApplications(1)"
+          >
+            <option value="">All Departments</option>
+            <option v-for="dept in departments" :key="dept.id" :value="dept.id">
+              {{ dept.name }}
+            </option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Year</label>
+          <input
+            v-model="selectedYear"
+            type="number"
+            class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+            @change="fetchApplications(1)"
+          />
+        </div>
+      </div>
+    </div>
 
     <!-- Loading -->
     <div v-if="loading" class="flex items-center justify-center py-20">
@@ -253,6 +290,7 @@ async function viewLeaveForm(id) {
         <thead class="bg-gray-50 border-b">
           <tr>
             <th class="text-left px-4 py-3 text-gray-600 font-medium">Employee</th>
+            <th class="text-left px-4 py-3 text-gray-600 font-medium">Department</th>
             <th class="text-left px-4 py-3 text-gray-600 font-medium">Leave Type</th>
             <th class="text-left px-4 py-3 text-gray-600 font-medium">Start Date</th>
             <th class="text-left px-4 py-3 text-gray-600 font-medium">End Date</th>
@@ -271,6 +309,7 @@ async function viewLeaveForm(id) {
                 {{ app.leave_type_code }}
               </span>
             </td>
+            <td class="px-4 py-3 text-gray-700">{{ app.department_name }}</td>
             <td class="px-4 py-3">{{ formatDate(app.start_date) }}</td>
             <td class="px-4 py-3">{{ formatDate(app.end_date) }}</td>
             <td class="px-4 py-3">{{ app.days_applied }}</td>
@@ -316,7 +355,7 @@ async function viewLeaveForm(id) {
             </td>
           </tr>
           <tr v-if="applications.length === 0">
-            <td colspan="9" class="px-4 py-8 text-center text-gray-500">No applications found</td>
+            <td colspan="10" class="px-4 py-8 text-center text-gray-500">No applications found</td>
           </tr>
         </tbody>
       </table>
@@ -375,11 +414,27 @@ const currentPage = ref(1)
 const lastPage = ref(1)
 const total = ref(0)
 
+const search = ref('')
+const selectedDepartment = ref('')
+const selectedYear = ref(new Date().getFullYear())
+const departments = ref([])
+let searchTimeout = null
+
+function debounceSearch() {
+  clearTimeout(searchTimeout)
+  searchTimeout = setTimeout(() => {
+    fetchApplications(1)
+  }, 500)
+}
+
 async function fetchApplications(page = 1) {
   loading.value = true
   try {
     const params = new URLSearchParams({ page })
     if (filterStatus.value) params.append('status', filterStatus.value)
+    if (search.value) params.append('search', search.value)
+    if (selectedDepartment.value) params.append('department_id', selectedDepartment.value)
+    if (selectedYear.value) params.append('year', selectedYear.value)
 
     const response = await api.get(`/leave-applications?${params}`)
     applications.value = response.data.data
@@ -445,5 +500,11 @@ async function viewLeaveForm(id) {
 
 onMounted(async () => {
   await fetchApplications()
+  try {
+    const deptResponse = await api.get('/departments')
+    departments.value = deptResponse.data.data // ← add this
+  } catch (err) {
+    console.error('Error fetching departments:', err)
+  }
 })
 </script>

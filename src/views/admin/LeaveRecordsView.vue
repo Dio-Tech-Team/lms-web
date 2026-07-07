@@ -4,21 +4,20 @@
 
     <!-- Summary Table -->
     <div class="bg-white rounded-lg shadow p-6 mb-6">
-      <h2 class="text-lg font-semibold text-gray-800 mb-4">
+      <!-- <h2 class="text-lg font-semibold text-gray-800 mb-4">
         Employee Leave Summary ({{ summaryYear }})
-      </h2>
+      </h2> -->
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-semibold text-gray-800">
+          Employee Leave Summary
+          <span class="text-gray-400 font-normal text-base ml-1">({{ summaryYear }})</span>
+        </h2>
+        <!-- <p class="text-sm text-gray-400">Click an employee row to filter detailed records below</p> -->
+      </div>
 
       <!-- Summary Filters -->
-      <div class="grid grid-cols-2 gap-4 mb-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Year</label>
-          <input
-            v-model="summaryYear"
-            type="number"
-            class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
-            @change="fetchSummary(1)"
-          />
-        </div>
+      <!-- Summary Filters -->
+      <div class="grid grid-cols-3 gap-4 mb-4">
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Search Employee</label>
           <input
@@ -27,6 +26,28 @@
             placeholder="Type employee name..."
             class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
             @input="debounceSummarySearch"
+          />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Department</label>
+          <select
+            v-model="summaryDepartment"
+            class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+            @change="fetchSummary(1)"
+          >
+            <option value="">All Departments</option>
+            <option v-for="dept in departments" :key="dept.id" :value="dept.id">
+              {{ dept.name }}
+            </option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Year</label>
+          <input
+            v-model="summaryYear"
+            type="number"
+            class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+            @change="fetchSummary(1)"
           />
         </div>
       </div>
@@ -123,7 +144,7 @@
       </div>
 
       <!-- Filters -->
-      <div class="grid grid-cols-3 gap-4 mb-4">
+      <!-- <div class="grid grid-cols-3 gap-4 mb-4">
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Search Employee</label>
           <input
@@ -155,6 +176,56 @@
             class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
             @change="fetchRecords(1)"
           />
+        </div>
+      </div> -->
+      <!-- Filters -->
+      <div class="bg-white rounded-lg shadow p-6 mb-6">
+        <div class="grid grid-cols-4 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Search Employee</label>
+            <input
+              v-model="employeeSearch"
+              type="text"
+              placeholder="Type employee name..."
+              class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+              @input="debounceSearch"
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Department</label>
+            <select
+              v-model="selectedDepartment"
+              class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+              @change="fetchRecords(1)"
+            >
+              <option value="">All Departments</option>
+              <option v-for="dept in departments" :key="dept.id" :value="dept.id">
+                {{ dept.name }}
+              </option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Leave Type</label>
+            <select
+              v-model="selectedLeaveType"
+              class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+              @change="fetchRecords(1)"
+            >
+              <option value="">All Types</option>
+              <option v-for="config in leaveConfigs" :key="config.id" :value="config.code">
+                {{ config.name }}
+              </option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Year</label>
+            <input
+              v-model="selectedYear"
+              type="number"
+              class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+              @change="fetchRecords(1)"
+            />
+          </div>
         </div>
       </div>
 
@@ -247,6 +318,9 @@ const employeeSearch = ref('')
 const selectedLeaveType = ref('')
 const selectedYear = ref(currentYear)
 const leaveConfigs = ref([])
+const selectedDepartment = ref('')
+const departments = ref([])
+const summaryDepartment = ref('')
 
 let searchTimeout = null
 
@@ -278,6 +352,7 @@ async function fetchSummary(page = 1) {
     const params = new URLSearchParams({ page })
     if (summaryYear.value) params.append('year', summaryYear.value)
     if (summarySearch.value) params.append('search', summarySearch.value)
+    if (summaryDepartment.value) params.append('department_id', summaryDepartment.value)
 
     console.log('Fetching summary with params:', params.toString()) // ← add this
     const response = await api.get(`/leave-records/summary?${params}`)
@@ -297,6 +372,7 @@ async function fetchRecords(page = 1) {
     if (employeeSearch.value) params.append('search', employeeSearch.value)
     if (selectedLeaveType.value) params.append('leave_type', selectedLeaveType.value)
     if (selectedYear.value) params.append('year', selectedYear.value)
+    if (selectedDepartment.value) params.append('department_id', selectedDepartment.value)
 
     const response = await api.get(`/leave-records?${params}`)
     records.value = response.data.data
@@ -324,7 +400,8 @@ function clearFilter() {
 onMounted(async () => {
   await fetchSummary()
   await fetchRecords()
-
+  const deptResponse = await api.get('/departments')
+  departments.value = deptResponse.data.data
   try {
     const configResponse = await api.get('/leave-configurations')
     leaveConfigs.value = configResponse.data

@@ -1,1 +1,28 @@
 @import 'tailwindcss';
+/* Add this @theme block to your main.css (wherever you currently have
+   @import "tailwindcss";) — Tailwind v4 reads design tokens from CSS,
+   not a JS config file. This generates bg-navy, text-teal-600, font-serif, etc. */
+
+@theme {
+  --color-navy: #1b3a5c;
+  --color-navy-deep: #122942;
+  --color-sky: #eaf2fa;
+  --color-sky-100: #dce9f5;
+  --color-sky-300: #9db6cc;
+  --color-teal-600: #2f8b7c;
+  --color-teal-tint: #e4f3f0;
+  --color-amber-500: #e3a23b;
+  --color-amber-tint: #fbf1df;
+  --color-rose-100: #f8e9e6;
+  --color-rose-200: #ebc9c1;
+
+  --font-serif: 'Newsreader', ui-serif, Georgia, serif;
+  --font-sans: 'Manrope', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+}
+
+/* Add this to the <head> of index.html (or import in main.css): */
+/*
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600;6..72,700&family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+*/

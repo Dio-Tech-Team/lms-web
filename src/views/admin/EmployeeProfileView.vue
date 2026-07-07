@@ -372,15 +372,21 @@
               <div class="grid grid-cols-3 gap-2 text-center">
                 <div>
                   <p class="text-xs text-gray-500">Total</p>
-                  <p class="text-lg font-bold text-gray-800">{{ credit.total_credits }}</p>
+                  <p class="text-lg font-bold text-gray-800">
+                    {{ Number(credit.total_credits).toFixed(3) }}
+                  </p>
                 </div>
                 <div>
                   <p class="text-xs text-gray-500">Used</p>
-                  <p class="text-lg font-bold text-red-600">{{ credit.used_credits }}</p>
+                  <p class="text-lg font-bold text-red-600">
+                    {{ Number(credit.used_credits).toFixed(3) }}
+                  </p>
                 </div>
                 <div>
                   <p class="text-xs text-gray-500">Remaining</p>
-                  <p class="text-lg font-bold text-green-600">{{ credit.remaining_balance }}</p>
+                  <p class="text-lg font-bold text-green-600">
+                    {{ Number(credit.remaining_balance).toFixed(3) }}
+                  </p>
                 </div>
               </div>
             </div>

@@ -356,6 +356,16 @@
         placeholder="Search employees..."
         class="border border-gray-300 rounded px-3 py-2 text-sm w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
+
+      <select
+        v-model="selectedDepartment"
+        class="border border-gray-300 rounded px-3 py-2 text-sm w-52 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-600"
+      >
+        <option value="">All Departments</option>
+        <option v-for="dept in departments" :key="dept.id" :value="dept.id">
+          {{ dept.name }}
+        </option>
+      </select>
     </div>
 
     <!-- Table -->
@@ -427,10 +437,12 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '@/api/axios'
+import { watch } from 'vue'
 
 const router = useRouter()
 const employees = ref([])
 const search = ref('')
+const selectedDepartment = ref('') //
 const showAddModal = ref(false)
 const currentPage = ref(1)
 const lastPage = ref(1)
@@ -471,7 +483,13 @@ const form = ref({
 
 async function fetchEmployees(page = 1) {
   try {
-    const employeeResponse = await api.get(`/employees?page=${page}`)
+    // const employeeResponse = await api.get(`/employees?page=${page}`)
+    const employeeResponse = await api.get(`/employees`, {
+      params: {
+        page: page,
+        department_id: selectedDepartment.value,
+      },
+    })
     employees.value = employeeResponse.data.data
     currentPage.value = employeeResponse.data.current_page
     lastPage.value = employeeResponse.data.last_page
@@ -517,6 +535,9 @@ onMounted(async () => {
   } catch (error) {
     console.error('Error fetching departments:', error)
   }
+})
+watch(selectedDepartment, () => {
+  fetchEmployees(1) // Reset to page 1 on filter change
 })
 
 function viewEmployee(id) {

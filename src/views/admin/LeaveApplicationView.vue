@@ -1,262 +1,48 @@
-<!-- <template>
-  <div>
-
-    <div class="flex items-center justify-between mb-6">
-      <h1 class="text-2xl font-bold text-gray-700">Leave Applications</h1>
-    </div>
-
-    <div class="flex gap-2 mb-6">
-      <button
-        @click="filterStatus = ''"
-        :class="filterStatus === '' ? 'bg-gray-600 text-white' : 'bg-white text-gray-600'"
-        class="px-4 py-2 rounded text-sm border border-gray-300"
-      >
-        All
-      </button>
-      <button
-        @click="filterStatus = 'pending'"
-        :class="filterStatus === 'pending' ? 'bg-gray-600 text-white' : 'bg-white text-gray-600'"
-        class="px-4 py-2 rounded text-sm border border-gray-300"
-      >
-        Pending
-      </button>
-      <button
-        @click="filterStatus = 'approved'"
-        :class="filterStatus === 'approved' ? 'bg-gray-600 text-white' : 'bg-white text-gray-600'"
-        class="px-4 py-2 rounded text-sm border border-gray-300"
-      >
-        Approved
-      </button>
-      <button
-        @click="filterStatus = 'cancelled'"
-        :class="filterStatus === 'cancelled' ? 'bg-gray-600 text-white' : 'bg-white text-gray-600'"
-        class="px-4 py-2 rounded text-sm border border-gray-300"
-      >
-        Cancelled
-      </button>
-    </div>
-
-    <div v-if="loading" class="flex items-center justify-center py-20">
-      <div
-        class="w-8 h-8 border-4 border-gray-600 border-t-transparent rounded-full animate-spin"
-      ></div>
-    </div>
-
-
-    <div v-else class="bg-white rounded-lg shadow overflow-hidden">
-      <table class="w-full text-sm">
-        <thead class="bg-gray-50 border-b">
-          <tr>
-            <th class="text-left px-4 py-3 text-gray-600 font-medium">Employee</th>
-            <th class="text-left px-4 py-3 text-gray-600 font-medium">Leave Type</th>
-            <th class="text-left px-4 py-3 text-gray-600 font-medium">Start Date</th>
-            <th class="text-left px-4 py-3 text-gray-600 font-medium">End Date</th>
-            <th class="text-left px-4 py-3 text-gray-600 font-medium">Days</th>
-            <th class="text-left px-4 py-3 text-gray-600 font-medium">Reason</th>
-            <th class="text-left px-4 py-3 text-gray-600 font-medium">Status</th>
-
-            <th class="text-left px-4 py-3 text-gray-600 font-medium">Actions</th>
-
-            <th class="text-left px-4 py-3 text-gray-600 font-medium">Form</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="app in filteredApplications" :key="app.id" class="border-b hover:bg-gray-50">
-            <td class="px-4 py-3">{{ app.first_name }} {{ app.surname }}</td>
-            <td class="px-4 py-3">
-              <span class="bg-gray-100 text-white-700 px-2 py-1 rounded text-xs font-medium">
-                {{ app.leave_type_code }}
-              </span>
-            </td>
-            <td class="px-4 py-3">{{ formatDate(app.start_date) }}</td>
-            <td class="px-4 py-3">{{ formatDate(app.end_date) }}</td>
-            <td class="px-4 py-3">{{ app.days_applied }}</td>
-            <td class="px-4 py-3">{{ app.reason || 'N/A' }}</td>
-            <td class="px-4 py-3">
-              <span
-                :class="{
-                  'bg-gray-100 text-yellow-700': app.status === 'pending',
-                  'bg-gray-100 text-green-700': app.status === 'approved',
-                  'bg-gray-100 text-red-700': app.status === 'cancelled',
-                }"
-                class="px-2 py-1 rounded-full text-xs font-medium capitalize"
-              >
-                {{ app.status }}
-              </span>
-            </td>
-            <td class="px-4 py-3">
-              <div v-if="app.status === 'pending'" class="flex gap-2">
-                <button
-                  @click="handleApprove(app.id)"
-                  class="text-green-600 hover:text-green-700 text-sm"
-                >
-                  Approve
-                </button>
-                <button
-                  @click="handleCancel(app.id)"
-                  class="text-red-600 hover:text-red-700 text-sm"
-                >
-                  Cancel
-                </button>
-              </div>
-
-              <span v-else class="text-gray-400 text-sm">
-                {{ app.reviewed_by ? 'By ' + app.reviewed_by : '-' }}
-              </span>
-            </td>
-            <td class="px-4 py-3 text-center">
-              <button
-                @click="viewLeaveForm(app.id)"
-                class="text-blue-600 hover:text-blue-800 font-medium text-sm inline-flex items-center gap-1"
-                title="View/Print Form"
-              >
-                📄 View Form
-              </button>
-            </td>
-
-            <td class="px-4 py-3"></td>
-          </tr>
-          <tr v-if="filteredApplications.length === 0">
-            <td colspan="8" class="px-4 py-8 text-center text-gray-500">No applications found</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div
-      v-if="pdfUrl"
-      class="mt-8 bg-white rounded-lg shadow border border-gray-200 overflow-hidden"
-    >
-      <div class="flex items-center justify-between px-4 py-3 bg-gray-50 border-b">
-        <span class="font-bold text-gray-700 text-sm">Form Document View</span>
-        <button @click="pdfUrl = null" class="text-xs text-red-500 hover:underline">
-          Close View
-        </button>
-      </div>
-      <div class="h-[600px]">
-        <iframe :src="pdfUrl" class="w-full h-full border-0"></iframe>
-      </div>
-    </div>
-  </div>
-</template>
-
-<script setup>
-import { ref, onMounted, computed, onUnmounted } from 'vue'
-import api from '@/api/axios'
-
-const pdfModalOpen = ref(false)
-const pdfUrl = ref(null)
-
-const applications = ref([])
-const loading = ref(true)
-const filterStatus = ref('')
-
-const filteredApplications = computed(() => {
-  if (!filterStatus.value) return applications.value
-  return applications.value.filter((app) => app.status === filterStatus.value)
-})
-
-onMounted(async () => {
-  await fetchApplications()
-})
-
-async function fetchApplications() {
-  loading.value = true
-  try {
-    const response = await api.get('/leave-applications')
-    applications.value = response.data?.data || response.data || []
-  } catch (error) {
-    console.error('Error fetching applications:', error)
-    applications.value = []
-  } finally {
-    loading.value = false
-  }
-}
-async function handleApprove(id) {
-  if (confirm('Are you sure you want to approve this leave application?')) {
-    try {
-      await api.post(`/leave-applications/${id}/approve`)
-      await fetchApplications()
-    } catch (err) {
-      console.error('Failed to approve', err)
-    }
-  }
-}
-
-async function handleCancel(id) {
-  if (confirm('Are you sure you want to cancel this leave application?')) {
-    try {
-      await api.post(`/leave-applications/${id}/cancel`)
-      await fetchApplications()
-    } catch (err) {
-      console.error('Failed to cancel', err)
-    }
-  }
-}
-function formatDate(dateString) {
-  if (!dateString) return 'N/A'
-  return dateString.split('T')[0]
-}
-
-async function viewLeaveForm(id) {
-  loading.value = true 
-  try {
-    const response = await api.get(`/leave-applications/${id}/pdf`, {
-      responseType: 'blob',
-    })
-
-    if (pdfUrl.value) {
-      URL.revokeObjectURL(pdfUrl.value)
-    }
-
-    const file = new Blob([response.data], { type: 'application/pdf' })
-    pdfUrl.value = URL.createObjectURL(file)
-    pdfModalOpen.value = true
-  } catch (error) {
-    console.error('Failed to load leave application PDF:', error)
-    alert('Could not generate leave form inside the panel.')
-  } finally {
-    loading.value = false
-  }
-}
-
-</script> -->
 <template>
   <div>
     <!-- Header -->
     <div class="flex items-center justify-between mb-6">
-      <h1 class="text-2xl font-bold text-gray-700">Leave Applications</h1>
+      <div>
+        <!-- <p class="text-[11px] uppercase tracking-wider text-teal-600 font-bold mb-1">Leave</p> -->
+        <h1 class="text-2xl font-bold text-gray-700">Leave Applications</h1>
+      </div>
     </div>
 
     <!-- Filter Tabs -->
-    <div class="flex gap-2 mb-6">
+    <div class="flex gap-2 mb-5">
       <button
         v-for="tab in ['', 'pending', 'approved', 'cancelled']"
         :key="tab"
         @click="setFilter(tab)"
-        :class="filterStatus === tab ? 'bg-gray-600 text-white' : 'bg-white text-gray-600'"
-        class="px-4 py-2 rounded text-sm border border-gray-300 capitalize"
+        :class="
+          filterStatus === tab
+            ? 'bg-navy text-white border-navy'
+            : 'bg-white text-slate-600 border-sky-100 hover:bg-sky'
+        "
+        class="px-4 py-2 rounded-xl text-sm font-semibold border capitalize transition-colors"
       >
         {{ tab === '' ? 'All' : tab }}
       </button>
     </div>
+
     <!-- Filters -->
-    <div class="bg-white rounded-lg shadow p-4 mb-6">
+    <div class="bg-white rounded-2xl border border-sky-100 p-5 mb-6">
       <div class="grid grid-cols-3 gap-4">
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Search Employee</label>
+          <label class="block text-sm font-medium text-navy-deep mb-1.5">Search Employee</label>
           <input
             v-model="search"
             type="text"
             placeholder="Type employee name..."
-            class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+            class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
             @input="debounceSearch"
           />
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Department</label>
+          <label class="block text-sm font-medium text-navy-deep mb-1.5">Department</label>
           <select
             v-model="selectedDepartment"
-            class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+            class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
             @change="fetchApplications(1)"
           >
             <option value="">All Departments</option>
@@ -266,11 +52,11 @@ async function viewLeaveForm(id) {
           </select>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Year</label>
+          <label class="block text-sm font-medium text-navy-deep mb-1.5">Year</label>
           <input
             v-model="selectedYear"
             type="number"
-            class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+            class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
             @change="fetchApplications(1)"
           />
         </div>
@@ -278,105 +64,169 @@ async function viewLeaveForm(id) {
     </div>
 
     <!-- Loading -->
-    <div v-if="loading" class="flex items-center justify-center py-20">
+    <div v-if="loading" class="flex items-center justify-center gap-3 py-24">
       <div
-        class="w-8 h-8 border-4 border-gray-600 border-t-transparent rounded-full animate-spin"
+        class="w-6 h-6 border-[3px] border-teal-600 border-t-transparent rounded-full animate-spin"
       ></div>
+      <span class="text-slate-500 text-sm">Loading applications...</span>
     </div>
 
     <!-- Table -->
-    <div v-else class="bg-white rounded-lg shadow overflow-hidden">
+    <div v-else class="bg-white rounded-2xl border border-sky-100 overflow-hidden">
       <table class="w-full text-sm">
-        <thead class="bg-gray-50 border-b">
+        <thead class="bg-sky/60 border-b border-sky-100">
           <tr>
-            <th class="text-left px-4 py-3 text-gray-600 font-medium">Employee</th>
-            <th class="text-left px-4 py-3 text-gray-600 font-medium">Department</th>
-            <th class="text-left px-4 py-3 text-gray-600 font-medium">Leave Type</th>
-            <th class="text-left px-4 py-3 text-gray-600 font-medium">Start Date</th>
-            <th class="text-left px-4 py-3 text-gray-600 font-medium">End Date</th>
-            <th class="text-left px-4 py-3 text-gray-600 font-medium">Days</th>
-            <th class="text-left px-4 py-3 text-gray-600 font-medium">Reason</th>
-            <th class="text-left px-4 py-3 text-gray-600 font-medium">Status</th>
-            <th class="text-left px-4 py-3 text-gray-600 font-medium">Actions</th>
-            <th class="text-left px-4 py-3 text-gray-600 font-medium">Form</th>
+            <th
+              class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+            >
+              Employee
+            </th>
+            <th
+              class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+            >
+              Type
+            </th>
+            <th
+              class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+            >
+              Department
+            </th>
+            <th
+              class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+            >
+              Start
+            </th>
+            <th
+              class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+            >
+              End
+            </th>
+            <th
+              class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+            >
+              Days
+            </th>
+            <th
+              class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+            >
+              Reason
+            </th>
+            <th
+              class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+            >
+              Status
+            </th>
+            <th
+              class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+            >
+              Actions
+            </th>
+            <th
+              class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+            >
+              Form
+            </th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="app in applications" :key="app.id" class="border-b hover:bg-gray-50">
-            <td class="px-4 py-3">{{ app.first_name }} {{ app.surname }}</td>
-            <td class="px-4 py-3">
-              <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs font-medium">
+          <tr
+            v-for="app in applications"
+            :key="app.id"
+            class="border-b border-sky-100 last:border-b-0 hover:bg-sky/40 transition-colors"
+          >
+            <td class="px-4 py-3.5 font-semibold text-navy-deep">
+              {{ app.first_name }} {{ app.surname }}
+            </td>
+            <td class="px-4 py-3.5">
+              <span
+                class="bg-sky-100 text-navy px-2 py-0.5 rounded-full text-[11px] font-bold font-mono"
+              >
                 {{ app.leave_type_code }}
               </span>
             </td>
-            <td class="px-4 py-3 text-gray-700">{{ app.department_name }}</td>
-            <td class="px-4 py-3">{{ formatDate(app.start_date) }}</td>
-            <td class="px-4 py-3">{{ formatDate(app.end_date) }}</td>
-            <td class="px-4 py-3">{{ app.days_applied }}</td>
-            <td class="px-4 py-3">{{ app.reason || 'N/A' }}</td>
-            <td class="px-4 py-3">
+            <td class="px-4 py-3.5 text-slate-600">{{ app.department_name }}</td>
+            <td class="px-4 py-3.5 font-mono text-[12.5px] text-slate-500">
+              {{ formatDate(app.start_date) }}
+            </td>
+            <td class="px-4 py-3.5 font-mono text-[12.5px] text-slate-500">
+              {{ formatDate(app.end_date) }}
+            </td>
+            <td class="px-4 py-3.5 text-slate-600">{{ app.days_applied }}</td>
+            <td class="px-4 py-3.5 text-slate-600">{{ app.reason || 'N/A' }}</td>
+            <td class="px-4 py-3.5">
               <span
+                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold capitalize"
                 :class="{
-                  'bg-yellow-100 text-yellow-700': app.status === 'pending',
-                  'bg-green-100 text-green-700': app.status === 'approved',
-                  'bg-red-100 text-red-700': app.status === 'cancelled',
+                  'bg-amber-tint text-amber-700': app.status === 'pending',
+                  'bg-teal-tint text-teal-700': app.status === 'approved',
+                  'bg-rose-tint text-rose-700': app.status === 'cancelled',
                 }"
-                class="px-2 py-1 rounded-full text-xs font-medium capitalize"
               >
+                <span
+                  class="w-1.5 h-1.5 rounded-full"
+                  :class="{
+                    'bg-amber-700': app.status === 'pending',
+                    'bg-teal-700': app.status === 'approved',
+                    'bg-rose-700': app.status === 'cancelled',
+                  }"
+                ></span>
                 {{ app.status }}
               </span>
             </td>
-            <td class="px-4 py-3">
-              <div v-if="app.status === 'pending'" class="flex gap-2">
+            <td class="px-4 py-3.5">
+              <div v-if="app.status === 'pending'" class="flex gap-3">
                 <button
                   @click="handleApprove(app.id)"
-                  class="text-green-600 hover:text-green-700 text-sm"
+                  class="text-teal-700 hover:text-teal-800 font-semibold text-sm transition-colors"
                 >
                   Approve
                 </button>
                 <button
                   @click="handleCancel(app.id)"
-                  class="text-red-600 hover:text-red-700 text-sm"
+                  class="text-rose-600 hover:text-rose-700 font-semibold text-sm transition-colors"
                 >
                   Cancel
                 </button>
               </div>
-              <span v-else class="text-gray-400 text-sm">
-                {{ app.reviewed_by_username ? 'By ' + app.reviewed_by_username : '-' }}
+              <span v-else class="text-slate-400 text-sm">
+                {{ app.reviewed_by_username ? 'By ' + app.reviewed_by_username : '—' }}
               </span>
             </td>
-            <td class="px-4 py-3 text-center">
+            <td class="px-4 py-3.5 text-center">
               <button
                 @click="viewLeaveForm(app.id)"
-                class="text-blue-600 hover:text-blue-800 font-medium text-sm inline-flex items-center gap-1"
+                class="text-navy hover:text-navy-deep font-semibold text-sm inline-flex items-center gap-1.5 transition-colors"
               >
-                📄 View Form
+                📄 View
               </button>
             </td>
           </tr>
           <tr v-if="applications.length === 0">
-            <td colspan="10" class="px-4 py-8 text-center text-gray-500">No applications found</td>
+            <td colspan="10" class="px-4 py-12 text-center text-slate-400 text-sm">
+              No applications found
+            </td>
           </tr>
         </tbody>
       </table>
 
       <!-- Pagination -->
-      <div class="flex items-center justify-between px-4 py-3 border-t">
-        <p class="text-sm text-gray-500">
-          Page {{ currentPage }} of {{ lastPage }} ({{ total }} total applications)
+      <div class="flex items-center justify-between px-5 py-4 border-t border-sky-100 bg-sky/30">
+        <p class="text-[12.5px] text-slate-500">
+          Page <span class="font-semibold text-navy-deep">{{ currentPage }}</span> of {{ lastPage }}
+          <span class="text-slate-400">· {{ total }} total applications</span>
         </p>
         <div class="flex gap-2">
           <button
             @click="fetchApplications(currentPage - 1)"
             :disabled="currentPage === 1"
-            class="px-3 py-1.5 text-sm border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50"
+            class="px-3.5 py-1.5 text-[12.5px] font-semibold border border-sky-100 rounded-lg bg-white hover:bg-sky text-navy transition-colors disabled:opacity-40 disabled:hover:bg-white"
           >
             ← Previous
           </button>
           <button
             @click="fetchApplications(currentPage + 1)"
             :disabled="currentPage === lastPage"
-            class="px-3 py-1.5 text-sm border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50"
+            class="px-3.5 py-1.5 text-[12.5px] font-semibold border border-sky-100 rounded-lg bg-white hover:bg-sky text-navy transition-colors disabled:opacity-40 disabled:hover:bg-white"
           >
             Next →
           </button>
@@ -385,13 +235,13 @@ async function viewLeaveForm(id) {
     </div>
 
     <!-- PDF Preview -->
-    <div
-      v-if="pdfUrl"
-      class="mt-8 bg-white rounded-lg shadow border border-gray-200 overflow-hidden"
-    >
-      <div class="flex items-center justify-between px-4 py-3 bg-gray-50 border-b">
-        <span class="font-bold text-gray-700 text-sm">Form Document View</span>
-        <button @click="pdfUrl = null" class="text-xs text-red-500 hover:underline">
+    <div v-if="pdfUrl" class="mt-6 bg-white rounded-2xl border border-sky-100 overflow-hidden">
+      <div class="flex items-center justify-between px-5 py-3.5 bg-sky/60 border-b border-sky-100">
+        <span class="font-serif font-semibold text-navy-deep text-sm">Form Document View</span>
+        <button
+          @click="pdfUrl = null"
+          class="text-[12.5px] font-semibold text-rose-600 hover:text-rose-700 transition-colors"
+        >
           Close View
         </button>
       </div>

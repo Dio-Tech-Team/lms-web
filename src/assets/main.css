@@ -19,6 +19,10 @@
   --font-serif: 'Newsreader', ui-serif, Georgia, serif;
   --font-sans: 'Manrope', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  /* Optimized Typography Configuration
+  /* --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-serif: 'Playfair Display', ui-serif, Georgia, serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace; */
 }
 
 /* Add this to the <head> of index.html (or import in main.css): */

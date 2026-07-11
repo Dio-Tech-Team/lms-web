@@ -1,140 +1,150 @@
 <template>
   <div>
     <!-- Header -->
-    <div class="flex items-center justify-between mb-6">
-      <h1 class="text-2xl font-bold text-gray-600">Employees</h1>
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <!-- <p class="text-[11px] uppercase tracking-wider text-teal-600 font-bold mb-1">Records</p> -->
+        <h1 class="text-2xl font-bold text-gray-700">Employees</h1>
+      </div>
       <button
         @click="showAddModal = true"
-        class="bg-gray-600 text-white px-4 py-2 rounded text-sm hover:bg-gray-700"
+        class="bg-navy text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-navy-deep transition-colors shadow-sm"
       >
-        Add Employee
+        + Add Employee
       </button>
 
       <!-- Add Employee Modal -->
       <div
         v-if="showAddModal"
-        class="fixed inset-0 bg-gray-200 bg-opacity-50 flex items-center justify-center z-50"
+        class="fixed inset-0 bg-navy-deep/40 backdrop-blur-sm flex items-center justify-center z-50 p-4"
       >
         <div
-          class="bg-white rounded-lg shadow-lg w-full max-w-2xl p-6 max-h-screen overflow-y-auto"
+          class="bg-white rounded-3xl shadow-xl w-full max-w-2xl p-7 max-h-[90vh] overflow-y-auto"
         >
           <div class="flex items-center justify-between mb-6">
-            <h2 class="text-xl font-bold text-gray-800">Add New Employee</h2>
-            <button @click="showAddModal = false" class="text-gray-400 hover:text-gray-600 text-xl">
+            <h2 class="font-serif text-xl font-semibold text-navy-deep">Add New Employee</h2>
+            <button
+              @click="showAddModal = false"
+              class="w-8 h-8 rounded-xl flex items-center justify-center text-slate-400 hover:bg-sky hover:text-navy transition-colors text-lg"
+            >
               ✕
             </button>
           </div>
 
           <div
             v-if="formError"
-            class="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded mb-4 text-sm"
+            class="bg-rose-tint border border-rose-200 text-rose-700 px-4 py-3 rounded-xl mb-5 text-sm"
           >
             {{ formError }}
           </div>
 
           <form @submit.prevent="handleAddEmployee">
-            <h3 class="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">
+            <h3 class="text-[11px] font-bold text-teal-600 mb-3 uppercase tracking-wider">
               Account Information
             </h3>
-            <div class="grid grid-cols-2 gap-4 mb-4">
+            <div class="grid grid-cols-2 gap-4 mb-6">
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                <label class="block text-sm font-medium text-navy-deep mb-1.5">Username</label>
                 <input
                   v-model="form.username"
                   type="text"
-                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
                   required
                 />
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <label class="block text-sm font-medium text-navy-deep mb-1.5">Email</label>
                 <input
                   v-model="form.email"
                   type="email"
-                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
                   required
                 />
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                <label class="block text-sm font-medium text-navy-deep mb-1.5">Password</label>
                 <input
                   v-model="form.password"
                   type="password"
-                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
                   required
                 />
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+                <label class="block text-sm font-medium text-navy-deep mb-1.5"
+                  >Confirm Password</label
+                >
                 <input
                   v-model="form.password_confirmation"
                   type="password"
-                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
                   required
                 />
               </div>
             </div>
 
-            <h3 class="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">
+            <h3 class="text-[11px] font-bold text-teal-600 mb-3 uppercase tracking-wider">
               Personal Information
             </h3>
-            <div class="grid grid-cols-2 gap-4 mb-4">
+            <div class="grid grid-cols-2 gap-4 mb-6">
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                <label class="block text-sm font-medium text-navy-deep mb-1.5">First Name</label>
                 <input
                   v-model="form.first_name"
                   type="text"
-                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
                   required
                 />
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Middle Name</label>
+                <label class="block text-sm font-medium text-navy-deep mb-1.5">Middle Name</label>
                 <input
                   v-model="form.middle_name"
                   type="text"
-                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
                 />
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Surname</label>
+                <label class="block text-sm font-medium text-navy-deep mb-1.5">Surname</label>
                 <input
                   v-model="form.surname"
                   type="text"
-                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
                   required
                 />
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">ID Number</label>
+                <label class="block text-sm font-medium text-navy-deep mb-1.5">ID Number</label>
                 <input
                   v-model="form.id_number"
                   type="text"
-                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
                   required
                 />
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Birthdate</label>
+                <label class="block text-sm font-medium text-navy-deep mb-1.5">Birthdate</label>
                 <input
                   v-model="form.birthdate"
                   type="date"
-                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
                 />
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Place of Birth</label>
+                <label class="block text-sm font-medium text-navy-deep mb-1.5"
+                  >Place of Birth</label
+                >
                 <input
                   v-model="form.place_of_birth"
                   type="text"
-                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
                 />
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Sex</label>
+                <label class="block text-sm font-medium text-navy-deep mb-1.5">Sex</label>
                 <select
                   v-model="form.sex"
-                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
                   required
                 >
                   <option value="">Select Sex</option>
@@ -143,10 +153,10 @@
                 </select>
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Civil Status</label>
+                <label class="block text-sm font-medium text-navy-deep mb-1.5">Civil Status</label>
                 <select
                   v-model="form.civil_status"
-                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
                   required
                 >
                   <option value="">Select Civil Status</option>
@@ -157,39 +167,39 @@
                 </select>
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Height</label>
+                <label class="block text-sm font-medium text-navy-deep mb-1.5">Height</label>
                 <input
                   v-model="form.height"
                   type="text"
                   placeholder="e.g. 5'6&quot;"
-                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
                 />
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Weight</label>
+                <label class="block text-sm font-medium text-navy-deep mb-1.5">Weight</label>
                 <input
                   v-model="form.weight"
                   type="text"
                   placeholder="e.g. 65kg"
-                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
                 />
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Blood Type</label>
+                <label class="block text-sm font-medium text-navy-deep mb-1.5">Blood Type</label>
                 <input
                   v-model="form.bloodtype"
                   type="text"
                   placeholder="e.g. O+"
-                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
                 />
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1"
+                <label class="block text-sm font-medium text-navy-deep mb-1.5"
                   >Highest Educational Attainment</label
                 >
                 <select
                   v-model="form.highest_educational_attainment"
-                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
                   required
                 >
                   <option value="">Select</option>
@@ -202,96 +212,98 @@
               </div>
             </div>
 
-            <h3 class="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">
+            <h3 class="text-[11px] font-bold text-teal-600 mb-3 uppercase tracking-wider">
               Contact & Address
             </h3>
-            <div class="grid grid-cols-2 gap-4 mb-4">
+            <div class="grid grid-cols-2 gap-4 mb-6">
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1"
+                <label class="block text-sm font-medium text-navy-deep mb-1.5"
                   >Residential Address</label
                 >
                 <input
                   v-model="form.residential_address"
                   type="text"
-                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
                 />
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Contact Number</label>
+                <label class="block text-sm font-medium text-navy-deep mb-1.5"
+                  >Contact Number</label
+                >
                 <input
                   v-model="form.contact_number"
                   type="text"
-                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
                 />
               </div>
             </div>
 
-            <h3 class="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">
+            <h3 class="text-[11px] font-bold text-teal-600 mb-3 uppercase tracking-wider">
               Government IDs
             </h3>
-            <div class="grid grid-cols-2 gap-4 mb-4">
+            <div class="grid grid-cols-2 gap-4 mb-6">
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">UMID</label>
+                <label class="block text-sm font-medium text-navy-deep mb-1.5">UMID</label>
                 <input
                   v-model="form.umid_id"
                   type="text"
-                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
                 />
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Pag-IBIG ID</label>
+                <label class="block text-sm font-medium text-navy-deep mb-1.5">Pag-IBIG ID</label>
                 <input
                   v-model="form.pagibig_id"
                   type="text"
-                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
                 />
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1"
+                <label class="block text-sm font-medium text-navy-deep mb-1.5"
                   >PhilHealth Number</label
                 >
                 <input
                   v-model="form.philhealth_number"
                   type="text"
-                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
                 />
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">PSN Number</label>
+                <label class="block text-sm font-medium text-navy-deep mb-1.5">PSN Number</label>
                 <input
                   v-model="form.psn_number"
                   type="text"
-                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
                 />
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">TIN Number</label>
+                <label class="block text-sm font-medium text-navy-deep mb-1.5">TIN Number</label>
                 <input
                   v-model="form.tin_number"
                   type="text"
-                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
                 />
               </div>
             </div>
 
-            <h3 class="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">
+            <h3 class="text-[11px] font-bold text-teal-600 mb-3 uppercase tracking-wider">
               Employment Information
             </h3>
-            <div class="grid grid-cols-2 gap-4 mb-6">
+            <div class="grid grid-cols-2 gap-4 mb-7">
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Position</label>
+                <label class="block text-sm font-medium text-navy-deep mb-1.5">Position</label>
                 <input
                   v-model="form.position"
                   type="text"
-                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
                   required
                 />
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Department</label>
+                <label class="block text-sm font-medium text-navy-deep mb-1.5">Department</label>
                 <select
                   v-model="form.department_id"
-                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
                   required
                 >
                   <option value="">Select Department</option>
@@ -301,12 +313,12 @@
                 </select>
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1"
+                <label class="block text-sm font-medium text-navy-deep mb-1.5"
                   >Employment Status</label
                 >
                 <select
                   v-model="form.employment_status"
-                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
                   required
                 >
                   <option value="">Select Status</option>
@@ -317,11 +329,11 @@
                 </select>
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Date Hired</label>
+                <label class="block text-sm font-medium text-navy-deep mb-1.5">Date Hired</label>
                 <input
                   v-model="form.date_hired"
                   type="date"
-                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
                   required
                 />
               </div>
@@ -331,14 +343,14 @@
               <button
                 type="button"
                 @click="showAddModal = false"
-                class="px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded hover:bg-gray-50"
+                class="px-5 py-2.5 text-sm font-semibold text-navy border border-sky-100 rounded-xl hover:bg-sky transition-colors"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 :disabled="formLoading"
-                class="px-4 py-2 text-sm bg-gray-600 text-white rounded hover:bg-gray-700 disabled:opacity-50"
+                class="px-5 py-2.5 text-sm font-semibold bg-navy text-white rounded-xl hover:bg-navy-deep transition-colors disabled:opacity-50"
               >
                 {{ formLoading ? 'Saving...' : 'Save Employee' }}
               </button>
@@ -348,18 +360,32 @@
       </div>
     </div>
 
-    <!-- Search -->
-    <div class="mb-4">
-      <input
-        v-model="search"
-        type="text"
-        placeholder="Search employees..."
-        class="border border-gray-300 rounded px-3 py-2 text-sm w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
-      />
+    <!-- Search + Filter -->
+    <div class="mb-5 flex gap-3">
+      <div class="relative w-64">
+        <svg
+          class="absolute left-3.5 top-1/2 -translate-y-1/2"
+          width="15"
+          height="15"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#8B98A6"
+          stroke-width="2"
+        >
+          <circle cx="11" cy="11" r="7" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+        <input
+          v-model="search"
+          type="text"
+          placeholder="Search employees..."
+          class="w-full border border-sky-100 rounded-xl pl-9 pr-3.5 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-teal-600 transition-colors"
+        />
+      </div>
 
       <select
         v-model="selectedDepartment"
-        class="border border-gray-300 rounded px-3 py-2 text-sm w-52 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-600"
+        class="border border-sky-100 rounded-xl px-3.5 py-2.5 text-sm w-56 bg-white text-navy-deep focus:outline-none focus:ring-2 focus:ring-teal-600 transition-colors"
       >
         <option value="">All Departments</option>
         <option v-for="dept in departments" :key="dept.id" :value="dept.id">
@@ -369,61 +395,94 @@
     </div>
 
     <!-- Table -->
-    <div class="bg-white rounded-lg shadow overflow-hidden">
+    <div class="bg-white rounded-2xl border border-sky-100 overflow-hidden">
       <table class="w-full text-sm">
-        <thead class="bg-gray-50 border-b">
+        <thead class="bg-sky/60 border-b border-sky-100">
           <tr>
-            <th class="text-left px-4 py-3 text-gray-600 font-medium">ID Number</th>
-            <th class="text-left px-4 py-3 text-gray-600 font-medium">Name</th>
-            <th class="text-left px-4 py-3 text-gray-600 font-medium">Position</th>
-            <th class="text-left px-4 py-3 text-gray-600 font-medium">Department</th>
-            <th class="text-left px-4 py-3 text-gray-600 font-medium">Employment Status</th>
-            <th class="text-left px-4 py-3 text-gray-600 font-medium">Actions</th>
+            <th
+              class="text-left px-5 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+            >
+              ID Number
+            </th>
+            <th
+              class="text-left px-5 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+            >
+              Name
+            </th>
+            <th
+              class="text-left px-5 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+            >
+              Position
+            </th>
+            <th
+              class="text-left px-5 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+            >
+              Department
+            </th>
+            <th
+              class="text-left px-5 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+            >
+              Status
+            </th>
+            <th
+              class="text-left px-5 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+            >
+              Actions
+            </th>
           </tr>
         </thead>
         <tbody>
           <tr
             v-for="employee in filteredEmployees"
             :key="employee.id"
-            class="border-b hover:bg-gray-50"
+            class="border-b border-sky-100 last:border-b-0 hover:bg-sky/40 transition-colors"
           >
-            <td class="px-4 py-3">{{ employee.id_number }}</td>
-            <td class="px-4 py-3">{{ employee.first_name }} {{ employee.surname }}</td>
-            <td class="px-4 py-3">{{ employee.position }}</td>
-            <td class="px-4 py-3">{{ employee.department_name }}</td>
-            <td class="px-4 py-3 capitalize">{{ employee.employment_status }}</td>
-            <td class="px-4 py-3">
+            <td class="px-5 py-3.5 font-mono text-[12.5px] text-slate-500">
+              {{ employee.id_number }}
+            </td>
+            <td class="px-5 py-3.5 font-semibold text-navy-deep">
+              {{ employee.first_name }} {{ employee.surname }}
+            </td>
+            <td class="px-5 py-3.5 text-slate-600">{{ employee.position }}</td>
+            <td class="px-5 py-3.5 text-slate-600">{{ employee.department_name }}</td>
+            <td class="px-5 py-3.5 text-slate-600 capitalize">
+              {{ employee.employment_status?.replace('_', ' ') }}
+            </td>
+            <td class="px-5 py-3.5">
               <button
                 @click="viewEmployee(employee.id)"
-                class="text-blue-600 hover:text-blue-700 text-sm mr-3"
+                class="text-teal-700 hover:text-teal-800 font-semibold text-sm transition-colors"
               >
-                View
+                View →
               </button>
             </td>
           </tr>
           <tr v-if="filteredEmployees.length === 0">
-            <td colspan="6" class="px-4 py-8 text-center text-gray-500">No employees found</td>
+            <td colspan="6" class="px-5 py-12 text-center text-slate-400 text-sm">
+              No employees found
+            </td>
           </tr>
         </tbody>
       </table>
 
       <!-- Pagination Controls -->
-      <div class="flex items-center justify-between px-4 py-3 border-t">
-        <p class="text-sm text-gray-500">
-          Showing page {{ currentPage }} of {{ lastPage }} ({{ total }} total employees)
+      <div class="flex items-center justify-between px-5 py-4 border-t border-sky-100 bg-sky/30">
+        <p class="text-[12.5px] text-slate-500">
+          Page <span class="font-semibold text-navy-deep">{{ currentPage }}</span> of {{ lastPage }}
+          <span class="text-slate-400">· {{ total }} total employees</span>
         </p>
         <div class="flex gap-2">
           <button
             @click="fetchEmployees(currentPage - 1)"
             :disabled="currentPage === 1"
-            class="px-3 py-1.5 text-sm border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50"
+            class="px-3.5 py-1.5 text-[12.5px] font-semibold border border-sky-100 rounded-lg bg-white hover:bg-sky text-navy transition-colors disabled:opacity-40 disabled:hover:bg-white"
           >
             ← Previous
           </button>
           <button
             @click="fetchEmployees(currentPage + 1)"
             :disabled="currentPage === lastPage"
-            class="px-3 py-1.5 text-sm border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50"
+            class="px-3.5 py-1.5 text-[12.5px] font-semibold border border-sky-100 rounded-lg bg-white hover:bg-sky text-navy transition-colors disabled:opacity-40 disabled:hover:bg-white"
           >
             Next →
           </button>
@@ -433,6 +492,7 @@
   </div>
 </template>
 
+ 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'

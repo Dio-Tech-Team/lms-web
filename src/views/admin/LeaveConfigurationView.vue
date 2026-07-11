@@ -2,91 +2,143 @@
   <div>
     <!-- Header -->
     <div class="flex items-center justify-between mb-6">
-      <h1 class="text-2xl font-bold text-gray-700">Leave Configuration</h1>
+      <div>
+        <!-- <p class="text-[11px] uppercase tracking-wider text-teal-600 font-bold mb-1">Leave</p> -->
+        <h1 class="text-2xl font-bold text-gray-700">Leave Configuration</h1>
+      </div>
       <button
         @click="showAddModal = true"
-        class="bg-gray-600 text-white px-4 py-2 rounded text-sm hover:bg-gray-700"
+        class="bg-navy text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-navy-deep transition-colors shadow-sm"
       >
-        Add Leave Type
+        + Add Leave Type
       </button>
     </div>
 
     <!-- Loading -->
-    <div v-if="loading" class="flex items-center justify-center py-20">
+    <div v-if="loading" class="flex items-center justify-center gap-3 py-24">
       <div
-        class="w-8 h-8 border-4 border-gray -600 border-t-transparent rounded-full animate-spin"
+        class="w-6 h-6 border-[3px] border-teal-600 border-t-transparent rounded-full animate-spin"
       ></div>
+      <span class="text-slate-500 text-sm">Loading configurations...</span>
     </div>
 
     <!-- Table -->
-    <div v-else class="bg-white rounded-lg shadow overflow-hidden">
+    <div v-else class="bg-white rounded-2xl border border-sky-100 overflow-hidden">
       <table class="w-full text-sm">
-        <thead class="bg-gray-50 border-b">
+        <thead class="bg-sky/60 border-b border-sky-100">
           <tr>
-            <th class="text-left px-4 py-3 text-gray-600 font-medium">Name</th>
-            <th class="text-left px-4 py-3 text-gray-600 font-medium">Code</th>
-            <th class="text-left px-4 py-3 text-gray-600 font-medium">Applicable To</th>
-            <th class="text-left px-4 py-3 text-gray-600 font-medium">Credit Type</th>
-            <th class="text-left px-4 py-3 text-gray-600 font-medium">Credits</th>
-            <th class="text-left px-4 py-3 text-gray-600 font-medium">Carry Over</th>
-            <th class="text-left px-4 py-3 text-gray-600 font-medium">Monetize</th>
-            <th class="text-left px-4 py-3 text-gray-600 font-medium">Actions</th>
+            <th
+              class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+            >
+              Name
+            </th>
+            <th
+              class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+            >
+              Code
+            </th>
+            <th
+              class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+            >
+              Applicable To
+            </th>
+            <th
+              class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+            >
+              Credit Type
+            </th>
+            <th
+              class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+            >
+              Credits
+            </th>
+            <th
+              class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+            >
+              Carry Over
+            </th>
+            <th
+              class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+            >
+              Monetize
+            </th>
+            <th
+              class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+            >
+              Actions
+            </th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="config in configurations" :key="config.id" class="border-b hover:bg-gray-50">
-            <td class="px-4 py-3 font-sm text-gray-800">{{ config.name }}</td>
-            <td class="px-4 py-3">
-              <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs font-medium">
+          <tr
+            v-for="config in configurations"
+            :key="config.id"
+            class="border-b border-sky-100 last:border-b-0 hover:bg-sky/40 transition-colors"
+          >
+            <td class="px-4 py-3.5 font-semibold text-navy-deep">{{ config.name }}</td>
+            <td class="px-4 py-3.5">
+              <span
+                class="bg-sky-100 text-navy px-2 py-0.5 rounded-full text-[11px] font-bold font-mono"
+              >
                 {{ config.code }}
               </span>
             </td>
-            <td class="px-4 py-3 capitalize">{{ config.application_to }}</td>
-            <td class="px-4 py-3 capitalize">{{ config.credit_type }}</td>
-            <td class="px-4 py-3">
+            <td class="px-4 py-3.5 text-slate-600 capitalize">{{ config.application_to }}</td>
+            <td class="px-4 py-3.5 text-slate-600 capitalize">{{ config.credit_type }}</td>
+            <td class="px-4 py-3.5 font-mono text-[13px] text-navy-deep">
               {{
                 config.credit_type === 'monthly'
                   ? config.monthly_credit + '/month'
                   : config.fixed_days + ' days'
               }}
             </td>
-            <td class="px-4 py-3">
+            <td class="px-4 py-3.5">
               <span
+                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold"
                 :class="
-                  config.can_carry_over ? 'bg-gray-10 text-green-700' : 'bg-gray-10 text-red-700'
+                  config.can_carry_over
+                    ? 'bg-teal-tint text-teal-700'
+                    : 'bg-rose-tint text-rose-700'
                 "
-                class="px-2 py-1 rounded-full text-xs"
               >
+                <span
+                  class="w-1.5 h-1.5 rounded-full"
+                  :class="config.can_carry_over ? 'bg-teal-700' : 'bg-rose-700'"
+                ></span>
                 {{ config.can_carry_over ? 'Yes' : 'No' }}
               </span>
             </td>
-            <td class="px-4 py-3">
+            <td class="px-4 py-3.5">
               <span
+                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold"
                 :class="
-                  config.can_monetize ? 'bg-gray-10 text-green-700' : 'bg-gray-10 text-red-700'
+                  config.can_monetize ? 'bg-teal-tint text-teal-700' : 'bg-rose-tint text-rose-700'
                 "
-                class="px-2 py-1 rounded-full text-xs"
               >
+                <span
+                  class="w-1.5 h-1.5 rounded-full"
+                  :class="config.can_monetize ? 'bg-teal-700' : 'bg-rose-700'"
+                ></span>
                 {{ config.can_monetize ? 'Yes' : 'No' }}
               </span>
             </td>
-            <td class="px-4 py-3">
+            <td class="px-4 py-3.5">
               <button
                 @click="openEditModal(config)"
-                class="text-gray-600 hover:text-gray-700 text-sm mr-3"
+                class="text-navy hover:text-navy-deep font-semibold text-sm mr-4 transition-colors"
               >
                 Edit
               </button>
               <button
                 @click="handleDelete(config.id)"
-                class="text-red-600 hover:text-red-700 text-sm"
+                class="text-rose-600 hover:text-rose-700 font-semibold text-sm transition-colors"
               >
                 Delete
               </button>
             </td>
           </tr>
           <tr v-if="configurations.length === 0">
-            <td colspan="8" class="px-4 py-8 text-center text-gray-500">
+            <td colspan="8" class="px-4 py-12 text-center text-slate-400 text-sm">
               No leave types configured
             </td>
           </tr>
@@ -97,48 +149,51 @@
     <!-- Add Modal -->
     <div
       v-if="showAddModal"
-      class="fixed inset-0 bg-gray bg-opacity-50 flex items-center justify-center z-50"
+      class="fixed inset-0 bg-navy-deep/40 backdrop-blur-sm flex items-center justify-center z-50 p-4"
     >
-      <div class="bg-white rounded-lg shadow-lg w-full max-w-lg p-6">
+      <div class="bg-white rounded-3xl shadow-xl w-full max-w-lg p-7">
         <div class="flex items-center justify-between mb-6">
-          <h2 class="text-xl font-bold text-gray-800">Add Leave Type</h2>
-          <button @click="showAddModal = false" class="text-gray-400 hover:text-gray-600 text-xl">
+          <h2 class="font-serif text-xl font-semibold text-navy-deep">Add Leave Type</h2>
+          <button
+            @click="showAddModal = false"
+            class="w-8 h-8 rounded-xl flex items-center justify-center text-slate-400 hover:bg-sky hover:text-navy transition-colors text-lg"
+          >
             ✕
           </button>
         </div>
 
         <div
           v-if="formError"
-          class="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded mb-4 text-sm"
+          class="bg-rose-tint border border-rose-200 text-rose-700 px-4 py-3 rounded-xl mb-5 text-sm"
         >
           {{ formError }}
         </div>
 
         <form @submit.prevent="handleAdd">
-          <div class="grid grid-cols-2 gap-4 mb-4">
+          <div class="grid grid-cols-2 gap-4 mb-5">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+              <label class="block text-sm font-medium text-navy-deep mb-1.5">Name</label>
               <input
                 v-model="form.name"
                 type="text"
-                class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
                 required
               />
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Code</label>
+              <label class="block text-sm font-medium text-navy-deep mb-1.5">Code</label>
               <input
                 v-model="form.code"
                 type="text"
-                class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
                 required
               />
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Applicable To</label>
+              <label class="block text-sm font-medium text-navy-deep mb-1.5">Applicable To</label>
               <select
                 v-model="form.application_to"
-                class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
               >
                 <option value="all">All</option>
                 <option value="permanent">Permanent</option>
@@ -147,62 +202,72 @@
               </select>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Credit Type</label>
+              <label class="block text-sm font-medium text-navy-deep mb-1.5">Credit Type</label>
               <select
                 v-model="form.credit_type"
-                class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
               >
                 <option value="monthly">Monthly</option>
                 <option value="fixed">Fixed</option>
               </select>
             </div>
             <div v-if="form.credit_type === 'monthly'">
-              <label class="block text-sm font-medium text-gray-700 mb-1">Monthly Credit</label>
+              <label class="block text-sm font-medium text-navy-deep mb-1.5">Monthly Credit</label>
               <input
                 v-model="form.monthly_credit"
                 type="number"
                 step="0.01"
-                class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
               />
             </div>
             <div v-if="form.credit_type === 'fixed'">
-              <label class="block text-sm font-medium text-gray-700 mb-1">Fixed Days</label>
+              <label class="block text-sm font-medium text-navy-deep mb-1.5">Fixed Days</label>
               <input
                 v-model="form.fixed_days"
                 type="number"
                 step="0.01"
-                class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
               />
             </div>
-            <div class="flex items-center gap-2">
-              <input v-model="form.can_carry_over" type="checkbox" id="carry_over" />
-              <label for="carry_over" class="text-sm text-gray-700">Can Carry Over</label>
+            <div class="flex items-center gap-2.5">
+              <input
+                v-model="form.can_carry_over"
+                type="checkbox"
+                id="carry_over"
+                class="w-4 h-4 rounded accent-teal-600"
+              />
+              <label for="carry_over" class="text-sm text-navy-deep">Can Carry Over</label>
             </div>
-            <div class="flex items-center gap-2">
-              <input v-model="form.can_monetize" type="checkbox" id="monetize" />
-              <label for="monetize" class="text-sm text-gray-700">Can Monetize</label>
+            <div class="flex items-center gap-2.5">
+              <input
+                v-model="form.can_monetize"
+                type="checkbox"
+                id="monetize"
+                class="w-4 h-4 rounded accent-teal-600"
+              />
+              <label for="monetize" class="text-sm text-navy-deep">Can Monetize</label>
             </div>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <label class="block text-sm font-medium text-navy-deep mb-1.5">Description</label>
             <textarea
               v-model="form.description"
-              class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+              class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
               rows="2"
             ></textarea>
           </div>
-          <div class="flex justify-end gap-3 mt-4">
+          <div class="flex justify-end gap-3 mt-6">
             <button
               type="button"
               @click="showAddModal = false"
-              class="px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded hover:bg-gray-50"
+              class="px-5 py-2.5 text-sm font-semibold text-navy border border-sky-100 rounded-xl hover:bg-sky transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               :disabled="formLoading"
-              class="px-4 py-2 text-sm bg-gray-600 text-white rounded hover:bg-gray-700 disabled:opacity-50"
+              class="px-5 py-2.5 text-sm font-semibold bg-navy text-white rounded-xl hover:bg-navy-deep transition-colors disabled:opacity-50"
             >
               {{ formLoading ? 'Saving...' : 'Save' }}
             </button>
@@ -214,41 +279,44 @@
     <!-- Edit Modal -->
     <div
       v-if="showEditModal"
-      class="fixed inset-0 bg-gray bg-opacity-50 flex items-center justify-center z-50"
+      class="fixed inset-0 bg-navy-deep/40 backdrop-blur-sm flex items-center justify-center z-50 p-4"
     >
-      <div class="bg-white rounded-lg shadow-lg w-full max-w-lg p-6">
+      <div class="bg-white rounded-3xl shadow-xl w-full max-w-lg p-7">
         <div class="flex items-center justify-between mb-6">
-          <h2 class="text-xl font-bold text-gray-800">Edit Leave Type</h2>
-          <button @click="showEditModal = false" class="text-gray-400 hover:text-gray-600 text-xl">
+          <h2 class="font-serif text-xl font-semibold text-navy-deep">Edit Leave Type</h2>
+          <button
+            @click="showEditModal = false"
+            class="w-8 h-8 rounded-xl flex items-center justify-center text-slate-400 hover:bg-sky hover:text-navy transition-colors text-lg"
+          >
             ✕
           </button>
         </div>
 
         <form @submit.prevent="handleEdit">
-          <div class="grid grid-cols-2 gap-4 mb-4">
+          <div class="grid grid-cols-2 gap-4 mb-5">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+              <label class="block text-sm font-medium text-navy-deep mb-1.5">Name</label>
               <input
                 v-model="editForm.name"
                 type="text"
-                class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
                 required
               />
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Code</label>
+              <label class="block text-sm font-medium text-navy-deep mb-1.5">Code</label>
               <input
                 v-model="editForm.code"
                 type="text"
-                class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
                 required
               />
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Applicable To</label>
+              <label class="block text-sm font-medium text-navy-deep mb-1.5">Applicable To</label>
               <select
                 v-model="editForm.application_to"
-                class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
               >
                 <option value="all">All</option>
                 <option value="permanent">Permanent</option>
@@ -257,62 +325,72 @@
               </select>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Credit Type</label>
+              <label class="block text-sm font-medium text-navy-deep mb-1.5">Credit Type</label>
               <select
                 v-model="editForm.credit_type"
-                class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
               >
                 <option value="monthly">Monthly</option>
                 <option value="fixed">Fixed</option>
               </select>
             </div>
             <div v-if="editForm.credit_type === 'monthly'">
-              <label class="block text-sm font-medium text-gray-700 mb-1">Monthly Credit</label>
+              <label class="block text-sm font-medium text-navy-deep mb-1.5">Monthly Credit</label>
               <input
                 v-model="editForm.monthly_credit"
                 type="number"
                 step="0.01"
-                class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
               />
             </div>
             <div v-if="editForm.credit_type === 'fixed'">
-              <label class="block text-sm font-medium text-gray-700 mb-1">Fixed Days</label>
+              <label class="block text-sm font-medium text-navy-deep mb-1.5">Fixed Days</label>
               <input
                 v-model="editForm.fixed_days"
                 type="number"
                 step="0.01"
-                class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
               />
             </div>
-            <div class="flex items-center gap-2">
-              <input v-model="editForm.can_carry_over" type="checkbox" id="edit_carry_over" />
-              <label for="edit_carry_over" class="text-sm text-gray-700">Can Carry Over</label>
+            <div class="flex items-center gap-2.5">
+              <input
+                v-model="editForm.can_carry_over"
+                type="checkbox"
+                id="edit_carry_over"
+                class="w-4 h-4 rounded accent-teal-600"
+              />
+              <label for="edit_carry_over" class="text-sm text-navy-deep">Can Carry Over</label>
             </div>
-            <div class="flex items-center gap-2">
-              <input v-model="editForm.can_monetize" type="checkbox" id="edit_monetize" />
-              <label for="edit_monetize" class="text-sm text-gray-700">Can Monetize</label>
+            <div class="flex items-center gap-2.5">
+              <input
+                v-model="editForm.can_monetize"
+                type="checkbox"
+                id="edit_monetize"
+                class="w-4 h-4 rounded accent-teal-600"
+              />
+              <label for="edit_monetize" class="text-sm text-navy-deep">Can Monetize</label>
             </div>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <label class="block text-sm font-medium text-navy-deep mb-1.5">Description</label>
             <textarea
               v-model="editForm.description"
-              class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+              class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
               rows="2"
             ></textarea>
           </div>
-          <div class="flex justify-end gap-3 mt-4">
+          <div class="flex justify-end gap-3 mt-6">
             <button
               type="button"
               @click="showEditModal = false"
-              class="px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded hover:bg-gray-50"
+              class="px-5 py-2.5 text-sm font-semibold text-navy border border-sky-100 rounded-xl hover:bg-sky transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               :disabled="editLoading"
-              class="px-4 py-2 text-sm bg-gray-600 text-white rounded hover:bg-gray-700 disabled:opacity-50"
+              class="px-5 py-2.5 text-sm font-semibold bg-navy text-white rounded-xl hover:bg-navy-deep transition-colors disabled:opacity-50"
             >
               {{ editLoading ? 'Saving...' : 'Save Changes' }}
             </button>
@@ -322,7 +400,7 @@
     </div>
   </div>
 </template>
-
+ 
 <script setup>
 import { ref, onMounted } from 'vue'
 import api from '@/api/axios'

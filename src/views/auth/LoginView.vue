@@ -1,52 +1,122 @@
 <template>
-  <div class="min-h-screen bg-gray-100 flex items-center justify-center">
-    <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-      <!-- Header -->
-      <div class="text-center mb-8">
-        <h1 class="text-2xl font-bold text-gray-800">LeaveSync</h1>
-        <p class="text-gray-500 text-sm mt-1">LGU Echague, Isabela</p>
+  <div class="min-h-screen flex items-center justify-center bg-sky px-6">
+    <div
+      class="w-full max-w-[820px] h-[480px] bg-white rounded-[32px] shadow-xl flex overflow-hidden relative"
+    >
+      <!-- Left Panel: curved brand side -->
+      <div class="relative w-[42%] flex-shrink-0">
+        <div
+          class="absolute inset-0 bg-gradient-to-br from-navy-deep to-navy"
+          style="border-radius: 0 120px 120px 0"
+        ></div>
+        <div
+          class="absolute inset-0 opacity-[0.06]"
+          style="
+            background-image: radial-gradient(circle, white 1px, transparent 1px);
+            background-size: 20px 20px;
+            border-radius: 0 120px 120px 0;
+          "
+        ></div>
+
+        <div class="relative h-full flex flex-col justify-between p-9">
+          <div class="flex items-center gap-2.5">
+            <div
+              class="w-8 h-8 rounded-xl bg-teal-600 flex items-center justify-center flex-shrink-0"
+            >
+              <span class="font-serif font-bold text-white text-sm">L</span>
+            </div>
+            <span class="font-serif text-[15px] font-semibold text-white">LeaveSync</span>
+          </div>
+
+          <div>
+            <h2 class="font-serif text-2xl leading-snug text-white mb-2">Welcome back</h2>
+            <p class="text-sky-300/70 text-[13px] leading-relaxed">
+              Sign in to manage leave applications and employee records for LGU Echague.
+            </p>
+          </div>
+
+          <p class="font-mono text-[10.5px] text-sky-300/50"></p>
+        </div>
       </div>
 
-      <!-- Error Message -->
-      <div
-        v-if="error"
-        class="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded mb-4 text-sm"
-      >
-        {{ error }}
-      </div>
+      <!-- Right Panel: form -->
+      <div class="flex-1 flex flex-col justify-center px-11">
+        <p class="text-[11px] uppercase tracking-wider text-teal-600 font-bold mb-1.5">
+          HR Admin Access
+        </p>
+        <h1 class="font-serif text-[26px] font-semibold text-navy-deep mb-7">Sign In</h1>
 
-      <!-- Login Form -->
-      <form @submit.prevent="handleLogin">
-        <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-          <input
-            v-model="email"
-            type="email"
-            placeholder="Enter your email"
-            class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          />
-        </div>
-
-        <div class="mb-6">
-          <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-          <input
-            v-model="password"
-            type="password"
-            placeholder="Enter your password"
-            class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          />
-        </div>
-
-        <button
-          type="submit"
-          :disabled="loading"
-          class="w-full bg-gray-600 text-white py-2 rounded font-medium text-sm hover:bg-gray-700 disabled:opacity-50"
+        <div
+          v-if="error"
+          class="bg-rose-tint border border-rose-200 text-rose-700 px-3.5 py-2.5 rounded-xl mb-4 text-[13px]"
         >
-          {{ loading ? 'Logging in...' : 'Login' }}
-        </button>
-      </form>
+          {{ error }}
+        </div>
+
+        <form @submit.prevent="handleLogin" class="space-y-4">
+          <div class="relative">
+            <svg
+              class="absolute left-3.5 top-1/2 -translate-y-1/2"
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#8B98A6"
+              stroke-width="2"
+            >
+              <path
+                d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
+              />
+              <polyline points="22,6 12,13 2,6" />
+            </svg>
+            <input
+              v-model="email"
+              type="email"
+              placeholder="Email"
+              class="w-full border border-sky-100 bg-sky/40 rounded-xl pl-10 pr-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
+              required
+            />
+          </div>
+
+          <div class="relative">
+            <svg
+              class="absolute left-3.5 top-1/2 -translate-y-1/2"
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#8B98A6"
+              stroke-width="2"
+            >
+              <rect x="3" y="11" width="18" height="11" rx="2" />
+              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+            </svg>
+            <input
+              v-model="password"
+              type="password"
+              placeholder="Password"
+              class="w-full border border-sky-100 bg-sky/40 rounded-xl pl-10 pr-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            :disabled="loading"
+            class="w-full bg-navy text-white py-2.5 rounded-xl font-semibold text-sm hover:bg-navy-deep transition-colors disabled:opacity-50 flex items-center justify-center gap-2 mt-1"
+          >
+            <span
+              v-if="loading"
+              class="w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin"
+            ></span>
+            {{ loading ? 'Signing in...' : 'Sign In' }}
+          </button>
+        </form>
+
+        <p class="text-[11.5px] text-slate-400 mt-6">
+          Access restricted to authorized LGU Echague personnel.
+        </p>
+      </div>
     </div>
   </div>
 </template>

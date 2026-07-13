@@ -574,6 +574,7 @@
 
             <div class="grid grid-cols-2 gap-5">
               <!-- Vacation Leave -->
+              <!-- Vacation Leave -->
               <div>
                 <h3 class="font-serif text-base font-semibold text-navy-deep mb-3">
                   Vacation Leave
@@ -583,27 +584,39 @@
                     <thead class="bg-sky/60 border-b border-sky-100">
                       <tr>
                         <th
-                          class="text-left px-3 py-2.5 text-[9.5px] uppercase tracking-wider text-slate-400 font-bold"
+                          class="text-left px-2.5 py-2.5 text-[9px] uppercase tracking-wider text-slate-400 font-bold"
                         >
                           Period
                         </th>
                         <th
-                          class="text-left px-3 py-2.5 text-[9.5px] uppercase tracking-wider text-slate-400 font-bold"
+                          class="text-left px-2.5 py-2.5 text-[9px] uppercase tracking-wider text-slate-400 font-bold"
                         >
                           Particulars
                         </th>
                         <th
-                          class="text-right px-3 py-2.5 text-[9.5px] uppercase tracking-wider text-slate-400 font-bold"
+                          class="text-right px-2 py-2.5 text-[9px] uppercase tracking-wider text-slate-400 font-bold"
                         >
                           Earned
                         </th>
                         <th
-                          class="text-right px-3 py-2.5 text-[9.5px] uppercase tracking-wider text-slate-400 font-bold"
+                          class="text-right px-2 py-2.5 text-[9px] uppercase tracking-wider text-slate-400 font-bold"
+                          title="Absence/Undertime With Pay"
+                        >
+                          W/P
+                        </th>
+                        <th
+                          class="text-right px-2 py-2.5 text-[9px] uppercase tracking-wider text-slate-400 font-bold"
+                          title="Absence/Undertime Without Pay"
+                        >
+                          WOP
+                        </th>
+                        <th
+                          class="text-right px-2 py-2.5 text-[9px] uppercase tracking-wider text-slate-400 font-bold"
                         >
                           Used
                         </th>
                         <th
-                          class="text-right px-3 py-2.5 text-[9.5px] uppercase tracking-wider text-slate-400 font-bold"
+                          class="text-right px-2.5 py-2.5 text-[9px] uppercase tracking-wider text-slate-400 font-bold"
                         >
                           Balance
                         </th>
@@ -615,17 +628,23 @@
                         :key="'vl-' + i"
                         class="border-b border-sky-100 last:border-b-0"
                       >
-                        <td class="px-3 py-2 font-mono text-[11px] text-slate-500">
+                        <td class="px-2.5 py-2 font-mono text-[10.5px] text-slate-500">
                           {{ row.period }}
                         </td>
-                        <td class="px-3 py-2 text-slate-600">{{ row.particulars }}</td>
-                        <td class="px-3 py-2 text-right font-mono text-navy">
+                        <td class="px-2.5 py-2 text-slate-600">{{ row.particulars }}</td>
+                        <td class="px-2 py-2 text-right font-mono text-navy">
                           {{ row.earned > 0 ? row.earned.toFixed(3) : '' }}
                         </td>
-                        <td class="px-3 py-2 text-right font-mono text-rose-600">
+                        <td class="px-2 py-2 text-right font-mono text-amber-700">
+                          {{ row.abs_wp > 0 ? row.abs_wp.toFixed(3) : '' }}
+                        </td>
+                        <td class="px-2 py-2 text-right font-mono text-rose-600">
+                          {{ row.abs_wop > 0 ? row.abs_wop.toFixed(3) : '' }}
+                        </td>
+                        <td class="px-2 py-2 text-right font-mono text-rose-600">
                           {{ row.used > 0 ? row.used.toFixed(3) : '' }}
                         </td>
-                        <td class="px-3 py-2 text-right font-mono font-bold text-navy-deep">
+                        <td class="px-2.5 py-2 text-right font-mono font-bold text-navy-deep">
                           {{ row.balance.toFixed(3) }}
                         </td>
                       </tr>
@@ -634,7 +653,7 @@
                           !leaveCardData.vacation_leave || leaveCardData.vacation_leave.length === 0
                         "
                       >
-                        <td colspan="5" class="px-3 py-8 text-center text-slate-400 text-xs">
+                        <td colspan="7" class="px-3 py-8 text-center text-slate-400 text-xs">
                           No VL history yet
                         </td>
                       </tr>
@@ -642,7 +661,7 @@
                   </table>
                 </div>
               </div>
-
+              <!-- Sick Leave -->
               <!-- Sick Leave -->
               <div>
                 <h3 class="font-serif text-base font-semibold text-navy-deep mb-3">Sick Leave</h3>
@@ -651,27 +670,39 @@
                     <thead class="bg-sky/60 border-b border-sky-100">
                       <tr>
                         <th
-                          class="text-left px-3 py-2.5 text-[9.5px] uppercase tracking-wider text-slate-400 font-bold"
+                          class="text-left px-2.5 py-2.5 text-[9px] uppercase tracking-wider text-slate-400 font-bold"
                         >
                           Period
                         </th>
                         <th
-                          class="text-left px-3 py-2.5 text-[9.5px] uppercase tracking-wider text-slate-400 font-bold"
+                          class="text-left px-2.5 py-2.5 text-[9px] uppercase tracking-wider text-slate-400 font-bold"
                         >
                           Particulars
                         </th>
                         <th
-                          class="text-right px-3 py-2.5 text-[9.5px] uppercase tracking-wider text-slate-400 font-bold"
+                          class="text-right px-2 py-2.5 text-[9px] uppercase tracking-wider text-slate-400 font-bold"
                         >
                           Earned
                         </th>
                         <th
-                          class="text-right px-3 py-2.5 text-[9.5px] uppercase tracking-wider text-slate-400 font-bold"
+                          class="text-right px-2 py-2.5 text-[9px] uppercase tracking-wider text-slate-400 font-bold"
+                          title="Absence/Undertime With Pay"
+                        >
+                          W/P
+                        </th>
+                        <th
+                          class="text-right px-2 py-2.5 text-[9px] uppercase tracking-wider text-slate-400 font-bold"
+                          title="Absence/Undertime Without Pay"
+                        >
+                          WOP
+                        </th>
+                        <th
+                          class="text-right px-2 py-2.5 text-[9px] uppercase tracking-wider text-slate-400 font-bold"
                         >
                           Used
                         </th>
                         <th
-                          class="text-right px-3 py-2.5 text-[9.5px] uppercase tracking-wider text-slate-400 font-bold"
+                          class="text-right px-2.5 py-2.5 text-[9px] uppercase tracking-wider text-slate-400 font-bold"
                         >
                           Balance
                         </th>
@@ -683,22 +714,28 @@
                         :key="'sl-' + i"
                         class="border-b border-sky-100 last:border-b-0"
                       >
-                        <td class="px-3 py-2 font-mono text-[11px] text-slate-500">
+                        <td class="px-2.5 py-2 font-mono text-[10.5px] text-slate-500">
                           {{ row.period }}
                         </td>
-                        <td class="px-3 py-2 text-slate-600">{{ row.particulars }}</td>
-                        <td class="px-3 py-2 text-right font-mono text-teal-700">
+                        <td class="px-2.5 py-2 text-slate-600">{{ row.particulars }}</td>
+                        <td class="px-2 py-2 text-right font-mono text-teal-700">
                           {{ row.earned > 0 ? row.earned.toFixed(3) : '' }}
                         </td>
-                        <td class="px-3 py-2 text-right font-mono text-rose-600">
+                        <td class="px-2 py-2 text-right font-mono text-amber-700">
+                          {{ row.abs_wp > 0 ? row.abs_wp.toFixed(3) : '' }}
+                        </td>
+                        <td class="px-2 py-2 text-right font-mono text-rose-600">
+                          {{ row.abs_wop > 0 ? row.abs_wop.toFixed(3) : '' }}
+                        </td>
+                        <td class="px-2 py-2 text-right font-mono text-rose-600">
                           {{ row.used > 0 ? row.used.toFixed(3) : '' }}
                         </td>
-                        <td class="px-3 py-2 text-right font-mono font-bold text-navy-deep">
+                        <td class="px-2.5 py-2 text-right font-mono font-bold text-navy-deep">
                           {{ row.balance.toFixed(3) }}
                         </td>
                       </tr>
                       <tr v-if="!leaveCardData.sick_leave || leaveCardData.sick_leave.length === 0">
-                        <td colspan="5" class="px-3 py-8 text-center text-slate-400 text-xs">
+                        <td colspan="7" class="px-3 py-8 text-center text-slate-400 text-xs">
                           No SL history yet
                         </td>
                       </tr>

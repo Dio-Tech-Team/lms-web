@@ -392,14 +392,25 @@
           {{ dept.name }}
         </option>
       </select>
+
+      <select
+        v-model="stepIncrementYear"
+        @change="fetchEmployees(1)"
+        class="border border-sky-100 rounded-xl px-3.5 py-2.5 text-sm w-56 bg-white text-navy-deep focus:outline-none focus:ring-2 focus:ring-teal-600 transition-colors"
+      >
+        <option value="">Step Increment</option>
+        <option v-for="y in stepIncrementYearOptions" :key="y" :value="y">
+          {{ y }}
+        </option>
+      </select>
     </div>
 
-    <!-- Table -->
     <div class="bg-white rounded-2xl border border-sky-100 overflow-hidden">
       <table class="w-full text-sm">
         <thead class="bg-sky/60 border-b border-sky-100">
           <tr>
             <th
+              v-if="!stepIncrementYear"
               class="text-left px-5 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
             >
               ID Number
@@ -420,9 +431,29 @@
               Department
             </th>
             <th
+              v-if="!stepIncrementYear"
               class="text-left px-5 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
             >
               Status
+            </th>
+
+            <th
+              v-if="stepIncrementYear"
+              class="text-left px-5 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+            >
+              Current Step
+            </th>
+            <th
+              v-if="stepIncrementYear"
+              class="text-left px-5 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+            >
+              Next Step
+            </th>
+            <th
+              v-if="stepIncrementYear"
+              class="text-left px-5 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+            >
+              Increment Date
             </th>
             <th
               class="text-left px-5 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
@@ -437,16 +468,31 @@
             :key="employee.id"
             class="border-b border-sky-100 last:border-b-0 hover:bg-sky/40 transition-colors"
           >
-            <td class="px-5 py-3.5 font-mono text-[12.5px] text-slate-500">
+            <td
+              v-if="!stepIncrementYear"
+              class="px-5 py-3.5 font-mono text-[12.5px] text-slate-500"
+            >
               {{ employee.id_number }}
             </td>
+
             <td class="px-5 py-3.5 font-semibold text-navy-deep">
               {{ employee.first_name }} {{ employee.surname }}
             </td>
             <td class="px-5 py-3.5 text-slate-600">{{ employee.position }}</td>
             <td class="px-5 py-3.5 text-slate-600">{{ employee.department_name }}</td>
-            <td class="px-5 py-3.5 text-slate-600 capitalize">
+
+            <td v-if="!stepIncrementYear" class="px-5 py-3.5 text-slate-600 capitalize">
               {{ employee.employment_status?.replace('_', ' ') }}
+            </td>
+
+            <td v-if="stepIncrementYear" class="px-5 py-3.5 text-slate-600">
+              Step {{ employee.current_step || 'N/A' }}
+            </td>
+            <td v-if="stepIncrementYear" class="px-5 py-3.5 text-teal-700 font-semibold">
+              Step {{ employee.next_step || 'N/A' }}
+            </td>
+            <td v-if="stepIncrementYear" class="px-5 py-3.5 text-slate-600">
+              {{ employee.next_step_date || 'N/A' }}
             </td>
             <td class="px-5 py-3.5">
               <button
@@ -457,9 +503,17 @@
               </button>
             </td>
           </tr>
+
           <tr v-if="filteredEmployees.length === 0">
-            <td colspan="6" class="px-5 py-12 text-center text-slate-400 text-sm">
-              No employees found
+            <td
+              :colspan="stepIncrementYear ? 3 : 3"
+              class="px-5 py-12 text-center text-slate-400 text-sm"
+            >
+              {{
+                stepIncrementYear
+                  ? `No step increments scheduled for ${stepIncrementYear}`
+                  : 'No employees found'
+              }}
             </td>
           </tr>
         </tbody>
@@ -494,15 +548,15 @@
 
  
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '@/api/axios'
-import { watch } from 'vue'
 
 const router = useRouter()
 const employees = ref([])
 const search = ref('')
 const selectedDepartment = ref('') //
+const stepIncrementYear = ref('') // NEW
 const showAddModal = ref(false)
 const currentPage = ref(1)
 const lastPage = ref(1)
@@ -510,6 +564,12 @@ const total = ref(0)
 const departments = ref([])
 const formError = ref(null)
 const formLoading = ref(false)
+
+// NEW: current year + next 5 years as quick filter options
+const stepIncrementYearOptions = computed(() => {
+  const current = new Date().getFullYear()
+  return Array.from({ length: 3 }, (_, i) => current + i)
+})
 
 const form = ref({
   username: '',
@@ -541,7 +601,53 @@ const form = ref({
   tin_number: '',
 })
 
+// async function fetchEmployees(page = 1) {
+//   try {
+//       const employeeResponse = await api.get(`/employees`, {
+//         params: {
+//           page: page,
+//           department_id: selectedDepartment.value,
+//         },
+//       })
+//       employees.value = employeeResponse.data.data
+//       currentPage.value = employeeResponse.data.current_page
+//       lastPage.value = employeeResponse.data.last_page
+//       total.value = employeeResponse.data.total
+//     } catch (error) {
+//     console.error('Error fetching employees:', error)
+//   }
+// }
 async function fetchEmployees(page = 1) {
+  filteredEmployees.value = [] // // NEW
+  if (stepIncrementYear.value) {
+    try {
+      const response = await api.get('/employees/step-increment-forecast', {
+        params: { year: stepIncrementYear.value },
+      })
+      // Normalize into the same shape the table/search already expect
+      // (first_name/surname instead of a combined "name" string) so
+      // filteredEmployees and the template don't need special-casing.
+      employees.value = response.data.employees.map((e) => {
+        const [first_name, ...rest] = e.name.split(' ')
+        return {
+          id: e.employee_id,
+          first_name,
+          surname: rest.join(' '),
+          position: e.position,
+          department_name: e.department,
+          current_step: e.current_step,
+          next_step: e.next_step,
+          next_step_date: e.next_step_date,
+          id_number: '', // not returned by forecast endpoint, not shown in this mode anyway
+        }
+      })
+    } catch (error) {
+      console.error('Error fetching step increment forecast:', error)
+      employees.value = []
+    }
+    return
+  }
+
   try {
     // const employeeResponse = await api.get(`/employees?page=${page}`)
     const employeeResponse = await api.get(`/employees`, {

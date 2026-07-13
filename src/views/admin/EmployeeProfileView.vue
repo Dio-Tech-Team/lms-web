@@ -99,7 +99,9 @@
               <p class="text-[10.5px] uppercase tracking-wide text-slate-400 font-bold mb-1">
                 Birthdate
               </p>
-              <p class="font-mono text-[13px] text-navy-deep">{{ employee.birthdate || 'N/A' }}</p>
+              <p class="font-mono text-[13px] text-navy-deep">
+                {{ formatDate(employee?.birthdate) }}
+              </p>
             </div>
             <div>
               <p class="text-[10.5px] uppercase tracking-wide text-slate-400 font-bold mb-1">
@@ -168,7 +170,7 @@
                   Date Hired
                 </p>
                 <p class="font-mono text-[13px] text-navy-deep">
-                  {{ employee.date_hired || 'N/A' }}
+                  {{ formatDate(employee?.date_hired) }}
                 </p>
               </div>
             </div>
@@ -320,72 +322,6 @@
           </div>
         </div>
       </div>
-
-      <!-- Employment History -->
-      <!-- <div class="bg-white rounded-2xl border border-sky-100 p-6">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="font-serif text-lg font-semibold text-navy-deep">Employment History</h2>
-          <button
-            @click="openPromotionModal"
-            class="bg-navy text-white px-3.5 py-2 rounded-xl text-sm font-semibold hover:bg-navy-deep transition-colors"
-          >
-            Update Employment Status
-          </button>
-        </div>
-
-        <div v-if="employee.employment_history && employee.employment_history.length > 0">
-          <table class="w-full text-sm">
-            <thead class="bg-sky/60 border-b border-sky-100">
-              <tr>
-                <th
-                  class="text-left px-4 py-3 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
-                >
-                  Previous Position
-                </th>
-                <th
-                  class="text-left px-4 py-3 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
-                >
-                  New Position
-                </th>
-                <th
-                  class="text-left px-4 py-3 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
-                >
-                  Employment Status
-                </th>
-                <th
-                  class="text-left px-4 py-3 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
-                >
-                  Effective Date
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                v-for="employment in employee.employment_history"
-                :key="employment.id"
-                class="border-b border-sky-100 last:border-b-0 hover:bg-sky/40 transition-colors"
-              >
-                <td class="px-4 py-3 text-slate-600">
-                  {{ employment.previous_position || '' }}
-                </td>
-                <td class="px-4 py-3 font-semibold text-navy-deep">
-                  {{ employment.new_position }}
-                </td>
-                <td class="px-4 py-3 text-slate-600 capitalize">
-                  {{ employment.new_employment_status?.replace('_', ' ') }}
-                </td>
-                <td class="px-4 py-3 text-slate-500 font-mono text-[12.5px]">
-                  {{ employment.effective_date }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          
-        </div>
-        <div v-else class="text-slate-400 text-sm italic py-4">
-          No employment history recorded yet.
-        </div>
-      </div> -->
       <!-- Employment History -->
       <div class="bg-white rounded-2xl border border-sky-100 p-6">
         <div class="flex items-center justify-between mb-4">
@@ -1297,6 +1233,7 @@ function openPromotionModal() {
 
 async function openLeaveCard() {
   showLeaveCard.value = true
+
   leaveCardLoading.value = true
   try {
     const response = await api.get(`/employees/${route.params.id}/leave-card`)
@@ -1308,7 +1245,12 @@ async function openLeaveCard() {
     leaveCardLoading.value = false
   }
 }
-
+// Add this helper near the bottom of your methods
+function formatDate(dateStr) {
+  if (!dateStr) return 'N/A'
+  // Safely slices '2025-06-30T00:00:00.000000Z' into '2025-06-30'
+  return dateStr.includes('T') ? dateStr.split('T')[0] : dateStr
+}
 function goBack() {
   router.push('/employees')
 }

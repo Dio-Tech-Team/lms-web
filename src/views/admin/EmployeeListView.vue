@@ -464,7 +464,7 @@
         </thead>
         <tbody>
           <tr
-            v-for="employee in filteredEmployees"
+            v-for="employee in employees"
             :key="employee.id"
             class="border-b border-sky-100 last:border-b-0 hover:bg-sky/40 transition-colors"
           >
@@ -504,7 +504,7 @@
             </td>
           </tr>
 
-          <tr v-if="filteredEmployees.length === 0">
+          <tr v-if="employees.length === 0">
             <td
               :colspan="stepIncrementYear ? 3 : 3"
               class="px-5 py-12 text-center text-slate-400 text-sm"
@@ -601,32 +601,13 @@ const form = ref({
   tin_number: '',
 })
 
-// async function fetchEmployees(page = 1) {
-//   try {
-//       const employeeResponse = await api.get(`/employees`, {
-//         params: {
-//           page: page,
-//           department_id: selectedDepartment.value,
-//         },
-//       })
-//       employees.value = employeeResponse.data.data
-//       currentPage.value = employeeResponse.data.current_page
-//       lastPage.value = employeeResponse.data.last_page
-//       total.value = employeeResponse.data.total
-//     } catch (error) {
-//     console.error('Error fetching employees:', error)
-//   }
-// }
 async function fetchEmployees(page = 1) {
-  filteredEmployees.value = [] // // NEW
   if (stepIncrementYear.value) {
     try {
       const response = await api.get('/employees/step-increment-forecast', {
         params: { year: stepIncrementYear.value },
       })
-      // Normalize into the same shape the table/search already expect
-      // (first_name/surname instead of a combined "name" string) so
-      // filteredEmployees and the template don't need special-casing.
+
       employees.value = response.data.employees.map((e) => {
         const [first_name, ...rest] = e.name.split(' ')
         return {
@@ -654,6 +635,7 @@ async function fetchEmployees(page = 1) {
       params: {
         page: page,
         department_id: selectedDepartment.value,
+        search: search.value,
       },
     })
     employees.value = employeeResponse.data.data
@@ -669,30 +651,21 @@ async function handleAddEmployee() {
   formLoading.value = true
   formError.value = ''
   try {
+    // Backend handles both employee creation AND default leave credit generation in this single call
     await api.post('employees', form.value)
+
     showAddModal.value = false
-    await fetchEmployees(currentPage.value)
     Object.keys(form.value).forEach((key) => {
       form.value[key] = ''
     })
+    await fetchEmployees(currentPage.value)
   } catch (error) {
-    formError.value = error.response?.data?.message || 'Failed to add employee. Please try again.'
+    formError.value =
+      error.response?.data?.message || 'Failed to register employee. Please try again.'
   } finally {
     formLoading.value = false
   }
 }
-
-const filteredEmployees = computed(() => {
-  if (!search.value) return employees.value
-  return employees.value.filter(
-    (emp) =>
-      emp.first_name.toLowerCase().includes(search.value.toLowerCase()) ||
-      emp.surname.toLowerCase().includes(search.value.toLowerCase()) ||
-      emp.id_number.toLowerCase().includes(search.value.toLowerCase()) ||
-      emp.position.toLowerCase().includes(search.value.toLowerCase())
-  )
-})
-
 onMounted(async () => {
   await fetchEmployees()
   try {
@@ -704,6 +677,13 @@ onMounted(async () => {
 })
 watch(selectedDepartment, () => {
   fetchEmployees(1) // Reset to page 1 on filter change
+})
+let searchTimeout = null
+watch(search, () => {
+  clearTimeout(searchTimeout)
+  searchTimeout = setTimeout(() => {
+    fetchEmployees(1)
+  }, 400)
 })
 
 function viewEmployee(id) {

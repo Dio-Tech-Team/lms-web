@@ -71,7 +71,7 @@
                 active-class="!bg-white/10 !text-white font-semibold"
               >
                 <span class="w-1.5 h-1.5 rounded-full bg-current opacity-50"></span>
-                Applications
+                Leave Applications
               </RouterLink>
             </li>
             <li>

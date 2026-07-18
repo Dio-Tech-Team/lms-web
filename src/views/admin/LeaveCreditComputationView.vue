@@ -611,7 +611,6 @@ onMounted(async () => {
             >({{ results.length }} employees processed)</span
           >
         </h2>
-        <span class="font-mono text-[10.5px] text-slate-400">CS FORM 6</span>
       </div>
       <table class="w-full text-sm">
         <thead class="bg-sky/60 border-b border-sky-100">

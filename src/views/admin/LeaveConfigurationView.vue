@@ -83,7 +83,14 @@
                 {{ config.code }}
               </span>
             </td>
-            <td class="px-4 py-3.5 text-slate-600 capitalize">{{ config.application_to }}</td>
+            <!-- Inside your table <tbody> -->
+            <td class="px-4 py-3.5 text-slate-600 capitalize">
+              {{
+                Array.isArray(config.application_to)
+                  ? config.application_to.join(', ')
+                  : config.application_to
+              }}
+            </td>
             <td class="px-4 py-3.5 text-slate-600 capitalize">{{ config.credit_type }}</td>
             <td class="px-4 py-3.5 font-mono text-[13px] text-navy-deep">
               {{
@@ -190,16 +197,54 @@
               />
             </div>
             <div>
-              <label class="block text-sm font-medium text-navy-deep mb-1.5">Applicable To</label>
-              <select
-                v-model="form.application_to"
-                class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
-              >
-                <option value="all">All</option>
-                <option value="permanent">Permanent</option>
-                <option value="casual">Casual</option>
-                <option value="elected">Elected</option>
-              </select>
+              <label class="block text-sm font-medium text-navy-deep mb-2">Applicable To</label>
+              <div class="grid grid-cols-2 gap-2 text-sm text-slate-600">
+                <label class="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    v-model="form.application_to"
+                    value="all"
+                    class="accent-teal-600"
+                  />
+                  All
+                </label>
+                <label class="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    v-model="form.application_to"
+                    value="permanent"
+                    class="accent-teal-600"
+                  />
+                  Permanent
+                </label>
+                <label class="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    v-model="form.application_to"
+                    value="casual"
+                    class="accent-teal-600"
+                  />
+                  Casual
+                </label>
+                <label class="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    v-model="form.application_to"
+                    value="elected"
+                    class="accent-teal-600"
+                  />
+                  Elected
+                </label>
+                <label class="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    v-model="form.application_to"
+                    value="job_order"
+                    class="accent-teal-600"
+                  />
+                  Job Order
+                </label>
+              </div>
             </div>
             <div>
               <label class="block text-sm font-medium text-navy-deep mb-1.5">Credit Type</label>
@@ -313,16 +358,54 @@
               />
             </div>
             <div>
-              <label class="block text-sm font-medium text-navy-deep mb-1.5">Applicable To</label>
-              <select
-                v-model="editForm.application_to"
-                class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
-              >
-                <option value="all">All</option>
-                <option value="permanent">Permanent</option>
-                <option value="casual">Casual</option>
-                <option value="elected">Elected</option>
-              </select>
+              <label class="block text-sm font-medium text-navy-deep mb-2">Applicable To</label>
+              <div class="grid grid-cols-2 gap-2 text-sm text-slate-600">
+                <label class="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    v-model="editForm.application_to"
+                    value="all"
+                    class="accent-teal-600"
+                  />
+                  All
+                </label>
+                <label class="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    v-model="editForm.application_to"
+                    value="permanent"
+                    class="accent-teal-600"
+                  />
+                  Permanent
+                </label>
+                <label class="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    v-model="editForm.application_to"
+                    value="casual"
+                    class="accent-teal-600"
+                  />
+                  Casual
+                </label>
+                <label class="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    v-model="editForm.application_to"
+                    value="elected"
+                    class="accent-teal-600"
+                  />
+                  Elected
+                </label>
+                <label class="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    v-model="editForm.application_to"
+                    value="job_order"
+                    class="accent-teal-600"
+                  />
+                  Job Order
+                </label>
+              </div>
             </div>
             <div>
               <label class="block text-sm font-medium text-navy-deep mb-1.5">Credit Type</label>
@@ -402,7 +485,7 @@
 </template>
  
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import api from '@/api/axios'
 
 const configurations = ref([])
@@ -417,7 +500,8 @@ const selectedId = ref(null)
 const form = ref({
   name: '',
   code: '',
-  application_to: 'all',
+  // application_to: 'all',
+  application_to: [],
   credit_type: 'monthly',
   monthly_credit: '',
   fixed_days: '',
@@ -429,7 +513,8 @@ const form = ref({
 const editForm = ref({
   name: '',
   code: '',
-  application_to: 'all',
+  // application_to: 'all',
+  application_to: [],
   credit_type: 'monthly',
   monthly_credit: '',
   fixed_days: '',
@@ -437,6 +522,23 @@ const editForm = ref({
   can_monetize: false,
   description: '',
 })
+watch(
+  () => form.value.application_to,
+  (newVal) => {
+    if (newVal.includes('all') && newVal.length > 1) {
+      form.value.application_to = ['all']
+    }
+  }
+)
+
+watch(
+  () => editForm.value.application_to,
+  (newVal) => {
+    if (newVal.includes('all') && newVal.length > 1) {
+      editForm.value.application_to = ['all']
+    }
+  }
+)
 
 onMounted(async () => {
   await fetchConfigurations()
@@ -464,7 +566,7 @@ async function handleAdd() {
     form.value = {
       name: '',
       code: '',
-      application_to: 'all',
+      application_to: [],
       credit_type: 'monthly',
       monthly_credit: '',
       fixed_days: '',
@@ -481,7 +583,10 @@ async function handleAdd() {
 
 function openEditModal(config) {
   selectedId.value = config.id
-  editForm.value = { ...config }
+  editForm.value = {
+    ...config,
+    application_to: Array.isArray(config.application_to) ? config.application_to : [],
+  }
   showEditModal.value = true
 }
 

@@ -34,6 +34,7 @@ const router = createRouter({
           path: 'leave-configurations',
           name: 'leave-configurations',
           component: () => import('@/views/admin/LeaveConfigurationView.vue'),
+          meta: { roles: ['super_admin'] }, // ← overrides parent, super_admin only
         },
         {
           path: 'leave-records',
@@ -50,6 +51,12 @@ const router = createRouter({
           name: 'leave-credit-computation',
           component: () => import('@/views/admin/LeaveCreditComputationView.vue'),
         },
+        {
+          path: 'accounts',
+          name: 'accounts',
+          component: () => import('@/views/admin/AccountManagementView.vue'),
+          meta: { roles: ['super_admin'] }, // ← new page for UserController
+        },
       ],
     },
   ],
@@ -64,6 +71,15 @@ router.beforeEach((to, from) => {
     return '/login'
   } else if (to.meta.guestOnly && authStore.isAuthenticated) {
     return '/'
+  }
+
+  const requiredRoles = to.matched
+    .slice()
+    .reverse()
+    .find((record) => record.meta.roles)?.meta.roles
+
+  if (requiredRoles && !requiredRoles.includes(authStore.user?.role)) {
+    return '/' // or a dedicated /unauthorized page
   }
 })
 

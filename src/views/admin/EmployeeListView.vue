@@ -7,6 +7,7 @@
         <h1 class="text-2xl font-bold text-gray-700">Employees</h1>
       </div>
       <button
+        v-if="authStore.isSuperAdmin"
         @click="showAddModal = true"
         class="bg-navy text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-navy-deep transition-colors shadow-sm"
       >
@@ -550,9 +551,11 @@
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 import api from '@/api/axios'
 
 const router = useRouter()
+const authStore = useAuthStore()
 const employees = ref([])
 const search = ref('')
 const selectedDepartment = ref('') //

@@ -442,15 +442,15 @@ onMounted(async () => {
             />
           </div>
           <div v-if="uploadMode === 'single'">
-            <label class="block text-sm font-medium text-navy-deep mb-1.5"
+            <!-- <label class="block text-sm font-medium text-navy-deep mb-1.5"
               >Department (optional)</label
-            >
-            <input
+            > -->
+            <!-- <input
               v-model="form.department"
               type="text"
               placeholder="e.g. MASO"
               class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
-            />
+            /> -->
           </div>
         </div>
 

@@ -57,6 +57,12 @@ const router = createRouter({
           component: () => import('@/views/admin/AccountManagementView.vue'),
           meta: { roles: ['super_admin'] }, // ← new page for UserController
         },
+        {
+          path: 'activity-logs',
+          name: 'activity-logs',
+          component: () => import('@/views/admin/ActivityLogView.vue'),
+          meta: { roles: ['super_admin'] },
+        },
       ],
     },
   ],

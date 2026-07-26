@@ -582,6 +582,7 @@ async function handleAdd() {
 }
 
 function openEditModal(config) {
+  console.log('config.application_to:', config.application_to) // ← add this
   selectedId.value = config.id
   editForm.value = {
     ...config,

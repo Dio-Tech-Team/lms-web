@@ -62,6 +62,12 @@
             >
               Monetize
             </th>
+
+            <th
+              class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+            >
+              Status
+            </th>
             <th
               class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
             >
@@ -129,6 +135,21 @@
                 {{ config.can_monetize ? 'Yes' : 'No' }}
               </span>
             </td>
+            <!-- ADDED: Status badge cell -->
+            <td class="px-4 py-3.5">
+              <span
+                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold"
+                :class="
+                  config.is_active ? 'bg-teal-tint text-teal-700' : 'bg-slate-100 text-slate-500'
+                "
+              >
+                <span
+                  class="w-1.5 h-1.5 rounded-full"
+                  :class="config.is_active ? 'bg-teal-700' : 'bg-slate-500'"
+                ></span>
+                {{ config.is_active ? 'Active' : 'Inactive' }}
+              </span>
+            </td>
             <td class="px-4 py-3.5">
               <button
                 @click="openEditModal(config)"
@@ -137,15 +158,23 @@
                 Edit
               </button>
               <button
-                @click="handleDelete(config.id)"
+                v-if="config.is_active"
+                @click="handleDeactivate(config.id)"
                 class="text-rose-600 hover:text-rose-700 font-semibold text-sm transition-colors"
               >
-                Delete
+                Deactivate
+              </button>
+              <button
+                v-else
+                @click="handleReactivate(config.id)"
+                class="text-teal-700 hover:text-teal-800 font-semibold text-sm transition-colors"
+              >
+                Reactivate
               </button>
             </td>
           </tr>
           <tr v-if="configurations.length === 0">
-            <td colspan="8" class="px-4 py-12 text-center text-slate-400 text-sm">
+            <td colspan="9" class="px-4 py-12 text-center text-slate-400 text-sm">
               No leave types configured
             </td>
           </tr>
@@ -582,7 +611,6 @@ async function handleAdd() {
 }
 
 function openEditModal(config) {
-  console.log('config.application_to:', config.application_to) // ← add this
   selectedId.value = config.id
   editForm.value = {
     ...config,
@@ -604,13 +632,41 @@ async function handleEdit() {
   }
 }
 
-async function handleDelete(id) {
-  if (confirm('Are you sure you want to delete this leave type?')) {
+// async function handleDelete(id) {
+//   if (confirm('Are you sure you want to delete this leave type?')) {
+//     try {
+//       await api.delete(`/leave-configurations/${id}`)
+//       await fetchConfigurations()
+//     } catch (err) {
+//       console.error('Failed to delete', err)
+//     }
+//   }
+// }
+
+async function handleDeactivate(id) {
+  if (
+    confirm(
+      'Are you sure you want to deactivate this leave type? Existing employee records will not be affected — this only stops it from being used for new applications.'
+    )
+  ) {
     try {
       await api.delete(`/leave-configurations/${id}`)
       await fetchConfigurations()
     } catch (err) {
-      console.error('Failed to delete', err)
+      console.error('Failed to deactivate', err)
+      alert(err.response?.data?.message || 'Failed to deactivate')
+    }
+  }
+}
+
+async function handleReactivate(id) {
+  if (confirm('Reactivate this leave type?')) {
+    try {
+      await api.post(`/leave-configurations/${id}/reactivate`)
+      await fetchConfigurations()
+    } catch (err) {
+      console.error('Failed to reactivate', err)
+      alert(err.response?.data?.message || 'Failed to reactivate')
     }
   }
 }

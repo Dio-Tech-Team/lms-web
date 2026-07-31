@@ -589,7 +589,7 @@ onMounted(async () => {
       api.get(`/employees/${route.params.id}`),
       api.get('/departments'),
       api.get(`/employees/${route.params.id}/leave-credits`),
-      api.get('/leave-configurations'), // This was missing from the destructuring
+      api.get('/leave-configurations?active_only=true'),
     ])
 
     employee.value = empResponse.data

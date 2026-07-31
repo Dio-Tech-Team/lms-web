@@ -13,7 +13,7 @@ const router = createRouter({
     {
       path: '/',
       component: () => import('@/layouts/AdminLayout.vue'),
-      meta: { requiresAuth: true, role: 'hr_admin' },
+      meta: { requiresAuth: true, roles: ['hr_admin', 'super_admin'] },
       children: [
         {
           path: '',
@@ -85,7 +85,7 @@ router.beforeEach((to, from) => {
     .find((record) => record.meta.roles)?.meta.roles
 
   if (requiredRoles && !requiredRoles.includes(authStore.user?.role)) {
-    return '/' // or a dedicated /unauthorized page
+    return '/login' // or a dedicated /unauthorized page
   }
 })
 

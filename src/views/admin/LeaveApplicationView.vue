@@ -11,7 +11,7 @@
     <!-- Filter Tabs -->
     <div class="flex gap-2 mb-5">
       <button
-        v-for="tab in ['', 'pending', 'approved', 'cancelled']"
+        v-for="tab in ['', 'pending', 'approved', 'rejected', 'cancelled']"
         :key="tab"
         @click="setFilter(tab)"
         :class="
@@ -159,7 +159,8 @@
                 :class="{
                   'bg-amber-tint text-amber-700': app.status === 'pending',
                   'bg-teal-tint text-teal-700': app.status === 'approved',
-                  'bg-rose-tint text-rose-700': app.status === 'cancelled',
+                  'bg-rose-tint text-rose-700': app.status === 'rejected',
+                  'bg-slate-100 text-slate-500': app.status === 'cancelled',
                 }"
               >
                 <span
@@ -167,7 +168,8 @@
                   :class="{
                     'bg-amber-700': app.status === 'pending',
                     'bg-teal-700': app.status === 'approved',
-                    'bg-rose-700': app.status === 'cancelled',
+                    'bg-rose-700': app.status === 'rejected',
+                    'bg-slate-500': app.status === 'cancelled',
                   }"
                 ></span>
                 {{ app.status }}
@@ -181,11 +183,12 @@
                 >
                   Approve
                 </button>
+
                 <button
-                  @click="handleCancel(app.id)"
+                  @click="handleReject(app.id)"
                   class="text-rose-600 hover:text-rose-700 font-semibold text-sm transition-colors"
                 >
-                  Cancel
+                  Reject
                 </button>
               </div>
               <span v-else class="text-slate-400 text-sm">
@@ -315,13 +318,13 @@ async function handleApprove(id) {
   }
 }
 
-async function handleCancel(id) {
-  if (confirm('Are you sure you want to cancel this leave application?')) {
+async function handleReject(id) {
+  if (confirm('Are you sure you want to Reject this leave application?')) {
     try {
-      await api.post(`/leave-applications/${id}/cancel`)
+      await api.post(`/leave-applications/${id}/reject`)
       await fetchApplications(currentPage.value)
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to cancel')
+      alert(err.response?.data?.message || 'Failed to Reject')
     }
   }
 }

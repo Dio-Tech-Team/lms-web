@@ -167,9 +167,6 @@ const stats = ref({
 const applications = ref([])
 const loading = ref(true)
 
-// These now come straight from the backend's aggregate counts (SQL COUNT/GROUP BY
-// via the new /employees/stats endpoint), not from filtering a paginated 10-row
-// employees array — so they stay correct whether you have 13 employees or 4,000.
 const totalEmployees = computed(() => stats.value.total)
 const activeEmployees = computed(() => stats.value.active)
 const inactiveEmployees = computed(() => stats.value.inactive)
@@ -181,10 +178,6 @@ const departmentBreakdown = computed(() =>
 )
 const maxDeptCount = computed(() => Math.max(1, ...departmentBreakdown.value.map((d) => d.count)))
 
-// NOTE: pending/approved/cancelled below still come from the first page of
-// /leave-applications, same as before — this has the same scaling issue the
-// employee counts just had. Worth adding a matching stats endpoint for
-// leave-applications once you're past a handful of records, same pattern as above.
 const pendingCount = computed(() => applications.value.filter((a) => a.status === 'pending').length)
 const approvedCount = computed(
   () => applications.value.filter((a) => a.status === 'approved').length

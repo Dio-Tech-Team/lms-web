@@ -211,7 +211,7 @@
           Employment Information
         </h3>
         <div class="grid grid-cols-2 gap-4 mb-7">
-          <div>
+          <!-- <div>
             <label class="block text-sm font-medium text-navy-deep mb-1.5">Employment Status</label>
             <select
               v-model="form.employment_status"
@@ -222,7 +222,7 @@
               <option value="elected">Elected</option>
               <option value="job_order">Job Order</option>
             </select>
-          </div>
+          </div> -->
           <div>
             <label class="block text-sm font-medium text-navy-deep mb-1.5">Department</label>
             <select
@@ -301,7 +301,6 @@ const form = ref({
   philhealth_number: '',
   psn_number: '',
   tin_number: '',
-  employment_status: '',
   department_id: '',
   date_hired: '',
 })
@@ -333,7 +332,7 @@ watch(
         philhealth_number: props.employee.philhealth_number,
         psn_number: props.employee.psn_number,
         tin_number: props.employee.tin_number,
-        employment_status: props.employee.employment_status,
+        // employment_status: props.employee.employment_status,
         department_id: props.employee.department_id,
         date_hired: props.employee.date_hired,
       }

@@ -507,7 +507,7 @@
 
           <tr v-if="employees.length === 0">
             <td
-              :colspan="stepIncrementYear ? 3 : 3"
+              :colspan="stepIncrementYear ? 7 : 6"
               class="px-5 py-12 text-center text-slate-400 text-sm"
             >
               {{
@@ -625,9 +625,16 @@ async function fetchEmployees(page = 1) {
           id_number: '', // not returned by forecast endpoint, not shown in this mode anyway
         }
       })
+      // NEW — forecast endpoint returns everything in one shot, not paginated
+      currentPage.value = 1
+      lastPage.value = 1
+      total.value = employees.value.length
     } catch (error) {
       console.error('Error fetching step increment forecast:', error)
       employees.value = []
+      currentPage.value = 1
+      lastPage.value = 1
+      total.value = 0
     }
     return
   }

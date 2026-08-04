@@ -43,6 +43,23 @@
               </span>
             </div>
           </div>
+          <!-- <div class="flex gap-2">
+            <button
+              @click="showEditModal = true"
+              class="bg-white border border-sky-100 text-navy px-4 py-2 rounded-xl text-sm font-semibold hover:bg-sky transition-colors"
+            >
+              Edit
+            </button>
+
+            
+            <button
+              v-if="employee.is_active"
+              @click="handleDeactivate"
+              class="bg-navy text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-navy-deep transition-colors"
+            >
+              Deactivate
+            </button>
+          </div> -->
           <div class="flex gap-2">
             <button
               @click="showEditModal = true"
@@ -51,12 +68,27 @@
               Edit
             </button>
             <button
-              v-if="employee.is_active"
-              @click="handleDeactivate"
-              class="bg-navy text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-navy-deep transition-colors"
+              v-if="employee.employment_status === 'resigned'"
+              @click="showRehireModal = true"
+              class="bg-teal-600 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-[#256F63] transition-colors"
             >
-              Deactivate
+              Rehire
             </button>
+            <template v-else>
+              <button
+                @click="handleResign"
+                class="bg-rose-600 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-rose-700 transition-colors"
+              >
+                Resign
+              </button>
+              <button
+                v-if="employee.is_active"
+                @click="handleDeactivate"
+                class="bg-navy text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-navy-deep transition-colors"
+              >
+                Deactivate
+              </button>
+            </template>
           </div>
         </div>
       </div>
@@ -500,6 +532,15 @@
       @updated="fetchEmployee"
     />
 
+    <RehireModal
+      :show="showRehireModal"
+      :employee-id="route.params.id"
+      :employee="employee"
+      :departments="departments"
+      @close="showRehireModal = false"
+      @updated="fetchEmployee"
+    />
+
     <PromotionModal
       :show="showPromotionModal"
       :employee-id="route.params.id"
@@ -531,6 +572,7 @@ import EditEmployeeModal from '../../views/modals/EditEmployeeModal.vue'
 import PromotionModal from '../../views/modals/PromotionModal.vue'
 import LeaveCardModal from '../../views/modals/LeaveCardModal.vue'
 import LeaveEntryModal from '../../views/modals/LeaveEntryModal.vue'
+import RehireModal from '../../views/modals/RehireModal.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -542,6 +584,7 @@ const leaveCredits = ref([])
 const leaveTypes = ref([])
 
 const showEditModal = ref(false)
+const showRehireModal = ref(false)
 const showPromotionModal = ref(false)
 const showLeaveCard = ref(false)
 const showLeaveEntryModal = ref(false)
@@ -645,7 +688,23 @@ const filteredCredits = computed(() => {
     return mainCodes.includes(code)
   })
 })
-
+async function handleResign() {
+  if (
+    confirm(
+      `Mark ${employee.value.first_name} ${employee.value.surname} as resigned effective today?`
+    )
+  ) {
+    try {
+      await api.post(`/employees/${route.params.id}/resign`, {
+        effective_date: new Date().toISOString().split('T')[0],
+      })
+      await fetchEmployee()
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to process resignation.')
+      console.error('Failed to resign employee', err)
+    }
+  }
+}
 function formatDate(dateStr) {
   if (!dateStr) return 'N/A'
   return dateStr.includes('T') ? dateStr.split('T')[0] : dateStr

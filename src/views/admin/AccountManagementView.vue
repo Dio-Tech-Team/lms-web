@@ -97,6 +97,19 @@
     </div>
 
     <!-- Accounts Table -->
+
+    <div class="flex items-center justify-between mb-4">
+      <select
+        v-model="selectedRole"
+        @change="fetchAccounts(1)"
+        class="border border-sky-200 rounded-lg px-3 py-1.5 text-sm text-navy-deep font-semibold bg-white"
+      >
+        <option value="">All Roles</option>
+        <option value="super_admin">Super Admin</option>
+        <option value="hr_admin">HR Admin</option>
+        <option value="employee">Employee</option>
+      </select>
+    </div>
     <div class="bg-white rounded-2xl border border-sky-100 overflow-hidden">
       <table class="w-full text-sm">
         <thead class="bg-sky/60 border-b border-sky-100">
@@ -150,6 +163,27 @@
           </tr>
         </tbody>
       </table>
+      <div class="flex items-center justify-between px-5 py-4 border-t border-sky-100 bg-sky/30">
+        <p class="text-[12.5px] text-slate-500">
+          Page <span class="font-semibold text-navy-deep">{{ currentPage }}</span> of {{ lastPage }}
+        </p>
+        <div class="flex gap-2">
+          <button
+            @click="fetchAccounts(currentPage - 1)"
+            :disabled="currentPage === 1"
+            class="px-3.5 py-1.5 text-[12.5px] font-semibold border border-sky-100 rounded-lg bg-white hover:bg-sky text-navy transition-colors disabled:opacity-40 disabled:hover:bg-white"
+          >
+            ← Previous
+          </button>
+          <button
+            @click="fetchAccounts(currentPage + 1)"
+            :disabled="currentPage === lastPage"
+            class="px-3.5 py-1.5 text-[12.5px] font-semibold border border-sky-100 rounded-lg bg-white hover:bg-sky text-navy transition-colors disabled:opacity-40 disabled:hover:bg-white"
+          >
+            Next →
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -163,6 +197,10 @@ const showAddModal = ref(false)
 const formError = ref(null)
 const formLoading = ref(false)
 
+const currentPage = ref(1)
+const lastPage = ref(1)
+const selectedRole = ref('')
+
 const form = ref({
   username: '',
   email: '',
@@ -170,15 +208,18 @@ const form = ref({
   role: '',
 })
 
-async function fetchAccounts() {
+async function fetchAccounts(page = 1) {
   try {
-    const response = await api.get('/users')
-    accounts.value = response.data
+    const response = await api.get('/users', {
+      params: { page, role: selectedRole.value || undefined },
+    })
+    accounts.value = response.data.data
+    currentPage.value = response.data.current_page
+    lastPage.value = response.data.last_page
   } catch (error) {
     console.error('Error fetching accounts:', error)
   }
 }
-
 async function handleAddAccount() {
   formLoading.value = true
   formError.value = ''
@@ -186,7 +227,7 @@ async function handleAddAccount() {
     await api.post('/users', form.value)
     showAddModal.value = false
     Object.keys(form.value).forEach((key) => (form.value[key] = ''))
-    await fetchAccounts()
+    await fetchAccounts(currentPage.value)
   } catch (error) {
     formError.value = error.response?.data?.message || 'Failed to create account. Please try again.'
   } finally {
@@ -198,11 +239,11 @@ async function handleDelete(id) {
   if (!confirm('Delete this account? This cannot be undone.')) return
   try {
     await api.delete(`/users/${id}`)
-    await fetchAccounts()
+    await fetchAccounts(currentPage.value)
   } catch (error) {
     alert(error.response?.data?.message || 'Failed to delete account.')
   }
 }
 
-onMounted(fetchAccounts)
+onMounted(() => fetchAccounts())
 </script>

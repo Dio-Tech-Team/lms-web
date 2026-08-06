@@ -4,6 +4,36 @@
       <h1 class="text-2xl font-bold text-gray-700">Activity Logs</h1>
     </div>
 
+    <div class="flex gap-3 mb-4">
+      <select
+        v-model="selectedAction"
+        @change="fetchLogs(1)"
+        class="border border-sky-200 rounded-lg px-3 py-1.5 text-sm text-navy-deep font-semibold bg-white"
+      >
+        <option value="">All Actions</option>
+        <option v-for="action in actionOptions" :key="action" :value="action">{{ action }}</option>
+      </select>
+
+      <select
+        v-model="selectedRole"
+        @change="fetchLogs(1)"
+        class="border border-sky-200 rounded-lg px-3 py-1.5 text-sm text-navy-deep font-semibold bg-white"
+      >
+        <option value="">All Roles</option>
+        <option value="hr_admin">HR Admin</option>
+        <option value="super_admin">Super Admin</option>
+        <option value="employee">Employee</option>
+      </select>
+
+      <button
+        v-if="selectedAction || selectedRole"
+        @click="clearFilters"
+        class="px-3.5 py-1.5 text-[12.5px] font-semibold border border-sky-100 rounded-lg bg-white hover:bg-sky text-navy transition-colors"
+      >
+        Clear filters
+      </button>
+    </div>
+
     <div class="bg-white rounded-2xl border border-sky-100 overflow-hidden">
       <table class="w-full text-sm">
         <thead class="bg-sky/60 border-b border-sky-100">
@@ -48,9 +78,8 @@
             <td class="px-5 py-3.5">
               <span
                 class="bg-sky-100 text-navy px-2 py-0.5 rounded-full text-[11px] font-bold font-mono"
+                >{{ log.action }}</span
               >
-                {{ log.action }}
-              </span>
             </td>
             <td class="px-5 py-3.5 text-slate-600">{{ log.description }}</td>
           </tr>
@@ -95,15 +124,31 @@ const logs = ref([])
 const currentPage = ref(1)
 const lastPage = ref(1)
 
+const actionOptions = ref([])
+const selectedAction = ref('')
+const selectedRole = ref('')
+
 async function fetchLogs(page = 1) {
   try {
-    const response = await api.get('/activity-logs', { params: { page } })
+    const response = await api.get('/activity-logs', {
+      params: {
+        page,
+        action: selectedAction.value || undefined,
+        role: selectedRole.value || undefined,
+      },
+    })
     logs.value = response.data.data
     currentPage.value = response.data.current_page
     lastPage.value = response.data.last_page
   } catch (error) {
     console.error('Error fetching activity logs:', error)
   }
+}
+
+function clearFilters() {
+  selectedAction.value = ''
+  selectedRole.value = ''
+  fetchLogs(1)
 }
 
 function formatDate(dateString) {
@@ -115,5 +160,13 @@ function formatDate(dateString) {
   })
 }
 
-onMounted(() => fetchLogs())
+onMounted(async () => {
+  fetchLogs()
+  try {
+    const actionsRes = await api.get('/activity-logs/actions')
+    actionOptions.value = actionsRes.data
+  } catch (error) {
+    console.error('Error fetching filter options:', error)
+  }
+})
 </script>

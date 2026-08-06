@@ -1,19 +1,27 @@
 <template>
   <div>
-    <div class="mb-7">
-      <!-- <p class="text-[11px] uppercase tracking-wider text-teal-600 font-bold mb-1">Overview</p> -->
+    <div class="mb-7 flex items-center justify-between">
       <h1 class="text-2xl font-bold text-gray-700">Dashboard</h1>
-      <!-- <p class="text-slate-500 text-sm mt-1">
-        Where leave credits, applications, and employee records stand today.
-      </p> -->
+      <select
+        v-model="selectedYear"
+        class="border border-sky-200 rounded-lg px-3 py-1.5 text-sm text-navy-deep font-semibold bg-white"
+      >
+        <option v-for="year in availableYears" :key="year" :value="year">{{ year }}</option>
+      </select>
     </div>
 
-    <!-- Loading -->
     <div v-if="loading" class="flex items-center justify-center gap-3 py-24">
       <div
         class="w-6 h-6 border-[3px] border-teal-600 border-t-transparent rounded-full animate-spin"
       ></div>
       <span class="text-slate-500 text-sm">Loading dashboard...</span>
+    </div>
+    <div
+      v-else-if="hasError"
+      class="flex flex-col items-center justify-center gap-2 py-24 text-center"
+    >
+      <p class="text-slate-600 font-semibold">Couldn't load dashboard data.</p>
+      <p class="text-slate-400 text-sm">Please refresh the page or try again in a moment.</p>
     </div>
 
     <template v-else>
@@ -47,7 +55,9 @@
           <p class="text-[10.5px] uppercase tracking-wide text-slate-400 font-bold">
             Pending Applications
           </p>
-          <p class="font-serif text-3xl font-semibold text-navy-deep mt-1.5">{{ pendingCount }}</p>
+          <p class="font-serif text-3xl font-semibold text-navy-deep mt-1.5">
+            {{ leaveStats.pending_count }}
+          </p>
           <p class="text-[12px] text-amber-700 font-semibold mt-1.5">awaiting HR review</p>
         </div>
 
@@ -55,8 +65,12 @@
           <p class="text-[10.5px] uppercase tracking-wide text-slate-400 font-bold">
             Approved This Year
           </p>
-          <p class="font-serif text-3xl font-semibold text-navy-deep mt-1.5">{{ approvedCount }}</p>
-          <p class="text-[12px] text-slate-400 mt-1.5">{{ cancelledCount }} cancelled</p>
+          <p class="font-serif text-3xl font-semibold text-navy-deep mt-1.5">
+            {{ leaveStats.approved_count }}
+          </p>
+          <p class="text-[12px] text-slate-400 mt-1.5">
+            {{ leaveStats.cancelled_count }} cancelled
+          </p>
         </div>
       </div>
 
@@ -120,7 +134,7 @@
               >{{ departmentBreakdown.length }} DEPTS</span
             >
           </div>
-          <div class="space-y-3.5">
+          <div class="space-y-3.5 max-h-64 overflow-y-auto pr-1">
             <div
               v-for="dept in departmentBreakdown"
               :key="dept.name"
@@ -148,13 +162,100 @@
           </div>
         </div>
       </div>
+
+      <!-- Analytics Row -->
+      <div class="grid grid-cols-2 gap-5 mb-6">
+        <div class="bg-white rounded-2xl border border-sky-100 p-6">
+          <h2 class="font-serif text-lg font-semibold text-navy-deep mb-4">
+            Leave Applications — {{ selectedYear }}
+          </h2>
+          <Line
+            v-if="trendChartData"
+            :data="trendChartData"
+            :options="chartOptions"
+            class="max-h-64"
+          />
+        </div>
+
+        <div class="bg-white rounded-2xl border border-sky-100 p-6">
+          <h2 class="font-serif text-lg font-semibold text-navy-deep mb-4">Leave Type Breakdown</h2>
+          <Doughnut
+            v-if="typeChartData"
+            :data="typeChartData"
+            :options="doughnutOptions"
+            class="max-h-64"
+          />
+        </div>
+      </div>
+
+      <!-- Low Credit Alerts -->
+      <div class="bg-white rounded-2xl border border-sky-100 p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="font-serif text-lg font-semibold text-navy-deep">Low Leave Credit Alerts</h2>
+          <span class="font-mono text-[10.5px] text-slate-400">VL/SL BELOW 3 DAYS</span>
+        </div>
+        <table class="w-full text-sm">
+          <tbody>
+            <tr
+              v-for="credit in leaveStats.low_credit_alerts"
+              :key="credit.id"
+              class="border-b border-sky-100 last:border-b-0"
+            >
+              <td class="py-2.5 pr-3">
+                <p class="font-semibold text-navy-deep">
+                  {{ credit.employee?.first_name }} {{ credit.employee?.surname }}
+                </p>
+                <p class="text-[12px] text-slate-400">{{ credit.employee?.department?.name }}</p>
+              </td>
+              <td class="py-2.5 pr-3">
+                <span
+                  class="bg-sky-100 text-navy px-2 py-0.5 rounded-full text-[11px] font-bold font-mono"
+                >
+                  {{ credit.leave_configuration?.code }}
+                </span>
+              </td>
+              <td class="py-2.5 text-right font-mono text-rose-700 font-bold">
+                {{ credit.remaining_balance }} days
+              </td>
+            </tr>
+            <tr v-if="!leaveStats.low_credit_alerts || leaveStats.low_credit_alerts.length === 0">
+              <td colspan="3" class="py-8 text-center text-slate-400 text-sm">
+                No low-credit employees
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </template>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import api from '@/api/axios'
+import { Line, Doughnut } from 'vue-chartjs'
+import {
+  Chart as ChartJS,
+  Title,
+  Tooltip,
+  Legend,
+  LineElement,
+  PointElement,
+  CategoryScale,
+  LinearScale,
+  ArcElement,
+} from 'chart.js'
+
+ChartJS.register(
+  Title,
+  Tooltip,
+  Legend,
+  LineElement,
+  PointElement,
+  CategoryScale,
+  LinearScale,
+  ArcElement
+)
 
 const stats = ref({
   total: 0,
@@ -164,8 +265,21 @@ const stats = ref({
   casual: 0,
   department_breakdown: [],
 })
+const leaveStats = ref({
+  pending_count: 0,
+  approved_count: 0,
+  cancelled_count: 0,
+  monthly_trend: [],
+  leave_type_breakdown: [],
+  low_credit_alerts: [],
+})
 const applications = ref([])
 const loading = ref(true)
+const hasError = ref(false)
+
+const currentYear = new Date().getFullYear()
+const selectedYear = ref(currentYear)
+const availableYears = [currentYear, currentYear - 1, currentYear - 2, currentYear - 3]
 
 const totalEmployees = computed(() => stats.value.total)
 const activeEmployees = computed(() => stats.value.active)
@@ -173,31 +287,76 @@ const inactiveEmployees = computed(() => stats.value.inactive)
 const permanentEmployees = computed(() => stats.value.permanent)
 const casualEmployees = computed(() => stats.value.casual)
 
+watch(selectedYear, fetchLeaveStats)
+
 const departmentBreakdown = computed(() =>
   stats.value.department_breakdown.map((d) => ({ name: d.department_name, count: d.count }))
 )
 const maxDeptCount = computed(() => Math.max(1, ...departmentBreakdown.value.map((d) => d.count)))
 
-const pendingCount = computed(() => applications.value.filter((a) => a.status === 'pending').length)
-const approvedCount = computed(
-  () => applications.value.filter((a) => a.status === 'approved').length
-)
-const cancelledCount = computed(
-  () => applications.value.filter((a) => a.status === 'cancelled').length
-)
-
 const recentApplications = computed(() => applications.value.slice(0, 5))
+
+const trendChartData = computed(() => {
+  if (!leaveStats.value.monthly_trend?.length) return null
+  return {
+    labels: leaveStats.value.monthly_trend.map((m) => m.month),
+    datasets: [
+      {
+        label: 'Applications',
+        data: leaveStats.value.monthly_trend.map((m) => m.count),
+        borderColor: '#0d9488',
+        backgroundColor: 'rgba(13, 148, 136, 0.1)',
+        tension: 0.3,
+        fill: true,
+      },
+    ],
+  }
+})
+
+async function fetchLeaveStats() {
+  try {
+    const res = await api.get('/dashboard/leave-stats', { params: { year: selectedYear.value } })
+    leaveStats.value = res.data
+  } catch (error) {
+    console.error('Error fetching leave stats:', error)
+    hasError.value = true
+  }
+}
+
+const typeChartData = computed(() => {
+  if (!leaveStats.value.leave_type_breakdown?.length) return null
+  return {
+    labels: leaveStats.value.leave_type_breakdown.map((t) => t.code),
+    datasets: [
+      {
+        data: leaveStats.value.leave_type_breakdown.map((t) => t.count),
+        backgroundColor: ['#0d9488', '#f59e0b', '#0369a1', '#e11d48', '#8b5cf6', '#64748b'],
+      },
+    ],
+  }
+})
+
+const chartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: { legend: { display: false } },
+}
+const doughnutOptions = { responsive: true, maintainAspectRatio: false }
 
 onMounted(async () => {
   try {
-    const [statsResponse, appResponse] = await Promise.all([
+    const [statsResponse, leaveStatsResponse, appResponse] = await Promise.all([
       api.get('/employees/stats'),
+      api.get('/dashboard/leave-stats'),
       api.get('/leave-applications'),
     ])
     stats.value = statsResponse.data
+    leaveStats.value = leaveStatsResponse.data
     applications.value = appResponse.data.data || appResponse.data || []
+    await fetchLeaveStats()
   } catch (error) {
     console.error('Error fetching dashboard data:', error)
+    hasError.value = true
   } finally {
     loading.value = false
   }

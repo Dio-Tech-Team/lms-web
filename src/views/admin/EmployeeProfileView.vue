@@ -504,6 +504,13 @@
                 </p>
               </div>
             </div>
+            <button
+              v-if="Number(credit.total_credits) === 0"
+              @click="openOpeningBalanceModal(credit)"
+              class="text-[11px] text-teal-700 hover:text-teal-800 font-semibold mt-3"
+            >
+              Set Opening Balance
+            </button>
           </div>
         </div>
         <div v-else class="text-slate-500 text-sm">
@@ -561,6 +568,13 @@
       @close="showLeaveEntryModal = false"
       @updated="fetchEmployee"
     />
+
+    <OpeningBalanceModal
+      :show="showOpeningBalanceModal"
+      :credit="selectedCredit"
+      @close="showOpeningBalanceModal = false"
+      @save="setOpeningBalance"
+    />
   </div>
 </template>
 
@@ -573,6 +587,7 @@ import PromotionModal from '../../views/modals/PromotionModal.vue'
 import LeaveCardModal from '../../views/modals/LeaveCardModal.vue'
 import LeaveEntryModal from '../../views/modals/LeaveEntryModal.vue'
 import RehireModal from '../../views/modals/RehireModal.vue'
+import OpeningBalanceModal from '../../views/modals/OpeningBalanceModal.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -582,6 +597,9 @@ const loading = ref(true)
 const departments = ref([])
 const leaveCredits = ref([])
 const leaveTypes = ref([])
+
+const showOpeningBalanceModal = ref(false)
+const selectedCredit = ref(null)
 
 const showEditModal = ref(false)
 const showRehireModal = ref(false)
@@ -602,29 +620,23 @@ async function fetchEmployee() {
   }
 }
 
-// onMounted(async () => {
-//   try {
-//     const [empResponse, deptResponse, creditsResponse] = await Promise.all([
-//       api.get(`/employees/${route.params.id}`),
-//       api.get('/departments'),
-//       api.get(`/employees/${route.params.id}/leave-credits`),
-//       api.get('/leave-configurations'),
-//     ])
+function openOpeningBalanceModal(credit) {
+  selectedCredit.value = credit
+  showOpeningBalanceModal.value = true
+}
 
-//     employee.value = empResponse.data
-//     departments.value = deptResponse.data.data
-//     leaveCredits.value =
-//       creditsResponse.data.credits || creditsResponse.data.data || creditsResponse.data
-//     leaveTypes.value = leaveTypesResponse.data
-//     if (!leaveCredits.value || leaveCredits.value.length === 0) {
-//       await initializeCredits()
-//     }
-//   } catch (error) {
-//     console.error('Error fetching profiling attributes:', error)
-//   } finally {
-//     loading.value = false
-//   }
-// })
+async function setOpeningBalance(amount) {
+  try {
+    await api.put(`/employees/${route.params.id}/leave-credits/${selectedCredit.value.id}`, {
+      total_credits: amount,
+    })
+    const creditsResponse = await api.get(`/employees/${route.params.id}/leave-credits`)
+    leaveCredits.value = creditsResponse.data.credits || creditsResponse.data
+    showOpeningBalanceModal.value = false
+  } catch (err) {
+    alert(err.response?.data?.message || 'Failed to set opening balance')
+  }
+}
 onMounted(async () => {
   try {
     // 1. Add 'leaveTypesResponse' to the array

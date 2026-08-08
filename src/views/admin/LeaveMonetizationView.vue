@@ -9,6 +9,22 @@
         + File Monetization
       </button>
     </div>
+    <!-- Search & Year Filter -->
+    <div class="mb-5">
+      <input
+        v-model="search"
+        type="text"
+        placeholder="Search employee name..."
+        class="w-full max-w-sm border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
+        @input="debounceSearch"
+      />
+      <input
+        v-model="selectedYear"
+        type="number"
+        class="w-32 border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
+        @change="fetchMonetizations(1)"
+      />
+    </div>
 
     <!-- Filter Tabs -->
     <div class="flex gap-2 mb-5">
@@ -189,11 +205,17 @@ const currentPage = ref(1)
 const lastPage = ref(1)
 const total = ref(0)
 
+const search = ref('')
+const selectedYear = ref(new Date().getFullYear())
+let searchTimeout = null
+
 async function fetchMonetizations(page = 1) {
   loading.value = true
   try {
     const params = new URLSearchParams({ page })
     if (filterStatus.value) params.append('status', filterStatus.value)
+    if (search.value) params.append('search', search.value)
+    if (selectedYear.value) params.append('year', selectedYear.value)
 
     const response = await api.get(`/leave-monetizations?${params}`)
     monetizations.value = response.data.data
@@ -239,7 +261,10 @@ function formatDate(dateString) {
   if (!dateString) return 'N/A'
   return dateString.toString().split('T')[0]
 }
-
+function debounceSearch() {
+  clearTimeout(searchTimeout)
+  searchTimeout = setTimeout(() => fetchMonetizations(1), 500)
+}
 onMounted(() => {
   fetchMonetizations()
 })

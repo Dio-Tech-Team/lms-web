@@ -259,6 +259,13 @@
             >
               Days
             </th>
+
+            <th
+              class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+            >
+              No Pay
+            </th>
+
             <th
               class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
             >
@@ -289,6 +296,15 @@
               {{ formatDate(record.end_date) }}
             </td>
             <td class="px-4 py-3.5 text-slate-600">{{ record.days_taken }}</td>
+            <td class="px-4 py-3.5">
+              <span
+                v-if="Number(record.no_pay_days) > 0"
+                class="bg-rose-tint text-rose-700 px-2 py-0.5 rounded-full text-[11px] font-bold"
+              >
+                {{ record.no_pay_days }} LWOP
+              </span>
+              <span v-else class="text-slate-400 text-sm">—</span>
+            </td>
             <td class="px-4 py-3.5 text-slate-600">{{ record.recorded_by }}</td>
           </tr>
           <tr v-if="records.length === 0">

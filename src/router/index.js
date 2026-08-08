@@ -51,6 +51,12 @@ const router = createRouter({
           name: 'leave-credit-computation',
           component: () => import('@/views/admin/LeaveCreditComputationView.vue'),
         },
+
+        {
+          path: 'leave-monetizations',
+          name: 'leave-monetizations',
+          component: () => import('@/views/admin/LeaveMonetizationView.vue'),
+        },
         {
           path: 'accounts',
           name: 'accounts',

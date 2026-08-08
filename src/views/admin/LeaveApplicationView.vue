@@ -178,7 +178,7 @@
             <td class="px-4 py-3.5">
               <div v-if="app.status === 'pending'" class="flex gap-3">
                 <button
-                  @click="handleApprove(app.id)"
+                  @click="handleApprove(app)"
                   class="text-teal-700 hover:text-teal-800 font-semibold text-sm transition-colors"
                 >
                   Approve
@@ -307,17 +307,35 @@ function setFilter(status) {
   fetchApplications(1) // reset to page 1 when filter changes
 }
 
-async function handleApprove(id) {
-  if (confirm('Are you sure you want to approve this leave application?')) {
+// async function handleApprove(id) {
+//   if (confirm('Are you sure you want to approve this leave application?')) {
+//     try {
+//       await api.post(`/leave-applications/${id}/approve`)
+//       await fetchApplications(currentPage.value)
+//     } catch (err) {
+//       alert(err.response?.data?.message || 'Failed to approve')
+//     }
+//   }
+// }
+async function handleApprove(app) {
+  let message = 'Are you sure you want to approve this leave application?'
+  if (app.remaining_balance !== null && Number(app.remaining_balance) < Number(app.days_applied)) {
+    const shortfall = (Number(app.days_applied) - Number(app.remaining_balance)).toFixed(2)
+    message = `This employee only has ${Number(app.remaining_balance).toFixed(
+      2
+    )} day(s) remaining, but applied for ${
+      app.days_applied
+    }. ${shortfall} day(s) will be recorded as Leave Without Pay. Continue?`
+  }
+  if (confirm(message)) {
     try {
-      await api.post(`/leave-applications/${id}/approve`)
+      await api.post(`/leave-applications/${app.id}/approve`)
       await fetchApplications(currentPage.value)
     } catch (err) {
       alert(err.response?.data?.message || 'Failed to approve')
     }
   }
 }
-
 async function handleReject(id) {
   if (confirm('Are you sure you want to Reject this leave application?')) {
     try {

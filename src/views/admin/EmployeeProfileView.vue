@@ -505,7 +505,7 @@
               </div>
             </div>
             <button
-              v-if="Number(credit.total_credits) === 0"
+              v-if="Number(credit.total_credits) === 0 && ['VL', 'SL'].includes(credit.code)"
               @click="openOpeningBalanceModal(credit)"
               class="text-[11px] text-teal-700 hover:text-teal-800 font-semibold mt-3"
             >

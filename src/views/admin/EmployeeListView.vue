@@ -439,6 +439,13 @@
             </th>
 
             <th
+              v-if="!stepIncrementYear"
+              class="text-left px-5 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+            >
+              On Leave
+            </th>
+
+            <th
               v-if="stepIncrementYear"
               class="text-left px-5 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
             >
@@ -485,6 +492,15 @@
             <td v-if="!stepIncrementYear" class="px-5 py-3.5 text-slate-600 capitalize">
               {{ employee.employment_status?.replace('_', ' ') }}
             </td>
+            <td v-if="!stepIncrementYear" class="px-5 py-3.5">
+              <span
+                v-if="employee.is_on_leave"
+                class="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-amber-100 text-amber-700"
+              >
+                On Leave
+              </span>
+              <span v-else class="text-slate-300 text-[12px]">—</span>
+            </td>
 
             <td v-if="stepIncrementYear" class="px-5 py-3.5 text-slate-600">
               Step {{ employee.current_step || 'N/A' }}
@@ -507,7 +523,7 @@
 
           <tr v-if="employees.length === 0">
             <td
-              :colspan="stepIncrementYear ? 7 : 6"
+              :colspan="stepIncrementYear ? 7 : 7"
               class="px-5 py-12 text-center text-slate-400 text-sm"
             >
               {{

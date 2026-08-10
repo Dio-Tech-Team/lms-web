@@ -61,6 +61,11 @@ watch(
 )
 
 function submit() {
+  if (
+    confirm(`Set opening balance to ${amount.value} days? This cannot be undone through this form.`)
+  ) {
+    emit('save', amount.value)
+  }
   emit('save', amount.value)
 }
 </script>

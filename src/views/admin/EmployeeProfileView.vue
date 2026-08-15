@@ -441,7 +441,12 @@
       <!-- Leave Balance -->
       <div class="bg-white rounded-2xl border border-sky-100 p-6 mt-6">
         <div class="flex items-center justify-between mb-5">
-          <h2 class="font-serif text-lg font-semibold text-navy-deep">Leave Balance</h2>
+          <div class="flex items-center gap-2">
+            <h2 class="font-serif text-lg font-semibold text-navy-deep">Leave Balance</h2>
+            <span class="text-[12.5px] font-semibold text-slate-400">{{
+              new Date().getFullYear()
+            }}</span>
+          </div>
           <div class="flex gap-2">
             <button
               @click="showLeaveEntryModal = true"
@@ -504,12 +509,19 @@
                 </p>
               </div>
             </div>
-            <button
+            <!-- <button
               v-if="Number(credit.total_credits) === 0 && ['VL', 'SL'].includes(credit.code)"
               @click="openOpeningBalanceModal(credit)"
               class="text-[11px] text-teal-700 hover:text-teal-800 font-semibold mt-3"
             >
               Set Opening Balance
+            </button> -->
+            <button
+              v-if="['VL', 'SL'].includes(credit.code)"
+              @click="openOpeningBalanceModal(credit)"
+              class="text-[11px] text-teal-700 hover:text-teal-800 font-semibold mt-3"
+            >
+              {{ Number(credit.total_credits) === 0 ? 'Set Opening Balance' : 'Edit Balance' }}
             </button>
           </div>
         </div>
@@ -530,11 +542,13 @@
 
     <!-- Modals: each owns its own form state + API call now, parent just
          passes IDs/data in and listens for close/updated -->
+
     <EditEmployeeModal
       :show="showEditModal"
       :employee-id="route.params.id"
       :employee="employee"
       :departments="departments"
+      :positions="positions"
       @close="showEditModal = false"
       @updated="fetchEmployee"
     />
@@ -544,6 +558,7 @@
       :employee-id="route.params.id"
       :employee="employee"
       :departments="departments"
+      :positions="positions"
       @close="showRehireModal = false"
       @updated="fetchEmployee"
     />
@@ -552,10 +567,10 @@
       :show="showPromotionModal"
       :employee-id="route.params.id"
       :employee="employee"
+      :positions="positions"
       @close="showPromotionModal = false"
       @updated="fetchEmployee"
     />
-
     <LeaveCardModal
       :show="showLeaveCard"
       :employee-id="route.params.id"
@@ -595,6 +610,7 @@ const route = useRoute()
 const employee = ref(null)
 const loading = ref(true)
 const departments = ref([])
+const positions = ref([])
 const leaveCredits = ref([])
 const leaveTypes = ref([])
 
@@ -639,13 +655,15 @@ async function setOpeningBalance(amount) {
 }
 onMounted(async () => {
   try {
-    // 1. Add 'leaveTypesResponse' to the array
-    const [empResponse, deptResponse, creditsResponse, leaveTypesResponse] = await Promise.all([
-      api.get(`/employees/${route.params.id}`),
-      api.get('/departments'),
-      api.get(`/employees/${route.params.id}/leave-credits`),
-      api.get('/leave-configurations?active_only=true'),
-    ])
+    // 1. Add 'leaveTypesResponse' and 'positionsResponse' to the array
+    const [empResponse, deptResponse, creditsResponse, leaveTypesResponse, positionsResponse] =
+      await Promise.all([
+        api.get(`/employees/${route.params.id}`),
+        api.get('/departments'),
+        api.get(`/employees/${route.params.id}/leave-credits`),
+        api.get('/leave-configurations?active_only=true'),
+        api.get('/positions'),
+      ])
 
     employee.value = empResponse.data
     departments.value = deptResponse.data.data
@@ -654,6 +672,7 @@ onMounted(async () => {
 
     // 2. Now this will work correctly
     leaveTypes.value = leaveTypesResponse.data.data || leaveTypesResponse.data
+    positions.value = positionsResponse.data
 
     if (!leaveCredits.value || leaveCredits.value.length === 0) {
       await initializeCredits()

@@ -105,6 +105,28 @@
                 Leave Configuration
               </RouterLink>
             </li>
+
+            <li v-if="authStore.isSuperAdmin">
+              <RouterLink
+                to="/holidays"
+                class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm text-sky-100/80 hover:bg-white/5 transition-colors"
+                active-class="!bg-white/10 !text-white font-semibold"
+              >
+                <span class="w-1.5 h-1.5 rounded-full bg-current opacity-50"></span>
+                Holidays
+              </RouterLink>
+            </li>
+            <li v-if="authStore.isSuperAdmin">
+              <RouterLink
+                to="/positions"
+                class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm text-sky-100/80 hover:bg-white/5 transition-colors"
+                active-class="!bg-white/10 !text-white font-semibold"
+              >
+                <span class="w-1.5 h-1.5 rounded-full bg-current opacity-50"></span>
+                Positions
+              </RouterLink>
+            </li>
+
             <li>
               <RouterLink
                 to="/leave-credit-computation"
@@ -227,5 +249,35 @@ async function handleLogout() {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+/* aside {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+aside::-webkit-scrollbar {
+  display: none;
+} */
+
+aside {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+}
+
+aside::-webkit-scrollbar {
+  width: 6px;
+}
+
+aside::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+aside::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 9999px;
+}
+
+aside::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.25);
 }
 </style>

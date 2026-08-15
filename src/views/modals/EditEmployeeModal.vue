@@ -234,6 +234,18 @@
               </option>
             </select>
           </div>
+
+          <div>
+            <label class="block text-sm font-medium text-navy-deep mb-1.5">Position</label>
+            <select
+              v-model="form.position"
+              class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
+            >
+              <option v-for="pos in positions" :key="pos.id" :value="pos.title">
+                {{ pos.title }}
+              </option>
+            </select>
+          </div>
           <div>
             <label class="block text-sm font-medium text-navy-deep mb-1.5">Date Hired</label>
             <input
@@ -274,6 +286,7 @@ const props = defineProps({
   employeeId: { type: [String, Number], required: true },
   employee: { type: Object, default: null },
   departments: { type: Array, default: () => [] },
+  positions: { type: Array, default: () => [] },
 })
 
 const emit = defineEmits(['close', 'updated'])
@@ -301,6 +314,7 @@ const form = ref({
   philhealth_number: '',
   psn_number: '',
   tin_number: '',
+  position: '',
   department_id: '',
   date_hired: '',
 })
@@ -333,6 +347,7 @@ watch(
         psn_number: props.employee.psn_number,
         tin_number: props.employee.tin_number,
         // employment_status: props.employee.employment_status,
+        position: props.employee.position, // add
         department_id: props.employee.department_id,
         date_hired: props.employee.date_hired,
       }

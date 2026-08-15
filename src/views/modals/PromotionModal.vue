@@ -33,7 +33,7 @@
               required
             />
           </div>
-          <div>
+          <!-- <div>
             <label class="block text-sm font-medium text-navy-deep mb-1.5">New Position</label>
             <input
               v-model="form.new_position"
@@ -41,6 +41,18 @@
               class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
               required
             />
+          </div> -->
+          <div>
+            <label class="block text-sm font-medium text-navy-deep mb-1.5">New Position</label>
+            <select
+              v-model="form.new_position"
+              class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
+              required
+            >
+              <option v-for="pos in positions" :key="pos.id" :value="pos.title">
+                {{ pos.title }}
+              </option>
+            </select>
           </div>
           <div>
             <label class="block text-sm font-medium text-navy-deep mb-1.5"
@@ -97,6 +109,7 @@ const props = defineProps({
   show: { type: Boolean, default: false },
   employeeId: { type: [String, Number], required: true },
   employee: { type: Object, default: null },
+  positions: { type: Array, default: () => [] },
 })
 
 const emit = defineEmits(['close', 'updated'])

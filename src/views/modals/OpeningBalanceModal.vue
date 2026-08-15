@@ -4,16 +4,23 @@
     class="fixed inset-0 z-50 flex items-center justify-center bg-navy/20 backdrop-blur-sm p-4"
   >
     <div class="bg-white rounded-2xl w-full max-w-sm p-6 shadow-xl border border-sky-100">
-      <h2 class="font-serif text-lg font-semibold text-navy-deep mb-1">Set Opening Balance</h2>
+      <h2 class="font-serif text-lg font-semibold text-navy-deep mb-1">
+        {{ isEditing ? 'Edit Balance' : 'Set Opening Balance' }}
+      </h2>
       <p class="text-xs text-slate-500 mb-4">
-        Enter the balance from {{ credit?.leave_type }}'s physical leave card. This is a one-time
-        entry and cannot be changed later through this form.
+        <template v-if="isEditing">
+          Correct {{ credit?.leave_type }}'s current balance. This updates the total credits on
+          record — the remaining balance will recalculate automatically based on days already used.
+        </template>
+        <template v-else>
+          Enter the balance from {{ credit?.leave_type }}'s physical leave card.
+        </template>
       </p>
 
       <form @submit.prevent="submit" class="space-y-4">
         <div>
           <label class="block text-[10.5px] uppercase font-bold text-slate-400 mb-1">
-            Opening Balance ({{ credit?.code }})
+            {{ isEditing ? 'Corrected Balance' : 'Opening Balance' }} ({{ credit?.code }})
           </label>
           <input
             v-model.number="amount"
@@ -46,26 +53,32 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, computed, watch } from 'vue'
 
 const props = defineProps(['show', 'credit'])
 const emit = defineEmits(['close', 'save'])
 
 const amount = ref(0)
 
+const isEditing = computed(() => Number(props.credit?.total_credits) > 0)
+
 watch(
   () => props.show,
   (val) => {
-    if (val) amount.value = 0
+    if (val) {
+      // Pre-fill with current value when editing; blank/zero when setting for the first time
+      amount.value = isEditing.value ? Number(props.credit?.total_credits) : 0
+    }
   }
 )
 
 function submit() {
-  if (
-    confirm(`Set opening balance to ${amount.value} days? This cannot be undone through this form.`)
-  ) {
+  const message = isEditing.value
+    ? `Change balance to ${amount.value} days? This will recalculate the remaining balance based on days already used.`
+    : `Set opening balance to ${amount.value} days?`
+
+  if (confirm(message)) {
     emit('save', amount.value)
   }
-  emit('save', amount.value)
 }
 </script>

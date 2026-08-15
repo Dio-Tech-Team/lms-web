@@ -23,7 +23,7 @@
 
       <form @submit.prevent="handleSubmit">
         <div class="space-y-4">
-          <div>
+          <!-- <div>
             <label class="block text-sm font-medium text-navy-deep mb-1.5">Position</label>
             <input
               v-model="form.position"
@@ -31,6 +31,18 @@
               class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
               required
             />
+          </div> -->
+          <div>
+            <label class="block text-sm font-medium text-navy-deep mb-1.5">Position</label>
+            <select
+              v-model="form.position"
+              class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
+              required
+            >
+              <option v-for="pos in positions" :key="pos.id" :value="pos.title">
+                {{ pos.title }}
+              </option>
+            </select>
           </div>
           <div>
             <label class="block text-sm font-medium text-navy-deep mb-1.5">Employment Status</label>
@@ -109,6 +121,7 @@ const props = defineProps({
   employeeId: { type: [String, Number], required: true },
   employee: { type: Object, default: null },
   departments: { type: Array, default: () => [] },
+  positions: { type: Array, default: () => [] },
 })
 
 const emit = defineEmits(['close', 'updated'])

@@ -41,50 +41,6 @@
 
           <form @submit.prevent="handleAddEmployee">
             <h3 class="text-[11px] font-bold text-teal-600 mb-3 uppercase tracking-wider">
-              Account Information
-            </h3>
-            <div class="grid grid-cols-2 gap-4 mb-6">
-              <div>
-                <label class="block text-sm font-medium text-navy-deep mb-1.5">Username</label>
-                <input
-                  v-model="form.username"
-                  type="text"
-                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
-                  required
-                />
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-navy-deep mb-1.5">Email</label>
-                <input
-                  v-model="form.email"
-                  type="email"
-                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
-                  required
-                />
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-navy-deep mb-1.5">Password</label>
-                <input
-                  v-model="form.password"
-                  type="password"
-                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
-                  required
-                />
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-navy-deep mb-1.5"
-                  >Confirm Password</label
-                >
-                <input
-                  v-model="form.password_confirmation"
-                  type="password"
-                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
-                  required
-                />
-              </div>
-            </div>
-
-            <h3 class="text-[11px] font-bold text-teal-600 mb-3 uppercase tracking-wider">
               Personal Information
             </h3>
             <div class="grid grid-cols-2 gap-4 mb-6">
@@ -214,6 +170,73 @@
             </div>
 
             <h3 class="text-[11px] font-bold text-teal-600 mb-3 uppercase tracking-wider">
+              Employment Information
+            </h3>
+            <div class="grid grid-cols-2 gap-4 mb-7">
+              <!-- <div>
+                <label class="block text-sm font-medium text-navy-deep mb-1.5">Position</label>
+                <input
+                  v-model="form.position"
+                  type="text"
+                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
+                  required
+                />
+              </div> -->
+
+              <div>
+                <label class="block text-sm font-medium text-navy-deep mb-1.5">Position</label>
+                <select
+                  v-model="form.position"
+                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
+                  required
+                >
+                  <option value="">Select Position</option>
+                  <option v-for="pos in positions" :key="pos.id" :value="pos.title">
+                    {{ pos.title }}
+                  </option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-navy-deep mb-1.5">Department</label>
+                <select
+                  v-model="form.department_id"
+                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
+                  required
+                >
+                  <option value="">Select Department</option>
+                  <option v-for="dept in departments" :key="dept.id" :value="dept.id">
+                    {{ dept.name }}
+                  </option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-navy-deep mb-1.5"
+                  >Employment Status</label
+                >
+                <select
+                  v-model="form.employment_status"
+                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
+                  required
+                >
+                  <option value="">Select Status</option>
+                  <option value="permanent">Permanent</option>
+                  <option value="casual">Casual</option>
+                  <option value="elected">Elected</option>
+                  <option value="job_order">Job Order</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-navy-deep mb-1.5">Date Hired</label>
+                <input
+                  v-model="form.date_hired"
+                  type="date"
+                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
+                  required
+                />
+              </div>
+            </div>
+
+            <h3 class="text-[11px] font-bold text-teal-600 mb-3 uppercase tracking-wider">
               Contact & Address
             </h3>
             <div class="grid grid-cols-2 gap-4 mb-6">
@@ -238,7 +261,6 @@
                 />
               </div>
             </div>
-
             <h3 class="text-[11px] font-bold text-teal-600 mb-3 uppercase tracking-wider">
               Government IDs
             </h3>
@@ -288,58 +310,48 @@
             </div>
 
             <h3 class="text-[11px] font-bold text-teal-600 mb-3 uppercase tracking-wider">
-              Employment Information
+              Account Information
             </h3>
-            <div class="grid grid-cols-2 gap-4 mb-7">
+            <div class="grid grid-cols-2 gap-4 mb-6">
               <div>
-                <label class="block text-sm font-medium text-navy-deep mb-1.5">Position</label>
+                <label class="block text-sm font-medium text-navy-deep mb-1.5">Username</label>
                 <input
-                  v-model="form.position"
+                  v-model="form.username"
                   type="text"
                   class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
                   required
                 />
               </div>
               <div>
-                <label class="block text-sm font-medium text-navy-deep mb-1.5">Department</label>
-                <select
-                  v-model="form.department_id"
+                <label class="block text-sm font-medium text-navy-deep mb-1.5">Email</label>
+                <input
+                  v-model="form.email"
+                  type="email"
                   class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
                   required
-                >
-                  <option value="">Select Department</option>
-                  <option v-for="dept in departments" :key="dept.id" :value="dept.id">
-                    {{ dept.name }}
-                  </option>
-                </select>
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-navy-deep mb-1.5">Password</label>
+                <input
+                  v-model="form.password"
+                  type="password"
+                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
+                  required
+                />
               </div>
               <div>
                 <label class="block text-sm font-medium text-navy-deep mb-1.5"
-                  >Employment Status</label
+                  >Confirm Password</label
                 >
-                <select
-                  v-model="form.employment_status"
-                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
-                  required
-                >
-                  <option value="">Select Status</option>
-                  <option value="permanent">Permanent</option>
-                  <option value="casual">Casual</option>
-                  <option value="elected">Elected</option>
-                  <option value="job_order">Job Order</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-navy-deep mb-1.5">Date Hired</label>
                 <input
-                  v-model="form.date_hired"
-                  type="date"
+                  v-model="form.password_confirmation"
+                  type="password"
                   class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
                   required
                 />
               </div>
             </div>
-
             <div class="flex justify-end gap-3">
               <button
                 type="button"
@@ -395,6 +407,15 @@
       </select>
 
       <select
+        v-model="selectedSex"
+        class="border border-sky-100 rounded-xl px-3.5 py-2.5 text-sm w-40 bg-white text-navy-deep focus:outline-none focus:ring-2 focus:ring-teal-600 transition-colors"
+      >
+        <option value="">All Gender</option>
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+      </select>
+
+      <select
         v-model="stepIncrementYear"
         @change="fetchEmployees(1)"
         class="border border-sky-100 rounded-xl px-3.5 py-2.5 text-sm w-56 bg-white text-navy-deep focus:outline-none focus:ring-2 focus:ring-teal-600 transition-colors"
@@ -406,65 +427,74 @@
       </select>
     </div>
 
+    <!-- Employee Table List -->
+
     <div class="bg-white rounded-2xl border border-sky-100 overflow-hidden">
-      <table class="w-full text-sm">
+      <table class="w-full text-sm table-fixed">
         <thead class="bg-sky/60 border-b border-sky-100">
           <tr>
             <th
+              class="w-10 text-left px-5 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+            >
+              #
+            </th>
+
+            <th
               v-if="!stepIncrementYear"
-              class="text-left px-5 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+              class="w-32 text-left px-5 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
             >
               ID Number
             </th>
+
             <th
-              class="text-left px-5 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+              class="w-40 text-left px-5 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
             >
               Name
             </th>
             <th
-              class="text-left px-5 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+              class="w-36 text-left px-5 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
             >
               Position
             </th>
             <th
-              class="text-left px-5 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+              class="w-56 text-left px-5 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
             >
               Department
             </th>
             <th
               v-if="!stepIncrementYear"
-              class="text-left px-5 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+              class="w-28 text-left px-5 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
             >
               Status
             </th>
 
             <th
               v-if="!stepIncrementYear"
-              class="text-left px-5 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+              class="w-24 text-left px-5 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
             >
               On Leave
             </th>
 
             <th
               v-if="stepIncrementYear"
-              class="text-left px-5 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+              class="w-28 text-left px-5 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
             >
               Current Step
             </th>
             <th
               v-if="stepIncrementYear"
-              class="text-left px-5 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+              class="w-28 text-left px-5 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
             >
               Next Step
             </th>
             <th
               v-if="stepIncrementYear"
-              class="text-left px-5 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+              class="w-32 text-left px-5 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
             >
               Increment Date
             </th>
             <th
-              class="text-left px-5 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+              class="w-20 text-left px-5 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
             >
               Actions
             </th>
@@ -472,24 +502,29 @@
         </thead>
         <tbody>
           <tr
-            v-for="employee in employees"
+            v-for="(employee, index) in employees"
             :key="employee.id"
             class="border-b border-sky-100 last:border-b-0 hover:bg-sky/40 transition-colors"
           >
+            <td class="px-5 py-3.5 text-slate-500">
+              {{ (currentPage - 1) * 10 + index + 1 }}
+            </td>
             <td
               v-if="!stepIncrementYear"
-              class="px-5 py-3.5 font-mono text-[12.5px] text-slate-500"
+              class="px-5 py-3.5 font-mono text-[12.5px] text-slate-500 truncate"
             >
               {{ employee.id_number }}
             </td>
 
-            <td class="px-5 py-3.5 font-semibold text-navy-deep">
+            <td class="px-5 py-3.5 font-semibold text-navy-deep truncate">
               {{ employee.first_name }} {{ employee.surname }}
             </td>
-            <td class="px-5 py-3.5 text-slate-600">{{ employee.position }}</td>
-            <td class="px-5 py-3.5 text-slate-600">{{ employee.department_name }}</td>
+            <td class="px-5 py-3.5 text-slate-600 truncate">{{ employee.position }}</td>
+            <td class="px-5 py-3.5 text-slate-600 truncate" :title="employee.department_name">
+              {{ employee.department_name }}
+            </td>
 
-            <td v-if="!stepIncrementYear" class="px-5 py-3.5 text-slate-600 capitalize">
+            <td v-if="!stepIncrementYear" class="px-5 py-3.5 text-slate-600 capitalize truncate">
               {{ employee.employment_status?.replace('_', ' ') }}
             </td>
             <td v-if="!stepIncrementYear" class="px-5 py-3.5">
@@ -575,12 +610,14 @@ const authStore = useAuthStore()
 const employees = ref([])
 const search = ref('')
 const selectedDepartment = ref('') //
+const selectedSex = ref('')
 const stepIncrementYear = ref('') // NEW
 const showAddModal = ref(false)
 const currentPage = ref(1)
 const lastPage = ref(1)
 const total = ref(0)
 const departments = ref([])
+const positions = ref([])
 const formError = ref(null)
 const formLoading = ref(false)
 
@@ -661,6 +698,7 @@ async function fetchEmployees(page = 1) {
       params: {
         page: page,
         department_id: selectedDepartment.value,
+        sex: selectedSex.value,
         search: search.value,
       },
     })
@@ -692,6 +730,16 @@ async function handleAddEmployee() {
     formLoading.value = false
   }
 }
+// onMounted(async () => {
+//   await fetchEmployees()
+//   try {
+//     const deptResponse = await api.get('/departments')
+//     departments.value = deptResponse.data.data
+//   } catch (error) {
+//     console.error('Error fetching departments:', error)
+//   }
+// })
+
 onMounted(async () => {
   await fetchEmployees()
   try {
@@ -700,9 +748,18 @@ onMounted(async () => {
   } catch (error) {
     console.error('Error fetching departments:', error)
   }
+  try {
+    const posResponse = await api.get('/positions')
+    positions.value = posResponse.data
+  } catch (error) {
+    console.error('Error fetching positions:', error)
+  }
 })
 watch(selectedDepartment, () => {
   fetchEmployees(1) // Reset to page 1 on filter change
+})
+watch(selectedSex, () => {
+  fetchEmployees(1)
 })
 let searchTimeout = null
 watch(search, () => {

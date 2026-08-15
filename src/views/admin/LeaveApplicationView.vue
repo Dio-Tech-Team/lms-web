@@ -191,8 +191,18 @@
                   Reject
                 </button>
               </div>
+              <!-- <span v-else class="text-slate-400 text-sm">
+                {{ app.reviewed_by_username ? 'By ' + app.reviewed_by_username : '—' }}
+              </span> -->
               <span v-else class="text-slate-400 text-sm">
                 {{ app.reviewed_by_username ? 'By ' + app.reviewed_by_username : '—' }}
+                <button
+                  v-if="app.status === 'rejected' && app.rejection_reason"
+                  @click="alert(app.rejection_reason)"
+                  class="ml-1.5 text-[11px] font-semibold text-rose-600 hover:text-rose-700 underline underline-offset-2"
+                >
+                  View reason
+                </button>
               </span>
             </td>
             <td class="px-4 py-3.5 text-center">
@@ -336,14 +346,35 @@ async function handleApprove(app) {
     }
   }
 }
+// async function handleReject(id) {
+//   if (confirm('Are you sure you want to Reject this leave application?')) {
+//     try {
+//       await api.post(`/leave-applications/${id}/reject`)
+//       await fetchApplications(currentPage.value)
+//     } catch (err) {
+//       alert(err.response?.data?.message || 'Failed to Reject')
+//     }
+//   }
+// }
+
 async function handleReject(id) {
-  if (confirm('Are you sure you want to Reject this leave application?')) {
-    try {
-      await api.post(`/leave-applications/${id}/reject`)
-      await fetchApplications(currentPage.value)
-    } catch (err) {
-      alert(err.response?.data?.message || 'Failed to Reject')
-    }
+  const reason = prompt('Please provide a reason for rejecting this leave application:')
+
+  if (reason === null) {
+    // user clicked Cancel
+    return
+  }
+
+  if (!reason.trim()) {
+    alert('A rejection reason is required.')
+    return
+  }
+
+  try {
+    await api.post(`/leave-applications/${id}/reject`, { rejection_reason: reason.trim() })
+    await fetchApplications(currentPage.value)
+  } catch (err) {
+    alert(err.response?.data?.message || 'Failed to Reject')
   }
 }
 

@@ -3,7 +3,8 @@
     v-if="show"
     class="fixed inset-0 bg-navy-deep/40 backdrop-blur-sm flex items-center justify-center z-50 p-4"
   >
-    <div class="bg-white rounded-3xl shadow-xl w-full max-w-5xl p-7 max-h-[90vh] overflow-y-auto">
+    <!-- <div class="bg-white rounded-3xl shadow-xl w-full max-w-5xl p-7 max-h-[90vh] overflow-y-auto"> -->
+    <div class="bg-white rounded-3xl shadow-xl w-full max-w-7xl p-8 max-h-[90vh] overflow-y-auto">
       <div class="flex items-center justify-between mb-2">
         <div>
           <h2 class="font-serif text-xl font-semibold text-navy-deep">Employee's Leave Card</h2>
@@ -29,43 +30,43 @@
           <div>
             <h3 class="font-serif text-base font-semibold text-navy-deep mb-3">Vacation Leave</h3>
             <div class="border border-sky-100 rounded-xl overflow-hidden">
-              <table class="w-full text-xs">
+              <table class="w-full text-sm">
                 <thead class="bg-sky/60 border-b border-sky-100">
                   <tr>
                     <th
-                      class="text-left px-2.5 py-2.5 text-[9px] uppercase tracking-wider text-slate-400 font-bold"
+                      class="text-left px-2.5 py-2.5 text-[11px] uppercase tracking-wider text-slate-400 font-bold"
                     >
                       Period
                     </th>
                     <th
-                      class="text-left px-2.5 py-2.5 text-[9px] uppercase tracking-wider text-slate-400 font-bold"
+                      class="text-left px-2.5 py-2.5 text-[11px] uppercase tracking-wider text-slate-400 font-bold"
                     >
                       Particulars
                     </th>
                     <th
-                      class="text-right px-2 py-2.5 text-[9px] uppercase tracking-wider text-slate-400 font-bold"
+                      class="text-right px-2 py-2.5 text-[11px] uppercase tracking-wider text-slate-400 font-bold"
                     >
                       Earned
                     </th>
                     <th
-                      class="text-right px-2 py-2.5 text-[9px] uppercase tracking-wider text-slate-400 font-bold"
+                      class="text-right px-2 py-2.5 text-[11px] uppercase tracking-wider text-slate-400 font-bold"
                       title="Absence/Undertime With Pay"
                     >
                       W/P
                     </th>
                     <th
-                      class="text-right px-2 py-2.5 text-[9px] uppercase tracking-wider text-slate-400 font-bold"
+                      class="text-right px-2 py-2.5 text-[11px] uppercase tracking-wider text-slate-400 font-bold"
                       title="Absence/Undertime Without Pay"
                     >
                       WOP
                     </th>
                     <th
-                      class="text-right px-2 py-2.5 text-[9px] uppercase tracking-wider text-slate-400 font-bold"
+                      class="text-right px-2 py-2.5 text-[11px] uppercase tracking-wider text-slate-400 font-bold"
                     >
                       Used
                     </th>
                     <th
-                      class="text-right px-2.5 py-2.5 text-[9px] uppercase tracking-wider text-slate-400 font-bold"
+                      class="text-right px-2.5 py-2.5 text-[11px] uppercase tracking-wider text-slate-400 font-bold"
                     >
                       Balance
                     </th>
@@ -111,43 +112,43 @@
           <div>
             <h3 class="font-serif text-base font-semibold text-navy-deep mb-3">Sick Leave</h3>
             <div class="border border-sky-100 rounded-xl overflow-hidden">
-              <table class="w-full text-xs">
+              <table class="w-full text-sm">
                 <thead class="bg-sky/60 border-b border-sky-100">
                   <tr>
                     <th
-                      class="text-left px-2.5 py-2.5 text-[9px] uppercase tracking-wider text-slate-400 font-bold"
+                      class="text-left px-2.5 py-2.5 text-[11px] uppercase tracking-wider text-slate-400 font-bold"
                     >
                       Period
                     </th>
                     <th
-                      class="text-left px-2.5 py-2.5 text-[9px] uppercase tracking-wider text-slate-400 font-bold"
+                      class="text-left px-2.5 py-2.5 text-[11px] uppercase tracking-wider text-slate-400 font-bold"
                     >
                       Particulars
                     </th>
                     <th
-                      class="text-right px-2 py-2.5 text-[9px] uppercase tracking-wider text-slate-400 font-bold"
+                      class="text-right px-2 py-2.5 text-[11px] uppercase tracking-wider text-slate-400 font-bold"
                     >
                       Earned
                     </th>
                     <th
-                      class="text-right px-2 py-2.5 text-[9px] uppercase tracking-wider text-slate-400 font-bold"
+                      class="text-right px-2 py-2.5 text-[11px] uppercase tracking-wider text-slate-400 font-bold"
                       title="Absence/Undertime With Pay"
                     >
                       W/P
                     </th>
                     <th
-                      class="text-right px-2 py-2.5 text-[9px] uppercase tracking-wider text-slate-400 font-bold"
+                      class="text-right px-2 py-2.5 text-[11px] uppercase tracking-wider text-slate-400 font-bold"
                       title="Absence/Undertime Without Pay"
                     >
                       WOP
                     </th>
                     <th
-                      class="text-right px-2 py-2.5 text-[9px] uppercase tracking-wider text-slate-400 font-bold"
+                      class="text-right px-2 py-2.5 text-[11px] uppercase tracking-wider text-slate-400 font-bold"
                     >
                       Used
                     </th>
                     <th
-                      class="text-right px-2.5 py-2.5 text-[9px] uppercase tracking-wider text-slate-400 font-bold"
+                      class="text-right px-2.5 py-2.5 text-[11px] uppercase tracking-wider text-slate-400 font-bold"
                     >
                       Balance
                     </th>

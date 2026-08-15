@@ -37,6 +37,18 @@ const router = createRouter({
           meta: { roles: ['super_admin'] }, // ← overrides parent, super_admin only
         },
         {
+          path: '/holidays',
+          name: 'holidays',
+          component: () => import('@/views/admin/HolidaysView.vue'),
+          meta: { requiresAuth: true, roles: ['super_admin'] }, // match whatever meta your other protected routes use
+        },
+        {
+          path: '/positions',
+          name: 'positions',
+          component: () => import('@/views/admin/PositionView.vue'),
+          meta: { requiresAuth: true, roles: ['super_admin'] },
+        },
+        {
           path: 'leave-records',
           name: 'leave-records',
           component: () => import('@/views/admin/LeaveRecordsView.vue'),

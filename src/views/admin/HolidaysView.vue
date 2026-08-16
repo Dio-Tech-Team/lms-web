@@ -8,7 +8,7 @@
         </p>
       </div>
       <button
-        @click="showAddModal = true"
+        @click="openAddModal()"
         class="bg-navy text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-navy-deep transition-colors shadow-sm"
       >
         + Add Holiday
@@ -29,7 +29,10 @@
     >
       <div class="bg-white rounded-3xl shadow-xl w-full max-w-md p-7">
         <div class="flex items-center justify-between mb-6">
-          <h2 class="font-serif text-xl font-semibold text-navy-deep">Add Holiday</h2>
+          <!-- <h2 class="font-serif text-xl font-semibold text-navy-deep">Add Holiday</h2> -->
+          <h2 class="font-serif text-xl font-semibold text-navy-deep">
+            {{ editingId ? 'Edit Holiday' : 'Add Holiday' }}
+          </h2>
           <button
             @click="showAddModal = false"
             class="w-8 h-8 rounded-xl flex items-center justify-center text-slate-400 hover:bg-sky hover:text-navy transition-colors text-lg"
@@ -45,7 +48,7 @@
           {{ formError }}
         </div>
 
-        <form @submit.prevent="handleAddHoliday">
+        <form @submit.prevent="handleSaveHoliday">
           <div class="mb-4">
             <label class="block text-sm font-medium text-navy-deep mb-1.5">Date</label>
             <input
@@ -151,14 +154,6 @@
               >
                 Edit
               </button>
-              <button
-                @click="handleDelete(holiday.id)"
-                class="text-rose-600 hover:text-rose-700 font-semibold text-sm transition-colors"
-              >
-                Delete
-              </button>
-            </td>
-            <td class="px-5 py-3.5">
               <button
                 @click="handleDelete(holiday.id)"
                 class="text-rose-600 hover:text-rose-700 font-semibold text-sm transition-colors"

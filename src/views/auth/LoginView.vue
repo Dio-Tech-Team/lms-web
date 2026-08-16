@@ -70,9 +70,9 @@
               <polyline points="22,6 12,13 2,6" />
             </svg>
             <input
-              v-model="email"
-              type="email"
-              placeholder="Email"
+              v-model="login"
+              type="text"
+              placeholder="Username or Email"
               class="w-full border border-sky-100 bg-sky/40 rounded-xl pl-10 pr-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
               required
             />
@@ -91,14 +91,6 @@
               <rect x="3" y="11" width="18" height="11" rx="2" />
               <path d="M7 11V7a5 5 0 0 1 10 0v4" />
             </svg>
-            <!-- <input
-              v-model="password"
-              type="password"
-              placeholder="Password"
-              class="w-full border border-sky-100 bg-sky/40 rounded-xl pl-10 pr-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
-              required
-            /> -->
-
             <input
               v-model="password"
               :type="showPassword ? 'text' : 'password'"
@@ -170,7 +162,7 @@ import { useAuthStore } from '@/stores/auth'
 const router = useRouter()
 const authStore = useAuthStore()
 
-const email = ref('')
+const login = ref('')
 const password = ref('')
 const showPassword = ref(false)
 const loading = ref(false)
@@ -181,7 +173,7 @@ async function handleLogin() {
   error.value = ''
 
   try {
-    await authStore.login(email.value, password.value)
+    await authStore.login(login.value, password.value)
     router.push('/')
   } catch (err) {
     error.value = err.response?.data?.message || 'Invalid credentials'

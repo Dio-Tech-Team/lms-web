@@ -10,6 +10,13 @@ const router = createRouter({
       component: () => import('@/views/auth/LoginView.vue'),
       meta: { guestOnly: true },
     },
+
+    {
+      path: '/change-password',
+      name: 'change-password',
+      component: () => import('@/views/auth/ChangePasswordView.vue'),
+      meta: { requiresAuth: true },
+    },
     {
       path: '/',
       component: () => import('@/layouts/AdminLayout.vue'),
@@ -75,6 +82,7 @@ const router = createRouter({
           component: () => import('@/views/admin/AccountManagementView.vue'),
           meta: { roles: ['super_admin'] }, // ← new page for UserController
         },
+
         {
           path: 'activity-logs',
           name: 'activity-logs',
@@ -94,6 +102,24 @@ router.beforeEach((to, from) => {
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     return '/login'
   } else if (to.meta.guestOnly && authStore.isAuthenticated) {
+    return '/'
+  }
+
+  // Force password change before accessing anything else
+  if (
+    authStore.isAuthenticated &&
+    authStore.user?.must_change_password &&
+    to.name !== 'change-password'
+  ) {
+    return '/change-password'
+  }
+
+  // Once changed, don't let them linger on the change-password screen
+  if (
+    authStore.isAuthenticated &&
+    !authStore.user?.must_change_password &&
+    to.name === 'change-password'
+  ) {
     return '/'
   }
 

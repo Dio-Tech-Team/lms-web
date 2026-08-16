@@ -74,12 +74,18 @@
             >
               Rehire
             </button>
-            <template v-else>
+            <template v-else-if="employee.employment_status !== 'retired'">
               <button
-                @click="handleResign"
+                @click="showResignModal = true"
                 class="bg-rose-600 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-rose-700 transition-colors"
               >
                 Resign
+              </button>
+              <button
+                @click="showRetireModal = true"
+                class="bg-amber-600 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-amber-700 transition-colors"
+              >
+                Retire
               </button>
               <button
                 v-if="employee.is_active"
@@ -110,6 +116,12 @@
                 Email
               </p>
               <p class="font-medium text-ink">{{ employee.email || 'N/A' }}</p>
+            </div>
+            <div>
+              <p class="text-[10.5px] uppercase tracking-wide text-slate-400 font-bold mb-1">
+                Username
+              </p>
+              <p class="font-mono text-[13px] text-navy-deep">{{ employee.username || 'N/A' }}</p>
             </div>
             <div>
               <p class="text-[10.5px] uppercase tracking-wide text-slate-400 font-bold mb-1">
@@ -351,9 +363,6 @@
             >
               Eligible for retirement
             </p>
-            <p v-else class="text-xs text-slate-500 mt-2 font-mono">
-              Retirement date: {{ employee.retirement?.retirement_date }}
-            </p>
           </div>
         </div>
       </div>
@@ -550,7 +559,7 @@
       :departments="departments"
       :positions="positions"
       @close="showEditModal = false"
-      @updated="fetchEmployee"
+      @updated="refreshAll"
     />
 
     <RehireModal
@@ -560,6 +569,22 @@
       :departments="departments"
       :positions="positions"
       @close="showRehireModal = false"
+      @updated="refreshAll"
+    />
+
+    <ResignModal
+      :show="showResignModal"
+      :employee-id="route.params.id"
+      :employee="employee"
+      @close="showResignModal = false"
+      @updated="fetchEmployee"
+    />
+
+    <RetireModal
+      :show="showRetireModal"
+      :employee-id="route.params.id"
+      :employee="employee"
+      @close="showRetireModal = false"
       @updated="fetchEmployee"
     />
 
@@ -569,7 +594,7 @@
       :employee="employee"
       :positions="positions"
       @close="showPromotionModal = false"
-      @updated="fetchEmployee"
+      @updated="refreshAll"
     />
     <LeaveCardModal
       :show="showLeaveCard"
@@ -581,7 +606,7 @@
       :employee-id="route.params.id"
       :leave-types="leaveTypes"
       @close="showLeaveEntryModal = false"
-      @updated="fetchEmployee"
+      @updated="refreshAll"
     />
 
     <OpeningBalanceModal
@@ -603,6 +628,8 @@ import LeaveCardModal from '../../views/modals/LeaveCardModal.vue'
 import LeaveEntryModal from '../../views/modals/LeaveEntryModal.vue'
 import RehireModal from '../../views/modals/RehireModal.vue'
 import OpeningBalanceModal from '../../views/modals/OpeningBalanceModal.vue'
+import ResignModal from '../../views/modals/ResignModal.vue'
+import RetireModal from '../../views/modals/RetireModal.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -622,10 +649,11 @@ const showRehireModal = ref(false)
 const showPromotionModal = ref(false)
 const showLeaveCard = ref(false)
 const showLeaveEntryModal = ref(false)
-
+const showResignModal = ref(false)
 const showAllSteps = ref(false)
 const showAllHistory = ref(false)
 const showAllCredits = ref(false)
+const showRetireModal = ref(false)
 
 async function fetchEmployee() {
   try {
@@ -635,7 +663,19 @@ async function fetchEmployee() {
     console.error('Error fetching employee:', error)
   }
 }
+async function fetchLeaveCredits() {
+  try {
+    const creditsResponse = await api.get(`/employees/${route.params.id}/leave-credits`)
+    leaveCredits.value = creditsResponse.data.credits || creditsResponse.data
+  } catch (error) {
+    console.error('Error fetching leave credits:', error)
+  }
+}
 
+async function refreshAll() {
+  await fetchEmployee()
+  await fetchLeaveCredits()
+}
 function openOpeningBalanceModal(credit) {
   selectedCredit.value = credit
   showOpeningBalanceModal.value = true
@@ -695,11 +735,19 @@ async function handleDeactivate() {
   }
 }
 
+// async function initializeCredits() {
+//   try {
+//     await api.post(`/employees/${route.params.id}/leave-credits/initialize`)
+//     const creditsResponse = await api.get(`/employees/${route.params.id}/leave-credits`)
+//     leaveCredits.value = creditsResponse.data.credits || creditsResponse.data
+//   } catch (error) {
+//     console.error('Failed to initialize credits', error)
+//   }
+// }
 async function initializeCredits() {
   try {
     await api.post(`/employees/${route.params.id}/leave-credits/initialize`)
-    const creditsResponse = await api.get(`/employees/${route.params.id}/leave-credits`)
-    leaveCredits.value = creditsResponse.data.credits || creditsResponse.data
+    await fetchLeaveCredits()
   } catch (error) {
     console.error('Failed to initialize credits', error)
   }
@@ -719,23 +767,7 @@ const filteredCredits = computed(() => {
     return mainCodes.includes(code)
   })
 })
-async function handleResign() {
-  if (
-    confirm(
-      `Mark ${employee.value.first_name} ${employee.value.surname} as resigned effective today?`
-    )
-  ) {
-    try {
-      await api.post(`/employees/${route.params.id}/resign`, {
-        effective_date: new Date().toISOString().split('T')[0],
-      })
-      await fetchEmployee()
-    } catch (err) {
-      alert(err.response?.data?.message || 'Failed to process resignation.')
-      console.error('Failed to resign employee', err)
-    }
-  }
-}
+
 function formatDate(dateStr) {
   if (!dateStr) return 'N/A'
   return dateStr.includes('T') ? dateStr.split('T')[0] : dateStr

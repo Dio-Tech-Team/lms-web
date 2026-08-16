@@ -12,14 +12,28 @@ export const useAuthStore = defineStore('auth', () => {
   const isHRAdmin = computed(() => user.value?.role === 'hr_admin')
   const isEmployee = computed(() => user.value?.role === 'employee')
 
-  async function login(email, password) {
-    const response = await api.post('/login', { email, password })
+  // async function login(email, password) {
+  //   const response = await api.post('/login', { email, password })
+  //   token.value = response.data.token
+  //   user.value = response.data.user
+  //   localStorage.setItem('token', token.value)
+  //   localStorage.setItem('user', JSON.stringify(user.value))
+  // }
+
+  async function login(login, password) {
+    const response = await api.post('/login', { login, password })
     token.value = response.data.token
     user.value = response.data.user
     localStorage.setItem('token', token.value)
     localStorage.setItem('user', JSON.stringify(user.value))
   }
-
+  
+  function clearMustChangePassword() {
+    if (user.value) {
+      user.value.must_change_password = false
+      localStorage.setItem('user', JSON.stringify(user.value))
+    }
+  }
   async function logout() {
     await api.post('/logout')
     token.value = null
@@ -38,5 +52,6 @@ export const useAuthStore = defineStore('auth', () => {
     isEmployee,
     login,
     logout,
+    clearMustChangePassword,
   }
 })

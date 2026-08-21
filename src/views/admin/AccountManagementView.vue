@@ -115,6 +115,11 @@
         <thead class="bg-sky/60 border-b border-sky-100">
           <tr>
             <th
+              class="w-10 text-left px-5 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+            >
+              No
+            </th>
+            <th
               class="text-left px-5 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
             >
               Username
@@ -138,10 +143,11 @@
         </thead>
         <tbody>
           <tr
-            v-for="acct in accounts"
+            v-for="(acct, index) in accounts"
             :key="acct.id"
             class="border-b border-sky-100 last:border-b-0 hover:bg-sky/40 transition-colors"
           >
+            <td class="px-5 py-3.5 text-slate-500">{{ (currentPage - 1) * 15 + index + 1 }}</td>
             <td class="px-5 py-3.5 font-semibold text-navy-deep">{{ acct.username }}</td>
             <td class="px-5 py-3.5 text-slate-600">{{ acct.email }}</td>
             <td class="px-5 py-3.5 text-slate-600 capitalize">
@@ -157,7 +163,7 @@
             </td>
           </tr>
           <tr v-if="accounts.length === 0">
-            <td colspan="4" class="px-5 py-12 text-center text-slate-400 text-sm">
+            <td colspan="5" class="px-5 py-12 text-center text-slate-400 text-sm">
               No accounts found
             </td>
           </tr>
@@ -191,6 +197,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import api from '@/api/axios'
+import { useConfirm } from '@/composables/useConfirm'
 
 const accounts = ref([])
 const showAddModal = ref(false)
@@ -200,6 +207,8 @@ const formLoading = ref(false)
 const currentPage = ref(1)
 const lastPage = ref(1)
 const selectedRole = ref('')
+
+const { confirm } = useConfirm()
 
 const form = ref({
   username: '',
@@ -236,7 +245,12 @@ async function handleAddAccount() {
 }
 
 async function handleDelete(id) {
-  if (!confirm('Delete this account? This cannot be undone.')) return
+  const ok = await confirm({
+    title: 'Delete account?',
+    message: 'This cannot be undone.',
+  })
+  if (!ok) return
+
   try {
     await api.delete(`/users/${id}`)
     await fetchAccounts(currentPage.value)

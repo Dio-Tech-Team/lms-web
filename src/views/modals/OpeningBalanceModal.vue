@@ -54,11 +54,14 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
+import { useConfirm } from '@/composables/useConfirm'
 
 const props = defineProps(['show', 'credit'])
 const emit = defineEmits(['close', 'save'])
 
 const amount = ref(0)
+
+const { confirm } = useConfirm()
 
 const isEditing = computed(() => Number(props.credit?.total_credits) > 0)
 
@@ -72,12 +75,13 @@ watch(
   }
 )
 
-function submit() {
+async function submit() {
   const message = isEditing.value
     ? `Change balance to ${amount.value} days? This will recalculate the remaining balance based on days already used.`
     : `Set opening balance to ${amount.value} days?`
 
-  if (confirm(message)) {
+  const ok = await confirm(message)
+  if (ok) {
     emit('save', amount.value)
   }
 }

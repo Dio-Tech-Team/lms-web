@@ -13,439 +13,15 @@
       >
         + Add Employee
       </button>
-
-      <!-- Add Employee Modal -->
-      <div
-        v-if="showAddModal"
-        class="fixed inset-0 bg-navy-deep/40 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-      >
-        <div
-          class="bg-white rounded-3xl shadow-xl w-full max-w-2xl p-7 max-h-[90vh] overflow-y-auto"
-        >
-          <div class="flex items-center justify-between mb-6">
-            <h2 class="font-serif text-xl font-semibold text-navy-deep">Add New Employee</h2>
-            <button
-              @click="showAddModal = false"
-              class="w-8 h-8 rounded-xl flex items-center justify-center text-slate-400 hover:bg-sky hover:text-navy transition-colors text-lg"
-            >
-              ✕
-            </button>
-          </div>
-
-          <div
-            v-if="formError"
-            class="bg-rose-tint border border-rose-200 text-rose-700 px-4 py-3 rounded-xl mb-5 text-sm"
-          >
-            {{ formError }}
-          </div>
-
-          <form @submit.prevent="handleAddEmployee">
-            <h3 class="text-[11px] font-bold text-teal-600 mb-3 uppercase tracking-wider">
-              Personal Information
-            </h3>
-            <div class="grid grid-cols-2 gap-4 mb-6">
-              <div>
-                <label class="block text-sm font-medium text-navy-deep mb-1.5">First Name</label>
-                <input
-                  v-model="form.first_name"
-                  type="text"
-                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
-                  required
-                />
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-navy-deep mb-1.5">Middle Name</label>
-                <input
-                  v-model="form.middle_name"
-                  type="text"
-                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
-                />
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-navy-deep mb-1.5">Surname</label>
-                <input
-                  v-model="form.surname"
-                  type="text"
-                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
-                  required
-                />
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-navy-deep mb-1.5">ID Number</label>
-                <input
-                  v-model="form.id_number"
-                  type="text"
-                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
-                  required
-                />
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-navy-deep mb-1.5">Birthdate</label>
-                <input
-                  v-model="form.birthdate"
-                  type="date"
-                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
-                />
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-navy-deep mb-1.5"
-                  >Place of Birth</label
-                >
-                <input
-                  v-model="form.place_of_birth"
-                  type="text"
-                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
-                />
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-navy-deep mb-1.5">Sex</label>
-                <select
-                  v-model="form.sex"
-                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
-                  required
-                >
-                  <option value="">Select Sex</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-navy-deep mb-1.5">Civil Status</label>
-                <select
-                  v-model="form.civil_status"
-                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
-                  required
-                >
-                  <option value="">Select Civil Status</option>
-                  <option value="single">Single</option>
-                  <option value="married">Married</option>
-                  <option value="widowed">Widowed</option>
-                  <option value="separated">Separated</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-navy-deep mb-1.5">Height</label>
-                <input
-                  v-model="form.height"
-                  type="text"
-                  placeholder="e.g. 5'6&quot;"
-                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
-                />
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-navy-deep mb-1.5">Weight</label>
-                <input
-                  v-model="form.weight"
-                  type="text"
-                  placeholder="e.g. 65kg"
-                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
-                />
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-navy-deep mb-1.5">Blood Type</label>
-                <input
-                  v-model="form.bloodtype"
-                  type="text"
-                  placeholder="e.g. O+"
-                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
-                />
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-navy-deep mb-1.5"
-                  >Highest Educational Attainment</label
-                >
-                <select
-                  v-model="form.highest_educational_attainment"
-                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
-                  required
-                >
-                  <option value="">Select</option>
-                  <option value="elementary">Elementary</option>
-                  <option value="secondary">Secondary</option>
-                  <option value="vocational">Vocational</option>
-                  <option value="college">College</option>
-                  <option value="graduate">Graduate</option>
-                </select>
-              </div>
-            </div>
-
-            <h3 class="text-[11px] font-bold text-teal-600 mb-3 uppercase tracking-wider">
-              Employment Information
-            </h3>
-            <div class="grid grid-cols-2 gap-4 mb-7">
-              <!-- <div>
-                <label class="block text-sm font-medium text-navy-deep mb-1.5">Position</label>
-                <input
-                  v-model="form.position"
-                  type="text"
-                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
-                  required
-                />
-              </div> -->
-
-              <div>
-                <label class="block text-sm font-medium text-navy-deep mb-1.5">Position</label>
-                <select
-                  v-model="form.position"
-                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
-                  required
-                >
-                  <option value="">Select Position</option>
-                  <option v-for="pos in positions" :key="pos.id" :value="pos.title">
-                    {{ pos.title }}
-                  </option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-navy-deep mb-1.5">Department</label>
-                <select
-                  v-model="form.department_id"
-                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
-                  required
-                >
-                  <option value="">Select Department</option>
-                  <option v-for="dept in departments" :key="dept.id" :value="dept.id">
-                    {{ dept.name }}
-                  </option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-navy-deep mb-1.5"
-                  >Employment Status</label
-                >
-                <select
-                  v-model="form.employment_status"
-                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
-                  required
-                >
-                  <option value="">Select Status</option>
-                  <option value="permanent">Permanent</option>
-                  <option value="casual">Casual</option>
-                  <option value="elected">Elected</option>
-                  <option value="job_order">Job Order</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-navy-deep mb-1.5">Date Hired</label>
-                <input
-                  v-model="form.date_hired"
-                  type="date"
-                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
-                  required
-                />
-              </div>
-            </div>
-
-            <h3 class="text-[11px] font-bold text-teal-600 mb-3 uppercase tracking-wider">
-              Contact & Address
-            </h3>
-            <div class="grid grid-cols-2 gap-4 mb-6">
-              <div>
-                <label class="block text-sm font-medium text-navy-deep mb-1.5"
-                  >Residential Address</label
-                >
-                <input
-                  v-model="form.residential_address"
-                  type="text"
-                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
-                />
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-navy-deep mb-1.5"
-                  >Contact Number</label
-                >
-                <input
-                  v-model="form.contact_number"
-                  type="text"
-                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
-                />
-              </div>
-            </div>
-            <h3 class="text-[11px] font-bold text-teal-600 mb-3 uppercase tracking-wider">
-              Government IDs
-            </h3>
-            <div class="grid grid-cols-2 gap-4 mb-6">
-              <div>
-                <label class="block text-sm font-medium text-navy-deep mb-1.5">UMID</label>
-                <input
-                  v-model="form.umid_id"
-                  type="text"
-                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
-                />
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-navy-deep mb-1.5">Pag-IBIG ID</label>
-                <input
-                  v-model="form.pagibig_id"
-                  type="text"
-                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
-                />
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-navy-deep mb-1.5"
-                  >PhilHealth Number</label
-                >
-                <input
-                  v-model="form.philhealth_number"
-                  type="text"
-                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
-                />
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-navy-deep mb-1.5">PSN Number</label>
-                <input
-                  v-model="form.psn_number"
-                  type="text"
-                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
-                />
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-navy-deep mb-1.5">TIN Number</label>
-                <input
-                  v-model="form.tin_number"
-                  type="text"
-                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
-                />
-              </div>
-            </div>
-            <!-- 
-            <h3 class="text-[11px] font-bold text-teal-600 mb-3 uppercase tracking-wider">
-              Account Information
-            </h3>
-            <div class="grid grid-cols-2 gap-4 mb-6">
-              <div>
-                <label class="block text-sm font-medium text-navy-deep mb-1.5">Username</label>
-                <input
-                  v-model="form.username"
-                  type="text"
-                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
-                  required
-                />
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-navy-deep mb-1.5">Email</label>
-                <input
-                  v-model="form.email"
-                  type="email"
-                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
-                  required
-                />
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-navy-deep mb-1.5">Password</label>
-                <input
-                  v-model="form.password"
-                  type="password"
-                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
-                  required
-                />
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-navy-deep mb-1.5"
-                  >Confirm Password</label
-                >
-                <input
-                  v-model="form.password_confirmation"
-                  type="password"
-                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
-                  required
-                />
-              </div>
-            </div> -->
-
-            <!-- AFTER -->
-            <h3 class="text-[11px] font-bold text-teal-600 mb-3 uppercase tracking-wider">
-              Account Information
-            </h3>
-            <div class="grid grid-cols-2 gap-4 mb-6">
-              <div>
-                <label class="block text-sm font-medium text-navy-deep mb-1.5">Username</label>
-                <input
-                  v-model="form.username"
-                  type="text"
-                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
-                  required
-                />
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-navy-deep mb-1.5">
-                  Email <span class="text-slate-400 font-normal">(optional)</span>
-                </label>
-                <input
-                  v-model="form.email"
-                  type="email"
-                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
-                />
-                <p class="text-[11px] text-slate-400 mt-1">
-                  Leave blank if the employee has no email. They'll still be able to sign in using
-                  their username.
-                </p>
-              </div>
-            </div>
-            <p class="text-[12.5px] text-slate-500 bg-sky/50 rounded-xl px-3.5 py-2.5 mb-6">
-              A default password will be generated automatically from the employee's ID Number. It
-              will be shown once after saving.
-            </p>
-            <div class="flex justify-end gap-3">
-              <button
-                type="button"
-                @click="showAddModal = false"
-                class="px-5 py-2.5 text-sm font-semibold text-navy border border-sky-100 rounded-xl hover:bg-sky transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                :disabled="formLoading"
-                class="px-5 py-2.5 text-sm font-semibold bg-navy text-white rounded-xl hover:bg-navy-deep transition-colors disabled:opacity-50"
-              >
-                {{ formLoading ? 'Saving...' : 'Save Employee' }}
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-
-      <!-- Credentials Confirmation Modal -->
-      <div
-        v-if="createdCredentials"
-        class="fixed inset-0 bg-navy-deep/40 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-      >
-        <div class="bg-white rounded-3xl shadow-xl w-full max-w-md p-7">
-          <h2 class="font-serif text-xl font-semibold text-navy-deep mb-1">Employee Registered</h2>
-          <p class="text-[13px] text-slate-500 mb-5">
-            Share these credentials with the employee. They'll be required to change the password on
-            first login.
-          </p>
-
-          <div class="bg-sky/50 rounded-xl p-4 space-y-2.5 mb-6 font-mono text-[13px]">
-            <div class="flex justify-between">
-              <span class="text-slate-400">Username</span>
-              <span class="text-navy-deep font-semibold">{{ createdCredentials.username }}</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-slate-400">Email</span>
-              <span class="text-navy-deep font-semibold">{{
-                createdCredentials.email || 'Not provided'
-              }}</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-slate-400">Default Password</span>
-              <span class="text-navy-deep font-semibold">{{
-                createdCredentials.default_password
-              }}</span>
-            </div>
-          </div>
-
-          <button
-            @click="createdCredentials = null"
-            class="w-full bg-navy text-white py-2.5 rounded-xl font-semibold text-sm hover:bg-navy-deep transition-colors"
-          >
-            Done
-          </button>
-        </div>
-      </div>
     </div>
+
+    <AddEmployeeModal
+      :show="showAddModal"
+      :departments="departments"
+      :positions="positions"
+      @close="showAddModal = false"
+      @created="fetchEmployees(currentPage)"
+    />
 
     <!-- Search + Filter -->
     <div class="mb-5 flex gap-3">
@@ -510,7 +86,7 @@
             <th
               class="w-10 text-left px-5 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
             >
-              #
+              No.
             </th>
 
             <th
@@ -672,64 +248,31 @@
   </div>
 </template>
 
- 
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import api from '@/api/axios'
+import AddEmployeeModal from '../../views/modals/AddEmployeeModal.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
 const employees = ref([])
-const createdCredentials = ref(null) // { username, email, default_password }
 const search = ref('')
-const selectedDepartment = ref('') //
+const selectedDepartment = ref('')
 const selectedSex = ref('')
-const stepIncrementYear = ref('') // NEW
+const stepIncrementYear = ref('')
 const showAddModal = ref(false)
 const currentPage = ref(1)
 const lastPage = ref(1)
 const total = ref(0)
 const departments = ref([])
 const positions = ref([])
-const formError = ref(null)
-const formLoading = ref(false)
 
-// NEW: current year + next 5 years as quick filter options
+// current year + next 2 years as quick filter options
 const stepIncrementYearOptions = computed(() => {
   const current = new Date().getFullYear()
   return Array.from({ length: 3 }, (_, i) => current + i)
-})
-
-const form = ref({
-  username: '',
-  email: '',
-  // password: '',
-  // password_confirmation: '',
-  first_name: '',
-  middle_name: '',
-  surname: '',
-  birthdate: '',
-  place_of_birth: '',
-  sex: '',
-  civil_status: '',
-  height: '',
-  weight: '',
-  bloodtype: '',
-  highest_educational_attainment: '',
-  residential_address: '',
-  contact_number: '',
-  id_number: '',
-  position: '',
-  department_id: '',
-  employment_status: '',
-  date_hired: '',
-  umid_id: '',
-  pagibig_id: '',
-  philhealth_number: '',
-  psn_number: '',
-  tin_number: '',
 })
 
 async function fetchEmployees(page = 1) {
@@ -750,10 +293,9 @@ async function fetchEmployees(page = 1) {
           current_step: e.current_step,
           next_step: e.next_step,
           next_step_date: e.next_step_date,
-          id_number: '', // not returned by forecast endpoint, not shown in this mode anyway
+          id_number: '',
         }
       })
-      // NEW — forecast endpoint returns everything in one shot, not paginated
       currentPage.value = 1
       lastPage.value = 1
       total.value = employees.value.length
@@ -768,7 +310,6 @@ async function fetchEmployees(page = 1) {
   }
 
   try {
-    // const employeeResponse = await api.get(`/employees?page=${page}`)
     const employeeResponse = await api.get(`/employees`, {
       params: {
         page: page,
@@ -786,63 +327,6 @@ async function fetchEmployees(page = 1) {
   }
 }
 
-// async function handleAddEmployee() {
-//   formLoading.value = true
-//   formError.value = ''
-//   try {
-//     // Backend handles both employee creation AND default leave credit generation in this single call
-//     await api.post('employees', form.value)
-
-//     showAddModal.value = false
-//     Object.keys(form.value).forEach((key) => {
-//       form.value[key] = ''
-//     })
-//     await fetchEmployees(currentPage.value)
-//   } catch (error) {
-//     formError.value =
-//       error.response?.data?.message || 'Failed to register employee. Please try again.'
-//   } finally {
-//     formLoading.value = false
-//   }
-// }
-
-async function handleAddEmployee() {
-  formLoading.value = true
-  formError.value = ''
-  try {
-    const response = await api.post('employees', form.value)
-    createdCredentials.value = {
-      username: response.data.user.username,
-      email: response.data.user.email,
-      default_password: response.data.default_password,
-    }
-    // createdCredentials.value = {
-    //   username: response.data.user.username,
-    //   email: response.data.user.email,
-    //   default_password: response.data.default_password,
-    // }
-    showAddModal.value = false
-    Object.keys(form.value).forEach((key) => {
-      form.value[key] = ''
-    })
-    await fetchEmployees(currentPage.value)
-  } catch (error) {
-    formError.value =
-      error.response?.data?.message || 'Failed to register employee. Please try again.'
-  } finally {
-    formLoading.value = false
-  }
-}
-// onMounted(async () => {
-//   await fetchEmployees()
-//   try {
-//     const deptResponse = await api.get('/departments')
-//     departments.value = deptResponse.data.data
-//   } catch (error) {
-//     console.error('Error fetching departments:', error)
-//   }
-// })
-
 onMounted(async () => {
   await fetchEmployees()
   try {
@@ -858,8 +342,9 @@ onMounted(async () => {
     console.error('Error fetching positions:', error)
   }
 })
+
 watch(selectedDepartment, () => {
-  fetchEmployees(1) // Reset to page 1 on filter change
+  fetchEmployees(1)
 })
 watch(selectedSex, () => {
   fetchEmployees(1)

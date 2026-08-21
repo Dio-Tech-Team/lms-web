@@ -91,6 +91,16 @@
               class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
             />
           </div>
+
+          <!-- <div>
+            <label class="block text-sm font-medium text-navy-deep mb-1.5">Email</label>
+            <input
+              v-model="form.email"
+              type="email"
+              class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
+              placeholder="employee@example.com"
+            />
+          </div> -->
           <div>
             <label class="block text-sm font-medium text-navy-deep mb-1.5">Contact Number</label>
             <input
@@ -211,18 +221,6 @@
           Employment Information
         </h3>
         <div class="grid grid-cols-2 gap-4 mb-7">
-          <!-- <div>
-            <label class="block text-sm font-medium text-navy-deep mb-1.5">Employment Status</label>
-            <select
-              v-model="form.employment_status"
-              class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
-            >
-              <option value="permanent">Permanent</option>
-              <option value="casual">Casual</option>
-              <option value="elected">Elected</option>
-              <option value="job_order">Job Order</option>
-            </select>
-          </div> -->
           <div>
             <label class="block text-sm font-medium text-navy-deep mb-1.5">Department</label>
             <select
@@ -299,6 +297,7 @@ const form = ref({
   first_name: '',
   middle_name: '',
   surname: '',
+  // email: '',
   sex: '',
   civil_status: '',
   birthdate: '',
@@ -319,9 +318,6 @@ const form = ref({
   date_hired: '',
 })
 
-// Re-sync the form whenever the modal is opened, using the current
-// employee prop passed down from the parent — same effect as the
-// original syncEditForm(), just triggered by the show prop instead.
 watch(
   () => props.show,
   (visible) => {
@@ -331,6 +327,7 @@ watch(
         first_name: props.employee.first_name,
         middle_name: props.employee.middle_name,
         surname: props.employee.surname,
+        // email: props.employee.email,
         sex: props.employee.sex,
         civil_status: props.employee.civil_status,
         birthdate: props.employee.birthdate,
@@ -346,7 +343,6 @@ watch(
         philhealth_number: props.employee.philhealth_number,
         psn_number: props.employee.psn_number,
         tin_number: props.employee.tin_number,
-        // employment_status: props.employee.employment_status,
         position: props.employee.position, // add
         department_id: props.employee.department_id,
         date_hired: props.employee.date_hired,
@@ -360,6 +356,10 @@ async function handleSubmit() {
   editLoading.value = true
   editError.value = ''
   try {
+    // const payload = {
+    //   ...form.value,
+    //   email: form.value.email || null, // empty string → null, so backend's nullable check works correctly
+    // }
     await api.put(`/employees/${props.employeeId}`, form.value)
     emit('updated')
     emit('close')

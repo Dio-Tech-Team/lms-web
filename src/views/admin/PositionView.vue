@@ -72,6 +72,11 @@
         <thead class="bg-sky/60 border-b border-sky-100">
           <tr>
             <th
+              class="w-10 text-left px-5 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+            >
+              No
+            </th>
+            <th
               class="text-left px-5 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
             >
               Title
@@ -85,10 +90,13 @@
         </thead>
         <tbody>
           <tr
-            v-for="pos in positions"
+            v-for="(pos, index) in paginatedPositions"
             :key="pos.id"
             class="border-b border-sky-100 last:border-b-0 hover:bg-sky/40 transition-colors"
           >
+            <td class="px-5 py-3.5 text-slate-500">
+              {{ (currentPage - 1) * perPage + index + 1 }}
+            </td>
             <td class="px-5 py-3.5 font-medium text-navy-deep">{{ pos.title }}</td>
             <td class="px-5 py-3.5">
               <button
@@ -101,18 +109,41 @@
           </tr>
 
           <tr v-if="positions.length === 0">
-            <td colspan="2" class="px-5 py-12 text-center text-slate-400 text-sm">
+            <td colspan="3" class="px-5 py-12 text-center text-slate-400 text-sm">
               No positions found
             </td>
           </tr>
         </tbody>
       </table>
+      <!-- ADD (new, goes right after </table>, before the wrapper's closing </div>) -->
+      <div class="flex items-center justify-between px-5 py-4 border-t border-sky-100 bg-sky/30">
+        <p class="text-[12.5px] text-slate-500">
+          Page <span class="font-semibold text-navy-deep">{{ currentPage }}</span> of {{ lastPage }}
+          <span class="text-slate-400">· {{ positions.length }} total positions</span>
+        </p>
+        <div class="flex gap-2">
+          <button
+            @click="currentPage--"
+            :disabled="currentPage === 1"
+            class="px-3.5 py-1.5 text-[12.5px] font-semibold border border-sky-100 rounded-lg bg-white hover:bg-sky text-navy transition-colors disabled:opacity-40 disabled:hover:bg-white"
+          >
+            ← Previous
+          </button>
+          <button
+            @click="currentPage++"
+            :disabled="currentPage === lastPage"
+            class="px-3.5 py-1.5 text-[12.5px] font-semibold border border-sky-100 rounded-lg bg-white hover:bg-sky text-navy transition-colors disabled:opacity-40 disabled:hover:bg-white"
+          >
+            Next →
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import api from '@/api/axios'
 
 const positions = ref([])
@@ -120,6 +151,15 @@ const showModal = ref(false)
 const editingId = ref(null)
 const formError = ref('')
 const formLoading = ref(false)
+
+const currentPage = ref(1)
+const perPage = 10
+
+const paginatedPositions = computed(() => {
+  const start = (currentPage.value - 1) * perPage
+  return positions.value.slice(start, start + perPage)
+})
+const lastPage = computed(() => Math.max(1, Math.ceil(positions.value.length / perPage)))
 
 const form = ref({
   title: '',

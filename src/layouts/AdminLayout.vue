@@ -71,7 +71,7 @@
                 active-class="!bg-white/10 !text-white font-semibold"
               >
                 <span class="w-1.5 h-1.5 rounded-full bg-current opacity-50"></span>
-                Leave Applications
+                Applications
               </RouterLink>
             </li>
             <li>
@@ -81,7 +81,7 @@
                 active-class="!bg-white/10 !text-white font-semibold"
               >
                 <span class="w-1.5 h-1.5 rounded-full bg-current opacity-50"></span>
-                Leave Records
+                Records
               </RouterLink>
             </li>
 
@@ -92,9 +92,21 @@
                 active-class="!bg-white/10 !text-white font-semibold"
               >
                 <span class="w-1.5 h-1.5 rounded-full bg-current opacity-50"></span>
-                Leave Monetization
+                Monetization
               </RouterLink>
             </li>
+
+            <li>
+              <RouterLink
+                to="/leave-credit-computation"
+                class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm text-sky-100/80 hover:bg-white/5 transition-colors"
+                active-class="!bg-white/10 !text-white font-semibold"
+              >
+                <span class="w-1.5 h-1.5 rounded-full bg-current opacity-50"></span>
+                Credit Computation
+              </RouterLink>
+            </li>
+
             <li v-if="authStore.isSuperAdmin">
               <RouterLink
                 to="/leave-configurations"
@@ -102,7 +114,25 @@
                 active-class="!bg-white/10 !text-white font-semibold"
               >
                 <span class="w-1.5 h-1.5 rounded-full bg-current opacity-50"></span>
-                Leave Configuration
+                Configuration
+              </RouterLink>
+            </li>
+          </ul>
+        </div>
+
+        <div class="mb-2">
+          <p class="px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-sky-300/60">
+            System
+          </p>
+          <ul class="space-y-0.5">
+            <li v-if="authStore.isSuperAdmin">
+              <RouterLink
+                to="/accounts"
+                class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm text-sky-100/80 hover:bg-white/5 transition-colors"
+                active-class="!bg-white/10 !text-white font-semibold"
+              >
+                <span class="w-1.5 h-1.5 rounded-full bg-current opacity-50"></span>
+                Manage Accounts
               </RouterLink>
             </li>
 
@@ -124,35 +154,6 @@
               >
                 <span class="w-1.5 h-1.5 rounded-full bg-current opacity-50"></span>
                 Positions
-              </RouterLink>
-            </li>
-
-            <li>
-              <RouterLink
-                to="/leave-credit-computation"
-                class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm text-sky-100/80 hover:bg-white/5 transition-colors"
-                active-class="!bg-white/10 !text-white font-semibold"
-              >
-                <span class="w-1.5 h-1.5 rounded-full bg-current opacity-50"></span>
-                Credit Computation
-              </RouterLink>
-            </li>
-          </ul>
-        </div>
-
-        <div class="mb-2">
-          <p class="px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-sky-300/60">
-            System
-          </p>
-          <ul class="space-y-0.5">
-            <li v-if="authStore.isSuperAdmin">
-              <RouterLink
-                to="/accounts"
-                class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm text-sky-100/80 hover:bg-white/5 transition-colors"
-                active-class="!bg-white/10 !text-white font-semibold"
-              >
-                <span class="w-1.5 h-1.5 rounded-full bg-current opacity-50"></span>
-                Manage Accounts
               </RouterLink>
             </li>
             <li v-if="authStore.isSuperAdmin">

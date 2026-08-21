@@ -270,7 +270,7 @@
       <!-- Career Milestones -->
       <div class="bg-white rounded-2xl border border-sky-100 p-6 mb-6">
         <h2 class="font-serif text-lg font-semibold text-navy-deep mb-4">Career Progression</h2>
-        <div class="grid grid-cols-3 gap-4">
+        <div class="grid grid-cols-3 gap-4 items-start">
           <!-- Step Increment -->
           <div class="border border-sky-100 rounded-xl p-4 bg-sky/30">
             <p class="text-[10.5px] uppercase tracking-wide text-slate-400 font-bold mb-1">
@@ -305,11 +305,12 @@
               <div
                 v-for="s in employee.step_increment.all_steps"
                 :key="s.step"
-                class="flex justify-between text-xs"
+                class="flex justify-between text-xs py-0.4"
                 :class="{
-                  'text-slate-400': s.status === 'reached',
-                  'text-navy-deep font-bold': s.status === 'current',
-                  'text-slate-300': s.status === 'upcoming',
+                  'text-slate-600': s.status === 'reached',
+                  'text-navy-deep font-bold bg-teal-tint -mx-2 px-2 rounded':
+                    s.status === 'current',
+                  'text-slate-500': s.status === 'upcoming',
                 }"
               >
                 <span>Step {{ s.step }}</span>
@@ -354,14 +355,19 @@
             <p class="text-[10.5px] uppercase tracking-wide text-slate-400 font-bold mb-1">
               Retirement
             </p>
-            <p class="font-serif text-2xl font-semibold text-navy-deep">
-              {{ employee.retirement?.current_age ?? 'N/A' }} yrs old
-            </p>
             <p
-              v-if="employee.retirement?.eligible_now"
-              class="text-xs text-rose-600 mt-2 font-semibold"
+              v-if="!employee.retirement?.eligible_now"
+              class="font-serif text-2xl font-semibold text-navy-deep"
             >
-              Eligible for retirement
+              {{ employee.retirement?.years_remaining ?? 'N/A' }} yrs left
+            </p>
+            <p v-else class="font-serif text-2xl font-semibold text-rose-600">Eligible</p>
+            <p
+              v-if="employee.retirement?.retirement_date"
+              class="text-xs text-slate-500 mt-2 font-mono"
+            >
+              {{ employee.retirement?.eligible_now ? 'Since' : 'Retires' }}:
+              {{ employee.retirement.retirement_date }}
             </p>
           </div>
         </div>
@@ -403,6 +409,11 @@
                 >
                   Effective Date
                 </th>
+                <th
+                  class="text-right px-4 py-3 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+                >
+                  <!-- empty header for edit action -->
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -422,6 +433,14 @@
                 </td>
                 <td class="px-4 py-3 text-slate-500 font-mono text-[12.5px]">
                   {{ employment.effective_date }}
+                </td>
+                <td class="px-4 py-3 text-right">
+                  <button
+                    @click="openEditHistory(employment)"
+                    class="text-xs text-teal-700 hover:text-teal-800 font-semibold"
+                  >
+                    Edit
+                  </button>
                 </td>
               </tr>
             </tbody>
@@ -615,6 +634,15 @@
       @close="showOpeningBalanceModal = false"
       @save="setOpeningBalance"
     />
+
+    <EditHistoryModal
+      :show="showEditHistoryModal"
+      :employee-id="route.params.id"
+      :record="selectedHistory"
+      :positions="positions"
+      @close="showEditHistoryModal = false"
+      @updated="refreshAll"
+    />
   </div>
 </template>
 
@@ -630,6 +658,8 @@ import RehireModal from '../../views/modals/RehireModal.vue'
 import OpeningBalanceModal from '../../views/modals/OpeningBalanceModal.vue'
 import ResignModal from '../../views/modals/ResignModal.vue'
 import RetireModal from '../../views/modals/RetireModal.vue'
+import { useConfirm } from '@/composables/useConfirm'
+import EditHistoryModal from '../../views/modals/EditHistoryModal.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -654,6 +684,10 @@ const showAllSteps = ref(false)
 const showAllHistory = ref(false)
 const showAllCredits = ref(false)
 const showRetireModal = ref(false)
+const showEditHistoryModal = ref(false)
+const selectedHistory = ref(null)
+
+const { confirm } = useConfirm()
 
 async function fetchEmployee() {
   try {
@@ -693,6 +727,11 @@ async function setOpeningBalance(amount) {
     alert(err.response?.data?.message || 'Failed to set opening balance')
   }
 }
+
+function openEditHistory(employment) {
+  selectedHistory.value = employment
+  showEditHistoryModal.value = true
+}
 onMounted(async () => {
   try {
     // 1. Add 'leaveTypesResponse' and 'positionsResponse' to the array
@@ -725,13 +764,17 @@ onMounted(async () => {
 })
 
 async function handleDeactivate() {
-  if (confirm('Are you sure you want to deactivate this employee?')) {
-    try {
-      await api.delete(`/employees/${route.params.id}`)
-      await fetchEmployee()
-    } catch (err) {
-      console.error('Failed to update system state on record deactivation', err)
-    }
+  const ok = await confirm({
+    title: 'Deactivate employee?',
+    message: 'Are you sure you want to deactivate this employee?',
+  })
+  if (!ok) return
+
+  try {
+    await api.delete(`/employees/${route.params.id}`)
+    await fetchEmployee()
+  } catch (err) {
+    console.error('Failed to update system state on record deactivation', err)
   }
 }
 

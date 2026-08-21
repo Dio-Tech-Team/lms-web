@@ -7,7 +7,7 @@
     <div class="bg-white rounded-3xl shadow-xl w-full max-w-7xl p-8 max-h-[90vh] overflow-y-auto">
       <div class="flex items-center justify-between mb-2">
         <div>
-          <h2 class="font-serif text-xl font-semibold text-navy-deep">Employee's Leave Card</h2>
+          <h2 class="font-serif text-xl font-bold text-navy-deep">Leave Card</h2>
         </div>
         <button
           @click="$emit('close')"
@@ -34,9 +34,9 @@
                 <thead class="bg-sky/60 border-b border-sky-100">
                   <tr>
                     <th
-                      class="text-left px-2.5 py-2.5 text-[11px] uppercase tracking-wider text-slate-400 font-bold"
+                      class="text-left px-2.5 py-2.5 text-[10px] uppercase tracking-wider text-slate-400 font-bold"
                     >
-                      Period
+                      Period (mdy)
                     </th>
                     <th
                       class="text-left px-2.5 py-2.5 text-[11px] uppercase tracking-wider text-slate-400 font-bold"
@@ -78,7 +78,7 @@
                     :key="'vl-' + i"
                     class="border-b border-sky-100 last:border-b-0"
                   >
-                    <td class="px-2.5 py-2 font-mono text-[10.5px] text-slate-500">
+                    <td class="px-2.5 py-2 font-mono text-[12.5px] text-slate-500">
                       {{ row.period }}
                     </td>
                     <td class="px-2.5 py-2 text-slate-600">{{ row.particulars }}</td>
@@ -116,9 +116,9 @@
                 <thead class="bg-sky/60 border-b border-sky-100">
                   <tr>
                     <th
-                      class="text-left px-2.5 py-2.5 text-[11px] uppercase tracking-wider text-slate-400 font-bold"
+                      class="text-left px-2.5 py-2.5 text-[10px] uppercase tracking-wider text-slate-400 font-bold"
                     >
-                      Period
+                      Period (mdy)
                     </th>
                     <th
                       class="text-left px-2.5 py-2.5 text-[11px] uppercase tracking-wider text-slate-400 font-bold"
@@ -160,7 +160,7 @@
                     :key="'sl-' + i"
                     class="border-b border-sky-100 last:border-b-0"
                   >
-                    <td class="px-2.5 py-2 font-mono text-[10.5px] text-slate-500">
+                    <td class="px-2.5 py-2 font-mono text-[12.5px] text-slate-500">
                       {{ row.period }}
                     </td>
                     <td class="px-2.5 py-2 text-slate-600">{{ row.particulars }}</td>

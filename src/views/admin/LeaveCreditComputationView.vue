@@ -1,8 +1,9 @@
 <template>
   <div>
     <div class="mb-6">
-      <p class="text-[11px] uppercase tracking-wider text-teal-600 font-bold mb-1">Leave</p>
-      <h1 class="font-serif text-3xl font-semibold text-navy-deep">Leave Credit Computation</h1>
+      <!-- <p class="text-[11px] uppercase tracking-wider text-teal-600 font-bold mb-1">Leave</p> -->
+      <!-- <h1 class="font-serif text-3xl font-semibold text-navy-deep">Leave</h1> -->
+      <h1 class="text-2xl font-bold text-gray-700">Leave Credit Computation</h1>
     </div>
 
     <!-- Upload Form -->

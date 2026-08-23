@@ -1,5 +1,15 @@
 <template>
   <div>
+    <div
+      v-if="errorMessage"
+      class="bg-rose-tint text-rose-700 text-sm rounded-lg px-3.5 py-2.5 mb-4 font-medium flex items-center justify-between"
+    >
+      {{ errorMessage }}
+      <button @click="errorMessage = ''" class="text-rose-700 font-bold hover:text-rose-800 ml-3">
+        ✕
+      </button>
+    </div>
+
     <div class="flex items-center justify-between mb-6">
       <h1 class="text-2xl font-bold text-gray-700">Leave Monetization</h1>
       <button
@@ -194,6 +204,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useConfirm } from '@/composables/useConfirm'
 import api from '@/api/axios'
 import LeaveMonetizationModal from '../../views/modals/LeaveMonetizationModal.vue'
 
@@ -207,6 +218,8 @@ const total = ref(0)
 
 const search = ref('')
 const selectedYear = ref(new Date().getFullYear())
+const { confirm } = useConfirm()
+const errorMessage = ref('')
 let searchTimeout = null
 
 async function fetchMonetizations(page = 1) {
@@ -234,26 +247,32 @@ function setFilter(status) {
   filterStatus.value = status
   fetchMonetizations(1)
 }
-
 async function handleApprove(id) {
-  if (confirm('Approve this monetization request?')) {
-    try {
-      await api.post(`/leave-monetizations/${id}/approve`)
-      await fetchMonetizations(currentPage.value)
-    } catch (err) {
-      alert(err.response?.data?.message || 'Failed to approve')
-    }
+  const ok = await confirm({
+    title: 'Approve Monetization',
+    message: 'Approve this monetization request?',
+  })
+  if (!ok) return
+  errorMessage.value = ''
+  try {
+    await api.post(`/leave-monetizations/${id}/approve`)
+    await fetchMonetizations(currentPage.value)
+  } catch (err) {
+    errorMessage.value = err.response?.data?.message || 'Failed to approve'
   }
 }
-
 async function handleReject(id) {
-  if (confirm('Reject this monetization request?')) {
-    try {
-      await api.post(`/leave-monetizations/${id}/reject`)
-      await fetchMonetizations(currentPage.value)
-    } catch (err) {
-      alert(err.response?.data?.message || 'Failed to reject')
-    }
+  const ok = await confirm({
+    title: 'Reject Monetization',
+    message: 'Reject this monetization request?',
+  })
+  if (!ok) return
+  errorMessage.value = ''
+  try {
+    await api.post(`/leave-monetizations/${id}/reject`)
+    await fetchMonetizations(currentPage.value)
+  } catch (err) {
+    errorMessage.value = err.response?.data?.message || 'Failed to reject'
   }
 }
 

@@ -5,7 +5,12 @@
   >
     <div class="bg-white rounded-2xl w-full max-w-md p-6 shadow-xl border border-sky-100">
       <h2 class="font-serif text-lg font-semibold text-navy-deep mb-4">File Monetization</h2>
-
+      <div
+        v-if="errorMessage"
+        class="bg-rose-tint text-rose-700 text-sm rounded-lg px-3.5 py-2.5 mb-4 font-medium"
+      >
+        {{ errorMessage }}
+      </div>
       <form @submit.prevent="submit" class="space-y-4">
         <!-- Employee search -->
         <div class="relative">
@@ -118,6 +123,7 @@ const employeeSearch = ref('')
 const employeeResults = ref([])
 const leaveTypes = ref([])
 let searchTimeout = null
+const errorMessage = ref('')
 
 const monetizableTypes = computed(() => leaveTypes.value.filter((t) => t.can_monetize))
 
@@ -143,15 +149,14 @@ function selectEmployee(emp) {
   employeeSearch.value = `${emp.first_name} ${emp.surname}`
   employeeResults.value = []
 }
-
 async function submit() {
+  errorMessage.value = ''
   try {
     await api.post('/leave-monetizations', { ...form.value })
     emit('updated')
     close()
   } catch (error) {
-    const msg = error.response?.data?.message || 'Failed to file monetization'
-    alert(msg)
+    errorMessage.value = error.response?.data?.message || 'Failed to file monetization'
   }
 }
 
@@ -159,6 +164,7 @@ function close() {
   form.value = { employee_id: '', leave_configuration_id: '', days_monetized: '', reason: '' }
   employeeSearch.value = ''
   employeeResults.value = []
+  errorMessage.value = ''
   emit('close')
 }
 

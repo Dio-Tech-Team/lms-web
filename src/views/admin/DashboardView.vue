@@ -2,12 +2,21 @@
   <div>
     <div class="mb-7 flex items-center justify-between">
       <h1 class="text-2xl font-bold text-gray-700">Dashboard</h1>
-      <select
-        v-model="selectedYear"
-        class="border border-sky-200 rounded-lg px-3 py-1.5 text-sm text-navy-deep font-semibold bg-white"
-      >
-        <option v-for="year in availableYears" :key="year" :value="year">{{ year }}</option>
-      </select>
+      <div class="flex items-center gap-3">
+        <button
+          @click="handleInitializeAll"
+          :disabled="initializing"
+          class="text-sm font-semibold text-teal-700 border border-teal-200 rounded-lg px-3 py-1.5 bg-white hover:bg-teal-50 disabled:opacity-50"
+        >
+          {{ initializing ? 'Initializing…' : 'Initialize Credits' }}
+        </button>
+        <select
+          v-model="selectedYear"
+          class="border border-sky-200 rounded-lg px-3 py-1.5 text-sm text-navy-deep font-semibold bg-white"
+        >
+          <option v-for="year in availableYears" :key="year" :value="year">{{ year }}</option>
+        </select>
+      </div>
     </div>
 
     <div v-if="loading" class="flex items-center justify-center gap-3 py-24">
@@ -232,6 +241,7 @@
 
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue'
+import { useConfirm } from '@/composables/useConfirm' // adjust path if yours differs
 import api from '@/api/axios'
 import { Line, Doughnut } from 'vue-chartjs'
 import {
@@ -276,6 +286,8 @@ const leaveStats = ref({
 const applications = ref([])
 const loading = ref(true)
 const hasError = ref(false)
+const { confirm } = useConfirm()
+const initializing = ref(false)
 
 const currentYear = new Date().getFullYear()
 const selectedYear = ref(currentYear)
@@ -335,6 +347,28 @@ const typeChartData = computed(() => {
     ],
   }
 })
+
+async function handleInitializeAll() {
+  const ok = await confirm({
+    title: 'Initialize Leave Credits',
+    message: `This will initialize leave credits for every active employee for ${selectedYear.value}. Employees who already have credits for this year are skipped. Continue?`,
+  })
+  if (!ok) return
+
+  initializing.value = true
+  try {
+    const res = await api.post('/employees/leave-credits/initialize-all', {
+      year: selectedYear.value,
+    })
+    alert(res.data.message) // swap for your toast pattern if you have one
+    await fetchLeaveStats()
+  } catch (error) {
+    console.error('Error initializing credits:', error)
+    alert(error.response?.data?.message || 'Failed to initialize leave credits.')
+  } finally {
+    initializing.value = false
+  }
+}
 
 const chartOptions = {
   responsive: true,

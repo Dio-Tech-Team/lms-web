@@ -77,9 +77,16 @@
         </div>
 
         <div class="flex justify-end gap-2 mt-6">
-          <button
+          <!-- <button
             type="button"
             @click="$emit('close')"
+            class="px-4 py-2 text-sm text-slate-500 hover:text-navy"
+          >
+            Cancel
+          </button> -->
+          <button
+            type="button"
+            @click="close"
             class="px-4 py-2 text-sm text-slate-500 hover:text-navy"
           >
             Cancel
@@ -130,6 +137,7 @@ const daysApplied = computed(() => {
 //     emit('updated')
 //     emit('close')
 
+//     // Reset form...
 //     form.value = {
 //       leave_configuration_id: '',
 //       start_date: '',
@@ -138,7 +146,22 @@ const daysApplied = computed(() => {
 //       is_paper_submission: false,
 //     }
 //   } catch (error) {
-//     console.error('Failed to submit leave:', error)
+//     // Let's inspect the entire response object in the console
+//     console.log('Full Error Object:', error)
+
+//     if (error.response) {
+//       // This will print the raw data from the server to your console
+//       console.log('Server Response Data:', error.response.data)
+
+//       // Attempt to show the error more gracefully
+//       const errorMessage =
+//         error.response.data.message ||
+//         JSON.stringify(error.response.data.errors) ||
+//         'Unknown validation error'
+//       alert('Failed: ' + errorMessage)
+//     } else {
+//       alert('Network error or server unreachable')
+//     }
 //   }
 // }
 async function submitApplication() {
@@ -150,17 +173,12 @@ async function submitApplication() {
     })
 
     emit('updated')
-    emit('close')
-    // Reset form...
+    close()
   } catch (error) {
-    // Let's inspect the entire response object in the console
     console.log('Full Error Object:', error)
 
     if (error.response) {
-      // This will print the raw data from the server to your console
       console.log('Server Response Data:', error.response.data)
-
-      // Attempt to show the error more gracefully
       const errorMessage =
         error.response.data.message ||
         JSON.stringify(error.response.data.errors) ||
@@ -170,5 +188,15 @@ async function submitApplication() {
       alert('Network error or server unreachable')
     }
   }
+}
+function close() {
+  form.value = {
+    leave_configuration_id: '',
+    start_date: '',
+    end_date: '',
+    reason: '',
+    is_paper_submission: false,
+  }
+  emit('close')
 }
 </script>

@@ -282,7 +282,7 @@ async function fetchEmployees(page = 1) {
         params: { year: stepIncrementYear.value },
       })
 
-      employees.value = response.data.employees.map((e) => {
+      let results = response.data.employees.map((e) => {
         const [first_name, ...rest] = e.name.split(' ')
         return {
           id: e.employee_id,
@@ -294,8 +294,20 @@ async function fetchEmployees(page = 1) {
           next_step: e.next_step,
           next_step_date: e.next_step_date,
           id_number: '',
+          sex: e.sex, // ADD THIS — see note below
         }
       })
+
+      if (selectedDepartment.value) {
+        const deptName = departments.value.find((d) => d.id == selectedDepartment.value)?.name
+        results = results.filter((e) => e.department_name === deptName)
+      }
+
+      if (selectedSex.value) {
+        results = results.filter((e) => e.sex === selectedSex.value)
+      }
+
+      employees.value = results
       currentPage.value = 1
       lastPage.value = 1
       total.value = employees.value.length
@@ -308,6 +320,38 @@ async function fetchEmployees(page = 1) {
     }
     return
   }
+  // if (stepIncrementYear.value) {
+  //   try {
+  //     const response = await api.get('/employees/step-increment-forecast', {
+  //       params: { year: stepIncrementYear.value },
+  //     })
+
+  //     employees.value = response.data.employees.map((e) => {
+  //       const [first_name, ...rest] = e.name.split(' ')
+  //       return {
+  //         id: e.employee_id,
+  //         first_name,
+  //         surname: rest.join(' '),
+  //         position: e.position,
+  //         department_name: e.department,
+  //         current_step: e.current_step,
+  //         next_step: e.next_step,
+  //         next_step_date: e.next_step_date,
+  //         id_number: '',
+  //       }
+  //     })
+  //     currentPage.value = 1
+  //     lastPage.value = 1
+  //     total.value = employees.value.length
+  //   } catch (error) {
+  //     console.error('Error fetching step increment forecast:', error)
+  //     employees.value = []
+  //     currentPage.value = 1
+  //     lastPage.value = 1
+  //     total.value = 0
+  //   }
+  //   return
+  // }
 
   try {
     const employeeResponse = await api.get(`/employees`, {

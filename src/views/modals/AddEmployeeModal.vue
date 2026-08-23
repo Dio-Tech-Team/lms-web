@@ -309,6 +309,8 @@
               <input
                 v-model="form.contact_number"
                 type="text"
+                maxlength="11"
+                @input="form.contact_number = form.contact_number.replace(/\D/g, '')"
                 class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
               />
             </div>

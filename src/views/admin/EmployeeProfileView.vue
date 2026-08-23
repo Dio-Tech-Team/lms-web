@@ -478,9 +478,16 @@
           <div class="flex gap-2">
             <button
               @click="showLeaveEntryModal = true"
-              class="text-[12.5px] font-semibold text-white bg-teal-600 rounded-xl px-3.5 py-1.5 hover:bg-teal-700 transition-colors"
+              class="text-[12.5px] font-semibold text-white bg-navy rounded-xl px-3.5 py-1.5 hover:bg-navy-deep transition-colors"
             >
               Apply Leave
+            </button>
+
+            <button
+              @click="showMonetizationModal = true"
+              class="text-[12.5px] font-semibold text-white bg-teal-600 rounded-xl px-3.5 py-1.5 hover:bg-teal-700 transition-colors"
+            >
+              Monetize Leave
             </button>
             <button
               @click="showAllCredits = !showAllCredits"
@@ -643,6 +650,13 @@
       @close="showEditHistoryModal = false"
       @updated="refreshAll"
     />
+    <LeaveMonetizationModal
+      :show="showMonetizationModal"
+      :prefill-employee-id="Number(route.params.id)"
+      :prefill-employee-name="`${employee?.first_name} ${employee?.surname}`"
+      @close="showMonetizationModal = false"
+      @updated="refreshAll"
+    />
   </div>
 </template>
 
@@ -654,6 +668,7 @@ import EditEmployeeModal from '../../views/modals/EditEmployeeModal.vue'
 import PromotionModal from '../../views/modals/PromotionModal.vue'
 import LeaveCardModal from '../../views/modals/LeaveCardModal.vue'
 import LeaveEntryModal from '../../views/modals/LeaveEntryModal.vue'
+import LeaveMonetizationModal from '../../views/modals/LeaveMonetizationModal.vue'
 import RehireModal from '../../views/modals/RehireModal.vue'
 import OpeningBalanceModal from '../../views/modals/OpeningBalanceModal.vue'
 import ResignModal from '../../views/modals/ResignModal.vue'
@@ -679,6 +694,7 @@ const showRehireModal = ref(false)
 const showPromotionModal = ref(false)
 const showLeaveCard = ref(false)
 const showLeaveEntryModal = ref(false)
+const showMonetizationModal = ref(false)
 const showResignModal = ref(false)
 const showAllSteps = ref(false)
 const showAllHistory = ref(false)

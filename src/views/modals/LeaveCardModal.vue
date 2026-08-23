@@ -9,12 +9,27 @@
         <div>
           <h2 class="font-serif text-xl font-bold text-navy-deep">Leave Card</h2>
         </div>
-        <button
-          @click="$emit('close')"
-          class="w-8 h-8 rounded-xl flex items-center justify-center text-slate-400 hover:bg-sky hover:text-navy transition-colors text-lg"
-        >
-          ✕
-        </button>
+        <div class="flex items-center gap-3">
+          <select
+            v-model="selectedYear"
+            class="border border-sky-100 bg-sky/40 rounded-xl px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600"
+          >
+            <option v-for="y in yearOptions" :key="y" :value="y">{{ y }}</option>
+          </select>
+
+          <button
+            @click="printCard"
+            class="border border-sky-100 text-navy rounded-xl px-3.5 py-1.5 text-sm font-semibold hover:bg-sky transition-colors"
+          >
+            Print
+          </button>
+          <button
+            @click="$emit('close')"
+            class="w-8 h-8 rounded-xl flex items-center justify-center text-slate-400 hover:bg-sky hover:text-navy transition-colors text-lg"
+          >
+            ✕
+          </button>
+        </div>
       </div>
 
       <div v-if="loading" class="flex items-center justify-center gap-3 py-16">
@@ -198,7 +213,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import api from '@/api/axios'
 
 const props = defineProps({
@@ -210,22 +225,57 @@ defineEmits(['close'])
 
 const loading = ref(false)
 const cardData = ref(null)
+const currentYear = new Date().getFullYear()
+const selectedYear = ref(currentYear)
 
-// Fetch the leave card data each time the modal is opened
+// Adjust range as needed — last 6 years through current
+const yearOptions = computed(() => {
+  const years = []
+  for (let y = currentYear + 1; y >= currentYear - 1; y--) years.push(y)
+  return years
+})
+
+async function fetchLeaveCard() {
+  loading.value = true
+  try {
+    const response = await api.get(`/employees/${props.employeeId}/leave-card`, {
+      params: { year: selectedYear.value },
+    })
+    cardData.value = response.data
+  } catch (error) {
+    console.error('Failed to load leave card', error)
+    cardData.value = null
+  } finally {
+    loading.value = false
+  }
+}
+async function printCard() {
+  try {
+    const response = await api.get(`/employees/${props.employeeId}/leave-card/pdf`, {
+      params: { year: selectedYear.value },
+      responseType: 'blob',
+    })
+    const file = new Blob([response.data], { type: 'application/pdf' })
+    const url = URL.createObjectURL(file)
+    window.open(url, '_blank')
+  } catch (error) {
+    console.error('Failed to load leave card PDF:', error)
+    alert('Could not generate leave card PDF.')
+  }
+}
+
+// Reset to current year and fetch each time the modal opens
 watch(
   () => props.show,
-  async (visible) => {
+  (visible) => {
     if (!visible) return
-    loading.value = true
-    try {
-      const response = await api.get(`/employees/${props.employeeId}/leave-card`)
-      cardData.value = response.data
-    } catch (error) {
-      console.error('Failed to load leave card', error)
-      cardData.value = null
-    } finally {
-      loading.value = false
-    }
+    selectedYear.value = currentYear
+    fetchLeaveCard()
   }
 )
+
+// Refetch whenever the year dropdown changes, but only while the modal is open
+watch(selectedYear, () => {
+  if (props.show) fetchLeaveCard()
+})
 </script>

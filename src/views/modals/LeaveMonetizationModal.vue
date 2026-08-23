@@ -13,7 +13,7 @@
       </div>
       <form @submit.prevent="submit" class="space-y-4">
         <!-- Employee search -->
-        <div class="relative">
+        <!-- <div class="relative">
           <label class="block text-[10.5px] uppercase font-bold text-slate-400 mb-1"
             >Employee</label
           >
@@ -40,6 +40,41 @@
           <p v-if="form.employee_id" class="text-xs text-teal-700 font-semibold mt-1">
             Selected: {{ employeeSearch }}
           </p>
+        </div> -->
+        <div class="relative">
+          <label class="block text-[10.5px] uppercase font-bold text-slate-400 mb-1"
+            >Employee</label
+          >
+          <template v-if="prefillEmployeeId">
+            <p class="text-sm font-semibold text-navy-deep bg-sky/40 rounded-lg px-3 py-2.5">
+              {{ prefillEmployeeName }}
+            </p>
+          </template>
+          <template v-else>
+            <input
+              v-model="employeeSearch"
+              type="text"
+              placeholder="Search employee name..."
+              class="w-full border border-sky-100 rounded-lg p-2.5 text-sm"
+              @input="debounceSearch"
+            />
+            <ul
+              v-if="employeeResults.length > 0"
+              class="absolute z-10 w-full bg-white border border-sky-100 rounded-lg mt-1 max-h-40 overflow-y-auto shadow-lg"
+            >
+              <li
+                v-for="emp in employeeResults"
+                :key="emp.id"
+                @click="selectEmployee(emp)"
+                class="px-3 py-2 text-sm hover:bg-sky/60 cursor-pointer"
+              >
+                {{ emp.first_name }} {{ emp.surname }}
+              </li>
+            </ul>
+            <p v-if="form.employee_id" class="text-xs text-teal-700 font-semibold mt-1">
+              Selected: {{ employeeSearch }}
+            </p>
+          </template>
         </div>
 
         <!-- Leave Type -->
@@ -109,7 +144,7 @@
 import { ref, computed, watch } from 'vue'
 import api from '@/api/axios'
 
-const props = defineProps(['show'])
+const props = defineProps(['show', 'prefillEmployeeId', 'prefillEmployeeName'])
 const emit = defineEmits(['close', 'updated'])
 
 const form = ref({
@@ -178,6 +213,11 @@ watch(
       } catch (err) {
         console.error('Failed to load leave types:', err)
       }
+    }
+    // NEW — prefill employee when opened from the profile page
+    if (val && props.prefillEmployeeId) {
+      form.value.employee_id = props.prefillEmployeeId
+      employeeSearch.value = props.prefillEmployeeName || ''
     }
   }
 )

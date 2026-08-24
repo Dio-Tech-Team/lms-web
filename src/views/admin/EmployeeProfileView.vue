@@ -490,6 +490,12 @@
               Monetize Leave
             </button>
             <button
+              @click="showGrantLeaveModal = true"
+              class="text-[12.5px] font-semibold text-white bg-amber-600 rounded-xl px-3.5 py-1.5 hover:bg-amber-700 transition-colors"
+            >
+              Grant Special Leave
+            </button>
+            <button
               @click="showAllCredits = !showAllCredits"
               class="text-[12.5px] font-semibold text-teal-700 border border-teal-100 rounded-xl px-3.5 py-1.5 hover:bg-teal-50 transition-colors"
             >
@@ -518,7 +524,7 @@
                 {{ credit.code }}
               </span>
             </div>
-            <div class="grid grid-cols-3 gap-2 text-center">
+            <div v-if="credit.code !== 'FL'" class="grid grid-cols-3 gap-2 text-center">
               <div>
                 <p class="text-[10.5px] uppercase tracking-wide text-slate-400 font-bold mb-1">
                   Total
@@ -544,6 +550,40 @@
                 </p>
               </div>
             </div>
+            <div v-else class="text-center py-2">
+              <p class="text-[10.5px] uppercase tracking-wide text-slate-400 font-bold mb-1">
+                Days Taken This Year
+              </p>
+              <p class="font-serif text-lg font-semibold text-navy-deep">
+                {{ credit.fl_days_taken ?? 0 }} / {{ credit.fl_days_cap ?? 5 }}
+              </p>
+            </div>
+            <!-- <div class="grid grid-cols-3 gap-2 text-center">
+              <div>
+                <p class="text-[10.5px] uppercase tracking-wide text-slate-400 font-bold mb-1">
+                  Total
+                </p>
+                <p class="font-serif text-lg font-semibold text-navy-deep">
+                  {{ Number(credit.total_credits).toFixed(3) }}
+                </p>
+              </div>
+              <div>
+                <p class="text-[10.5px] uppercase tracking-wide text-slate-400 font-bold mb-1">
+                  Used
+                </p>
+                <p class="font-serif text-lg font-semibold text-rose-600">
+                  {{ Number(credit.used_credits).toFixed(3) }}
+                </p>
+              </div>
+              <div>
+                <p class="text-[10.5px] uppercase tracking-wide text-slate-400 font-bold mb-1">
+                  Remaining
+                </p>
+                <p class="font-serif text-lg font-semibold text-teal-700">
+                  {{ Number(credit.remaining_balance).toFixed(3) }}
+                </p>
+              </div>
+            </div> -->
             <!-- <button
               v-if="Number(credit.total_credits) === 0 && ['VL', 'SL'].includes(credit.code)"
               @click="openOpeningBalanceModal(credit)"
@@ -631,6 +671,7 @@
       :show="showLeaveEntryModal"
       :employee-id="route.params.id"
       :leave-types="leaveTypes"
+      :leave-credits="leaveCredits"
       @close="showLeaveEntryModal = false"
       @updated="refreshAll"
     />
@@ -638,6 +679,7 @@
     <OpeningBalanceModal
       :show="showOpeningBalanceModal"
       :credit="selectedCredit"
+      :is-saving="isSavingBalance"
       @close="showOpeningBalanceModal = false"
       @save="setOpeningBalance"
     />
@@ -655,6 +697,13 @@
       :prefill-employee-id="Number(route.params.id)"
       :prefill-employee-name="`${employee?.first_name} ${employee?.surname}`"
       @close="showMonetizationModal = false"
+      @updated="refreshAll"
+    />
+    <GrantLeaveModal
+      :show="showGrantLeaveModal"
+      :employee-id="Number(route.params.id)"
+      :leave-types="leaveTypes"
+      @close="showGrantLeaveModal = false"
       @updated="refreshAll"
     />
   </div>
@@ -675,6 +724,7 @@ import ResignModal from '../../views/modals/ResignModal.vue'
 import RetireModal from '../../views/modals/RetireModal.vue'
 import { useConfirm } from '@/composables/useConfirm'
 import EditHistoryModal from '../../views/modals/EditHistoryModal.vue'
+import GrantLeaveModal from '../../views/modals/GrantLeaveModal.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -695,6 +745,7 @@ const showPromotionModal = ref(false)
 const showLeaveCard = ref(false)
 const showLeaveEntryModal = ref(false)
 const showMonetizationModal = ref(false)
+const showGrantLeaveModal = ref(false)
 const showResignModal = ref(false)
 const showAllSteps = ref(false)
 const showAllHistory = ref(false)
@@ -704,6 +755,7 @@ const showEditHistoryModal = ref(false)
 const selectedHistory = ref(null)
 
 const { confirm } = useConfirm()
+const isSavingBalance = ref(false)
 
 async function fetchEmployee() {
   try {
@@ -732,6 +784,7 @@ function openOpeningBalanceModal(credit) {
 }
 
 async function setOpeningBalance(amount) {
+  isSavingBalance.value = true
   try {
     await api.put(`/employees/${route.params.id}/leave-credits/${selectedCredit.value.id}`, {
       total_credits: amount,
@@ -741,6 +794,8 @@ async function setOpeningBalance(amount) {
     showOpeningBalanceModal.value = false
   } catch (err) {
     alert(err.response?.data?.message || 'Failed to set opening balance')
+  } finally {
+    isSavingBalance.value = false
   }
 }
 
@@ -812,9 +867,23 @@ async function initializeCredits() {
   }
 }
 
+// const filteredCredits = computed(() => {
+//   const mainCodes = ['VL', 'SL']
+//   const extraCodes = ['SPL', 'WL', 'FL']
+
+//   return leaveCredits.value.filter((credit) => {
+//     const code = String(credit.code || '')
+//       .toUpperCase()
+//       .trim()
+//     if (showAllCredits.value) {
+//       return [...mainCodes, ...extraCodes].includes(code)
+//     }
+//     return mainCodes.includes(code)
+//   })
+// })
 const filteredCredits = computed(() => {
   const mainCodes = ['VL', 'SL']
-  const extraCodes = ['SPL', 'WL', 'FL']
+  const extraCodes = ['SPL', 'WL', 'FL', 'ML', 'PTL', 'VAWC', 'RHL', 'SLB', 'STL', 'ADL', 'CAL']
 
   return leaveCredits.value.filter((credit) => {
     const code = String(credit.code || '')

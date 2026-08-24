@@ -42,9 +42,10 @@
           </button>
           <button
             type="submit"
-            class="px-4 py-2 bg-navy text-white rounded-lg text-sm font-semibold hover:bg-navy-deep transition-colors"
+            :disabled="isSaving"
+            class="px-4 py-2 bg-navy text-white rounded-lg text-sm font-semibold hover:bg-navy-deep transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Save
+            {{ isSaving ? 'Saving...' : 'Save' }}
           </button>
         </div>
       </form>
@@ -56,12 +57,13 @@
 import { ref, computed, watch } from 'vue'
 import { useConfirm } from '@/composables/useConfirm'
 
-const props = defineProps(['show', 'credit'])
+const props = defineProps(['show', 'credit', 'isSaving'])
 const emit = defineEmits(['close', 'save'])
 
 const amount = ref(0)
 
 const { confirm } = useConfirm()
+const isSubmitting = ref(false)
 
 const isEditing = computed(() => Number(props.credit?.total_credits) > 0)
 

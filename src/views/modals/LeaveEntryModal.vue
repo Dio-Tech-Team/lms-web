@@ -91,11 +91,24 @@
           >
             Cancel
           </button>
-          <button
+          <!-- <button
             type="submit"
             class="px-4 py-2 bg-navy text-white rounded-lg text-sm font-semibold hover:bg-navy-deep transition-colors"
           >
             {{ form.is_paper_submission ? 'Post Paper Entry' : 'Submit Application' }}
+          </button> -->
+          <button
+            type="submit"
+            :disabled="isSubmitting"
+            class="px-4 py-2 bg-navy text-white rounded-lg text-sm font-semibold hover:bg-navy-deep transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {{
+              isSubmitting
+                ? 'Submitting...'
+                : form.is_paper_submission
+                ? 'Post Paper Entry'
+                : 'Submit Application'
+            }}
           </button>
         </div>
       </form>
@@ -104,11 +117,12 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import api from '@/api/axios'
 
-const props = defineProps(['show', 'employeeId', 'leaveTypes', 'isAdmin'])
+const props = defineProps(['show', 'employeeId', 'leaveTypes', 'leaveCredits', 'isAdmin'])
 const emit = defineEmits(['close', 'updated'])
+const isSubmitting = ref(false)
 
 const form = ref({
   leave_configuration_id: '',
@@ -125,6 +139,32 @@ const daysApplied = computed(() => {
   const diffTime = Math.abs(end - start)
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1
 })
+const selectedConfig = computed(() =>
+  (props.leaveTypes || []).find((c) => c.id === form.value.leave_configuration_id)
+)
+
+watch(
+  [() => form.value.leave_configuration_id, () => form.value.start_date],
+  ([configId, startDate]) => {
+    if (!configId || !startDate) return
+    if (selectedConfig.value?.grant_type !== 'event_manual') return
+
+    const year = new Date(startDate).getFullYear()
+    const credit = (props.leaveCredits || []).find(
+      (c) => c.code === selectedConfig.value?.code && Number(c.year) === year
+    )
+    if (!credit) return
+
+    const grantedDays = Number(credit.remaining_balance)
+    if (!grantedDays || grantedDays <= 0) return
+
+    const start = new Date(startDate)
+    const end = new Date(start)
+    end.setDate(end.getDate() + (grantedDays - 1))
+
+    form.value.end_date = end.toISOString().split('T')[0]
+  }
+)
 
 // async function submitApplication() {
 //   try {
@@ -165,6 +205,8 @@ const daysApplied = computed(() => {
 //   }
 // }
 async function submitApplication() {
+  if (isSubmitting.value) return
+  isSubmitting.value = true
   try {
     await api.post(`/leave-applications`, {
       ...form.value,
@@ -187,6 +229,8 @@ async function submitApplication() {
     } else {
       alert('Network error or server unreachable')
     }
+  } finally {
+    isSubmitting.value = false
   }
 }
 function close() {

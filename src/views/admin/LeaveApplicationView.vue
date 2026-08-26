@@ -51,11 +51,20 @@
             </option>
           </select>
         </div>
-        <div>
+        <!-- <div>
           <label class="block text-sm font-medium text-navy-deep mb-1.5">Year</label>
           <input
             v-model="selectedYear"
             type="number"
+            class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
+            @change="fetchApplications(1)"
+          />
+        </div> -->
+        <div>
+          <label class="block text-sm font-medium text-navy-deep mb-1.5">Month</label>
+          <input
+            v-model="selectedMonth"
+            type="month"
             class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
             @change="fetchApplications(1)"
           />
@@ -76,6 +85,12 @@
       <table class="w-full text-sm">
         <thead class="bg-sky/60 border-b border-sky-100">
           <tr>
+            <th
+              class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+            >
+              No
+            </th>
+
             <th
               class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
             >
@@ -130,10 +145,13 @@
         </thead>
         <tbody>
           <tr
-            v-for="app in applications"
+            v-for="(app, index) in applications"
             :key="app.id"
             class="border-b border-sky-100 last:border-b-0 hover:bg-sky/40 transition-colors"
           >
+            <td class="px-4 py-3.5 text-slate-500 font-mono text-[12.5px]">
+              {{ (currentPage - 1) * perPage + index + 1 }}
+            </td>
             <td class="px-4 py-3.5 font-semibold text-navy-deep">
               {{ app.first_name }} {{ app.surname }}
             </td>
@@ -215,7 +233,7 @@
             </td>
           </tr>
           <tr v-if="applications.length === 0">
-            <td colspan="10" class="px-4 py-12 text-center text-slate-400 text-sm">
+            <td colspan="11" class="px-4 py-12 text-center text-slate-400 text-sm">
               No applications found
             </td>
           </tr>
@@ -275,11 +293,14 @@ const filterStatus = ref('')
 const pdfUrl = ref(null)
 const currentPage = ref(1)
 const lastPage = ref(1)
+const perPage = ref(15)
 const total = ref(0)
 
 const search = ref('')
 const selectedDepartment = ref('')
-const selectedYear = ref(new Date().getFullYear())
+const now = new Date()
+const selectedMonth = ref(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`)
+
 const departments = ref([])
 let searchTimeout = null
 
@@ -297,13 +318,19 @@ async function fetchApplications(page = 1) {
     if (filterStatus.value) params.append('status', filterStatus.value)
     if (search.value) params.append('search', search.value)
     if (selectedDepartment.value) params.append('department_id', selectedDepartment.value)
-    if (selectedYear.value) params.append('year', selectedYear.value)
+    // if (selectedYear.value) params.append('year', selectedYear.value)
+    if (selectedMonth.value) {
+      const [year, month] = selectedMonth.value.split('-')
+      params.append('year', year)
+      params.append('month', month)
+    }
 
     const response = await api.get(`/leave-applications?${params}`)
     applications.value = response.data.data
     currentPage.value = response.data.current_page
     lastPage.value = response.data.last_page
     total.value = response.data.total
+    perPage.value = response.data.per_page
   } catch (error) {
     console.error('Error fetching applications:', error)
     applications.value = []

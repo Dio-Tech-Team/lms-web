@@ -19,7 +19,10 @@
       <div class="flex items-center justify-between mb-5">
         <h2 class="font-serif text-lg font-semibold text-navy-deep">
           Employee Leave Summary
-          <span class="text-slate-400 font-sans font-normal text-sm ml-1">({{ summaryYear }})</span>
+          <!-- <span class="text-slate-400 font-sans font-normal text-sm ml-1">({{ summaryYear }})</span> -->
+          <span class="text-slate-400 font-sans font-normal text-sm ml-1"
+            >({{ summaryMonth }})</span
+          >
         </h2>
         <p class="text-[12px] text-slate-400">Click a row to filter records below</p>
       </div>
@@ -49,11 +52,20 @@
             </option>
           </select>
         </div>
-        <div>
+        <!-- <div>
           <label class="block text-sm font-medium text-navy-deep mb-1.5">Year</label>
           <input
             v-model="summaryYear"
             type="number"
+            class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
+            @change="fetchSummary(1)"
+          />
+        </div> -->
+        <div>
+          <label class="block text-sm font-medium text-navy-deep mb-1.5">Month & Year</label>
+          <input
+            v-model="summaryMonth"
+            type="month"
             class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
             @change="fetchSummary(1)"
           />
@@ -69,6 +81,11 @@
       <table v-else class="w-full text-sm">
         <thead class="bg-sky/60 border-b border-sky-100">
           <tr>
+            <th
+              class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+            >
+              No.
+            </th>
             <th
               class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
             >
@@ -103,11 +120,14 @@
         </thead>
         <tbody>
           <tr
-            v-for="emp in summary"
+            v-for="(emp, index) in summary"
             :key="emp.id"
             class="border-b border-sky-100 last:border-b-0 hover:bg-sky/40 cursor-pointer transition-colors"
             @click="filterByEmployee(emp.first_name, emp.surname)"
           >
+            <td class="px-4 py-3.5 text-slate-500 font-mono text-[12.5px]">
+              {{ (summaryCurrentPage - 1) * summaryPerPage + index + 1 }}
+            </td>
             <td class="px-4 py-3.5 font-semibold text-navy-deep">
               {{ emp.first_name }} {{ emp.surname }}
             </td>
@@ -130,7 +150,7 @@
             </td>
           </tr>
           <tr v-if="summary.length === 0">
-            <td colspan="6" class="px-4 py-10 text-center text-slate-400 text-sm">
+            <td colspan="7" class="px-4 py-10 text-center text-slate-400 text-sm">
               No records found
             </td>
           </tr>
@@ -213,11 +233,20 @@
             </option>
           </select>
         </div>
-        <div>
+        <!-- <div>
           <label class="block text-sm font-medium text-navy-deep mb-1.5">Year</label>
           <input
             v-model="selectedYear"
             type="number"
+            class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
+            @change="fetchRecords(1)"
+          />
+        </div> -->
+        <div>
+          <label class="block text-sm font-medium text-navy-deep mb-1.5">Month & Year</label>
+          <input
+            v-model="selectedMonth"
+            type="month"
             class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
             @change="fetchRecords(1)"
           />
@@ -234,6 +263,11 @@
       <table v-else class="w-full text-sm">
         <thead class="bg-sky/60 border-b border-sky-100">
           <tr>
+            <th
+              class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+            >
+              No
+            </th>
             <th
               class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
             >
@@ -275,10 +309,13 @@
         </thead>
         <tbody>
           <tr
-            v-for="record in records"
+            v-for="(record, index) in records"
             :key="record.id"
             class="border-b border-sky-100 last:border-b-0 hover:bg-sky/40 transition-colors"
           >
+            <td class="px-4 py-3.5 text-slate-500 font-mono text-[12.5px]">
+              {{ (recordsCurrentPage - 1) * recordsPerPage + index + 1 }}
+            </td>
             <td class="px-4 py-3.5 font-semibold text-navy-deep">
               {{ record.first_name }} {{ record.surname }}
             </td>
@@ -308,7 +345,7 @@
             <td class="px-4 py-3.5 text-slate-600">{{ record.recorded_by }}</td>
           </tr>
           <tr v-if="records.length === 0">
-            <td colspan="6" class="px-4 py-10 text-center text-slate-400 text-sm">
+            <td colspan="7" class="px-4 py-10 text-center text-slate-400 text-sm">
               No leave records found
             </td>
           </tr>
@@ -355,6 +392,8 @@ const summary = ref([])
 const summaryLoading = ref(false)
 const summaryCurrentPage = ref(1)
 const summaryLastPage = ref(1)
+const summaryPerPage = ref(15)
+const recordsPerPage = ref(15)
 
 // Records
 const records = ref([])
@@ -366,15 +405,16 @@ const recordsTotal = ref(0)
 // Filters
 const employeeSearch = ref('')
 const selectedLeaveType = ref('')
-const selectedYear = ref(currentYear)
+// const selectedYear = ref(currentYear)
 const leaveConfigs = ref([])
 const selectedDepartment = ref('')
 const departments = ref([])
 const summaryDepartment = ref('')
 
 let searchTimeout = null
-
-const summaryYear = ref(currentYear)
+const now = new Date()
+const summaryMonth = ref(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`)
+const selectedMonth = ref(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`)
 const summarySearch = ref('')
 let summarySearchTimeout = null
 
@@ -400,7 +440,11 @@ async function fetchSummary(page = 1) {
   summaryLoading.value = true
   try {
     const params = new URLSearchParams({ page })
-    if (summaryYear.value) params.append('year', summaryYear.value)
+    if (summaryMonth.value) {
+      const [year, month] = summaryMonth.value.split('-')
+      params.append('year', year)
+      params.append('month', month)
+    }
     if (summarySearch.value) params.append('search', summarySearch.value)
     if (summaryDepartment.value) params.append('department_id', summaryDepartment.value)
 
@@ -408,6 +452,7 @@ async function fetchSummary(page = 1) {
     summary.value = response.data.data
     summaryCurrentPage.value = response.data.current_page
     summaryLastPage.value = response.data.last_page
+    summaryPerPage.value = response.data.per_page
   } catch (err) {
     console.error('Error fetching summary:', err)
   } finally {
@@ -420,7 +465,12 @@ async function fetchRecords(page = 1) {
     const params = new URLSearchParams({ page })
     if (employeeSearch.value) params.append('search', employeeSearch.value)
     if (selectedLeaveType.value) params.append('leave_type', selectedLeaveType.value)
-    if (selectedYear.value) params.append('year', selectedYear.value)
+    // if (selectedYear.value) params.append('year', selectedYear.value)
+    if (selectedMonth.value) {
+      const [year, month] = selectedMonth.value.split('-')
+      params.append('year', year)
+      params.append('month', month)
+    }
     if (selectedDepartment.value) params.append('department_id', selectedDepartment.value)
 
     const response = await api.get(`/leave-records?${params}`)
@@ -428,6 +478,7 @@ async function fetchRecords(page = 1) {
     recordsCurrentPage.value = response.data.current_page
     recordsLastPage.value = response.data.last_page
     recordsTotal.value = response.data.total
+    recordsPerPage.value = response.data.per_page
   } catch (err) {
     console.error('Error fetching records:', err)
   } finally {

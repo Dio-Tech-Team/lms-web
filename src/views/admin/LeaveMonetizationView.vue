@@ -39,7 +39,7 @@
     <!-- Filter Tabs -->
     <div class="flex gap-2 mb-5">
       <button
-        v-for="tab in ['', 'pending', 'approved', 'rejected']"
+        v-for="tab in ['', 'pending', 'approved', 'rejected', 'cancelled']"
         :key="tab"
         @click="setFilter(tab)"
         :class="
@@ -139,6 +139,7 @@
                   'bg-amber-tint text-amber-700': m.status === 'pending',
                   'bg-teal-tint text-teal-700': m.status === 'approved',
                   'bg-rose-tint text-rose-700': m.status === 'rejected',
+                  'bg-slate-100 text-slate-500': m.status === 'cancelled',
                 }"
               >
                 <span
@@ -147,6 +148,7 @@
                     'bg-amber-700': m.status === 'pending',
                     'bg-teal-700': m.status === 'approved',
                     'bg-rose-700': m.status === 'rejected',
+                    'bg-slate-400': m.status === 'cancelled',
                   }"
                 ></span>
                 {{ m.status }}
@@ -207,12 +209,12 @@
       @close="showModal = false"
       @updated="fetchMonetizations(currentPage)"
     />
-
     <ReviewMonetizationModal
       :show="reviewModal.show"
       :mode="reviewModal.mode"
       :monetization-id="reviewModal.id"
       :requested-days="reviewModal.requestedDays"
+      :remaining-balance="reviewModal.remainingBalance"
       :employee-name="reviewModal.employeeName"
       @close="reviewModal.show = false"
       @updated="fetchMonetizations(currentPage)"
@@ -244,6 +246,7 @@ const reviewModal = ref({
   mode: 'approve',
   id: null,
   requestedDays: 0,
+  remainingBalance: null,
   employeeName: '',
 })
 
@@ -253,6 +256,7 @@ function openReview(m, mode) {
     mode,
     id: m.id,
     requestedDays: parseFloat(m.days_monetized),
+    remainingBalance: m.remaining_balance,
     employeeName: `${m.first_name} ${m.surname}`,
   }
 }

@@ -6,13 +6,10 @@
   >
     <div class="bg-white rounded-2xl w-full max-w-md p-6 shadow-xl">
       <h2 class="text-lg font-bold text-navy-deep mb-1">
-        {{ mode === 'approve' ? 'Approve Monetization' : 'Reject Monetization' }}
+        {{ mode === 'approve' ? 'Approve Leave Application' : 'Reject Leave Application' }}
       </h2>
       <p class="text-[13px] text-slate-500 mb-5">
-        {{ employeeName }} · {{ requestedDays }} day(s) requested
-        <span v-if="remainingBalance !== null && remainingBalance !== undefined">
-          · {{ Number(remainingBalance).toFixed(1) }} day(s) available
-        </span>
+        {{ employeeName }} · {{ leaveTypeCode }} · {{ daysApplied }} day(s)
       </p>
 
       <div
@@ -23,25 +20,16 @@
       </div>
 
       <div v-if="mode === 'approve'" class="mb-5">
-        <label class="block text-[12.5px] font-semibold text-slate-600 mb-1.5">
-          Days to approve
-        </label>
-        <input
-          v-model="approvedDays"
-          type="number"
-          step="0.5"
-          min="0.5"
-          :max="requestedDays"
-          class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
-        />
-        <p class="text-[12px] text-slate-400 mt-1.5">
-          Approve fewer days than requested if the full amount can't be funded. Cannot exceed
-          {{ requestedDays }}.
-        </p>
-        <p v-if="isPartial" class="text-[12px] text-amber-700 mt-1.5 font-medium">
-          Partial approval — the remaining
-          {{ (parseFloat(requestedDays) - parseFloat(approvedDays)).toFixed(1) }}
-          day(s) will not be credited. This cannot be undone.
+        <div
+          v-if="shortfall > 0"
+          class="bg-amber-tint text-amber-700 text-[13px] rounded-lg px-3.5 py-3 font-medium leading-relaxed"
+        >
+          This employee has {{ Number(remainingBalance).toFixed(2) }} day(s) remaining but applied
+          for {{ daysApplied }}. {{ shortfall.toFixed(2) }} day(s) will be recorded as Leave Without
+          Pay.
+        </div>
+        <p v-else class="text-[13px] text-slate-500">
+          Credits will be deducted and the leave record created. This cannot be undone.
         </p>
       </div>
 
@@ -55,6 +43,9 @@
           placeholder="The employee sees this, so say what went wrong."
           class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors resize-none"
         ></textarea>
+        <p class="text-[12px] text-slate-400 mt-1.5">
+          Required — this is the only place the employee learns why.
+        </p>
       </div>
 
       <div class="flex justify-end gap-3">
@@ -73,13 +64,7 @@
             mode === 'approve' ? 'bg-navy hover:bg-navy-deep' : 'bg-rose-600 hover:bg-rose-700'
           "
         >
-          {{
-            submitting
-              ? 'Working...'
-              : mode === 'approve'
-              ? `Approve ${approvedDays || 0} day(s)`
-              : 'Reject'
-          }}
+          {{ submitting ? 'Working...' : mode === 'approve' ? 'Approve' : 'Reject' }}
         </button>
       </div>
     </div>
@@ -93,52 +78,43 @@ import api from '@/api/axios'
 const props = defineProps({
   show: Boolean,
   mode: { type: String, default: 'approve' }, // 'approve' | 'reject'
-  monetizationId: [Number, String],
-  requestedDays: [Number, String],
-  remainingBalance: [Number, String, null],
+  applicationId: [Number, String],
   employeeName: String,
+  leaveTypeCode: String,
+  daysApplied: [Number, String],
+  remainingBalance: [Number, String, null],
 })
 
 const emit = defineEmits(['close', 'updated'])
 
-const approvedDays = ref('')
 const rejectionReason = ref('')
 const submitting = ref(false)
 const error = ref('')
 
-// Only true for a genuine partial — a full approval stays quiet, since the
-// warning is about days the employee loses.
-const isPartial = computed(() => {
-  const days = parseFloat(approvedDays.value)
-  return !isNaN(days) && days > 0 && days < parseFloat(props.requestedDays)
+// Approving past the balance is allowed — the backend records the excess as
+// LWOP — but HR should see the figure before it happens, not after.
+const shortfall = computed(() => {
+  if (props.remainingBalance === null || props.remainingBalance === undefined) return 0
+  const diff = Number(props.daysApplied) - Number(props.remainingBalance)
+  return diff > 0 ? diff : 0
 })
 
-// Pre-fill to the full amount: approving in full is the common case, and
-// retyping the number every time would be friction for no benefit.
 watch(
   () => props.show,
   (open) => {
     if (!open) return
-    approvedDays.value = props.requestedDays ?? ''
     rejectionReason.value = ''
     error.value = ''
     submitting.value = false
-  }
+  },
 )
 
 async function submit() {
   if (submitting.value) return
 
-  if (props.mode === 'approve') {
-    const days = parseFloat(approvedDays.value)
-    if (isNaN(days) || days < 0.5) {
-      error.value = 'Enter a valid number of days (minimum 0.5).'
-      return
-    }
-    if (days > parseFloat(props.requestedDays)) {
-      error.value = `Cannot approve more than the ${props.requestedDays} day(s) requested.`
-      return
-    }
+  if (props.mode === 'reject' && !rejectionReason.value.trim()) {
+    error.value = 'A rejection reason is required.'
+    return
   }
 
   submitting.value = true
@@ -147,11 +123,9 @@ async function submit() {
   try {
     const path = props.mode === 'approve' ? 'approve' : 'reject'
     const body =
-      props.mode === 'approve'
-        ? { approved_days: parseFloat(approvedDays.value) }
-        : { rejection_reason: rejectionReason.value.trim() || null }
+      props.mode === 'approve' ? {} : { rejection_reason: rejectionReason.value.trim() }
 
-    await api.post(`/leave-monetizations/${props.monetizationId}/${path}`, body)
+    await api.post(`/leave-applications/${props.applicationId}/${path}`, body)
     emit('updated')
     emit('close')
   } catch (err) {

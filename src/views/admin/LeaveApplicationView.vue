@@ -196,14 +196,14 @@
             <td class="px-4 py-3.5">
               <div v-if="app.status === 'pending'" class="flex gap-3">
                 <button
-                  @click="handleApprove(app)"
+                  @click="openReview(app, 'approve')"
                   class="text-teal-700 hover:text-teal-800 font-semibold text-sm transition-colors"
                 >
                   Approve
                 </button>
 
                 <button
-                  @click="handleReject(app.id)"
+                  @click="openReview(app, 'reject')"
                   class="text-rose-600 hover:text-rose-700 font-semibold text-sm transition-colors"
                 >
                   Reject
@@ -264,7 +264,17 @@
         </div>
       </div>
     </div>
-
+    <ReviewApplicationModal
+      :show="reviewModal.show"
+      :mode="reviewModal.mode"
+      :application-id="reviewModal.id"
+      :employee-name="reviewModal.employeeName"
+      :leave-type-code="reviewModal.leaveTypeCode"
+      :days-applied="reviewModal.daysApplied"
+      :remaining-balance="reviewModal.remainingBalance"
+      @close="reviewModal.show = false"
+      @updated="fetchApplications(currentPage)"
+    />
     <!-- PDF Preview -->
     <div v-if="pdfUrl" class="mt-6 bg-white rounded-2xl border border-sky-100 overflow-hidden">
       <div class="flex items-center justify-between px-5 py-3.5 bg-sky/60 border-b border-sky-100">
@@ -286,6 +296,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import api from '@/api/axios'
+import ReviewApplicationModal from '../../views/modals/ReviewApplicationModal.vue'
 
 const applications = ref([])
 const loading = ref(true)
@@ -354,25 +365,25 @@ function setFilter(status) {
 //     }
 //   }
 // }
-async function handleApprove(app) {
-  let message = 'Are you sure you want to approve this leave application?'
-  if (app.remaining_balance !== null && Number(app.remaining_balance) < Number(app.days_applied)) {
-    const shortfall = (Number(app.days_applied) - Number(app.remaining_balance)).toFixed(2)
-    message = `This employee only has ${Number(app.remaining_balance).toFixed(
-      2
-    )} day(s) remaining, but applied for ${
-      app.days_applied
-    }. ${shortfall} day(s) will be recorded as Leave Without Pay. Continue?`
-  }
-  if (confirm(message)) {
-    try {
-      await api.post(`/leave-applications/${app.id}/approve`)
-      await fetchApplications(currentPage.value)
-    } catch (err) {
-      alert(err.response?.data?.message || 'Failed to approve')
-    }
-  }
-}
+// async function handleApprove(app) {
+//   let message = 'Are you sure you want to approve this leave application?'
+//   if (app.remaining_balance !== null && Number(app.remaining_balance) < Number(app.days_applied)) {
+//     const shortfall = (Number(app.days_applied) - Number(app.remaining_balance)).toFixed(2)
+//     message = `This employee only has ${Number(app.remaining_balance).toFixed(
+//       2
+//     )} day(s) remaining, but applied for ${
+//       app.days_applied
+//     }. ${shortfall} day(s) will be recorded as Leave Without Pay. Continue?`
+//   }
+//   if (confirm(message)) {
+//     try {
+//       await api.post(`/leave-applications/${app.id}/approve`)
+//       await fetchApplications(currentPage.value)
+//     } catch (err) {
+//       alert(err.response?.data?.message || 'Failed to approve')
+//     }
+//   }
+// }
 // async function handleReject(id) {
 //   if (confirm('Are you sure you want to Reject this leave application?')) {
 //     try {
@@ -384,26 +395,26 @@ async function handleApprove(app) {
 //   }
 // }
 
-async function handleReject(id) {
-  const reason = prompt('Please provide a reason for rejecting this leave application:')
+// async function handleReject(id) {
+//   const reason = prompt('Please provide a reason for rejecting this leave application:')
 
-  if (reason === null) {
-    // user clicked Cancel
-    return
-  }
+//   if (reason === null) {
+//     // user clicked Cancel
+//     return
+//   }
 
-  if (!reason.trim()) {
-    alert('A rejection reason is required.')
-    return
-  }
+//   if (!reason.trim()) {
+//     alert('A rejection reason is required.')
+//     return
+//   }
 
-  try {
-    await api.post(`/leave-applications/${id}/reject`, { rejection_reason: reason.trim() })
-    await fetchApplications(currentPage.value)
-  } catch (err) {
-    alert(err.response?.data?.message || 'Failed to Reject')
-  }
-}
+//   try {
+//     await api.post(`/leave-applications/${id}/reject`, { rejection_reason: reason.trim() })
+//     await fetchApplications(currentPage.value)
+//   } catch (err) {
+//     alert(err.response?.data?.message || 'Failed to Reject')
+//   }
+// }
 
 function formatDate(dateString) {
   if (!dateString) return 'N/A'
@@ -424,6 +435,28 @@ async function viewLeaveForm(id) {
     alert('Could not generate leave form.')
   } finally {
     loading.value = false
+  }
+}
+
+const reviewModal = ref({
+  show: false,
+  mode: 'approve',
+  id: null,
+  employeeName: '',
+  leaveTypeCode: '',
+  daysApplied: 0,
+  remainingBalance: null,
+})
+
+function openReview(app, mode) {
+  reviewModal.value = {
+    show: true,
+    mode,
+    id: app.id,
+    employeeName: `${app.first_name} ${app.surname}`,
+    leaveTypeCode: app.leave_type_code,
+    daysApplied: app.days_applied,
+    remainingBalance: app.remaining_balance,
   }
 }
 

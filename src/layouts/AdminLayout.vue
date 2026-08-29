@@ -118,6 +118,16 @@
                 Credit Computation
               </RouterLink>
             </li>
+            <li>
+              <RouterLink
+                to="/reports"
+                class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm text-sky-100/80 hover:bg-white/5 transition-colors"
+                active-class="!bg-white/10 !text-white font-semibold"
+              >
+                <span class="w-1.5 h-1.5 rounded-full bg-current opacity-50"></span>
+                Reports
+              </RouterLink>
+            </li>
 
             <li v-if="authStore.isSuperAdmin">
               <RouterLink

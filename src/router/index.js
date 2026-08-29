@@ -61,6 +61,11 @@ const router = createRouter({
           component: () => import('@/views/admin/LeaveRecordsView.vue'),
         },
         {
+          path: 'reports',
+          name: 'reports',
+          component: () => import('@/views/admin/ReportsView.vue'),
+        },
+        {
           path: 'leave-applications',
           name: 'leave-applications',
           component: () => import('@/views/admin/LeaveApplicationView.vue'),

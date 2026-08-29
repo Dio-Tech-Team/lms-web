@@ -20,6 +20,18 @@
           <p class="text-[10px] uppercase tracking-wider text-sky-300/70">LGU Echague, Isabela</p>
         </div>
       </div>
+      <!-- Logo -->
+      <!-- <div class="px-5 pt-7 pb-6 mb-2 border-b border-white/10 flex items-center gap-3">
+        <div
+          class="w-9 h-9 rounded-2xl flex items-center justify-center flex-shrink-0 overflow-hidden bg-white/10 p-1"
+        >
+          <img src="@/assets/logo.jpe" alt="LeaveSync Logo" class="w-full h-full object-contain" />
+        </div>
+        <div>
+          <h1 class="font-serif text-lg font-semibold text-white leading-tight">LeaveSync</h1>
+          <p class="text-[10px] uppercase tracking-wider text-sky-300/70">LGU Echague, Isabela</p>
+        </div>
+      </div> -->
 
       <!-- Navigation -->
       <nav class="flex-1 px-4 pb-4">

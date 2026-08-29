@@ -119,7 +119,15 @@
                 {{ m.leave_type_code }}
               </span>
             </td>
-            <td class="px-4 py-3.5 text-slate-600">{{ m.days_monetized }}</td>
+            <td class="px-4 py-3.5 text-slate-600">
+              <template
+                v-if="m.approved_days && parseFloat(m.approved_days) < parseFloat(m.days_monetized)"
+              >
+                <span class="line-through text-slate-400">{{ m.days_monetized }}</span>
+                <span class="font-semibold text-navy-deep ml-1.5">{{ m.approved_days }}</span>
+              </template>
+              <template v-else>{{ m.days_monetized }}</template>
+            </td>
             <td class="px-4 py-3.5 text-slate-600">{{ m.reason || 'N/A' }}</td>
             <td class="px-4 py-3.5 font-mono text-[12.5px] text-slate-500">
               {{ formatDate(m.applied_at) }}
@@ -147,13 +155,13 @@
             <td class="px-4 py-3.5">
               <div v-if="m.status === 'pending'" class="flex gap-3">
                 <button
-                  @click="handleApprove(m.id)"
+                  @click="openReview(m, 'approve')"
                   class="text-teal-700 hover:text-teal-800 font-semibold text-sm transition-colors"
                 >
                   Approve
                 </button>
                 <button
-                  @click="handleReject(m.id)"
+                  @click="openReview(m, 'reject')"
                   class="text-rose-600 hover:text-rose-700 font-semibold text-sm transition-colors"
                 >
                   Reject
@@ -199,14 +207,24 @@
       @close="showModal = false"
       @updated="fetchMonetizations(currentPage)"
     />
+
+    <ReviewMonetizationModal
+      :show="reviewModal.show"
+      :mode="reviewModal.mode"
+      :monetization-id="reviewModal.id"
+      :requested-days="reviewModal.requestedDays"
+      :employee-name="reviewModal.employeeName"
+      @close="reviewModal.show = false"
+      @updated="fetchMonetizations(currentPage)"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useConfirm } from '@/composables/useConfirm'
 import api from '@/api/axios'
 import LeaveMonetizationModal from '../../views/modals/LeaveMonetizationModal.vue'
+import ReviewMonetizationModal from '../../views/modals/ReviewMonetizationModal.vue'
 
 const monetizations = ref([])
 const loading = ref(true)
@@ -218,9 +236,26 @@ const total = ref(0)
 
 const search = ref('')
 const selectedYear = ref(new Date().getFullYear())
-const { confirm } = useConfirm()
 const errorMessage = ref('')
 let searchTimeout = null
+
+const reviewModal = ref({
+  show: false,
+  mode: 'approve',
+  id: null,
+  requestedDays: 0,
+  employeeName: '',
+})
+
+function openReview(m, mode) {
+  reviewModal.value = {
+    show: true,
+    mode,
+    id: m.id,
+    requestedDays: parseFloat(m.days_monetized),
+    employeeName: `${m.first_name} ${m.surname}`,
+  }
+}
 
 async function fetchMonetizations(page = 1) {
   loading.value = true
@@ -246,34 +281,6 @@ async function fetchMonetizations(page = 1) {
 function setFilter(status) {
   filterStatus.value = status
   fetchMonetizations(1)
-}
-async function handleApprove(id) {
-  const ok = await confirm({
-    title: 'Approve Monetization',
-    message: 'Approve this monetization request?',
-  })
-  if (!ok) return
-  errorMessage.value = ''
-  try {
-    await api.post(`/leave-monetizations/${id}/approve`)
-    await fetchMonetizations(currentPage.value)
-  } catch (err) {
-    errorMessage.value = err.response?.data?.message || 'Failed to approve'
-  }
-}
-async function handleReject(id) {
-  const ok = await confirm({
-    title: 'Reject Monetization',
-    message: 'Reject this monetization request?',
-  })
-  if (!ok) return
-  errorMessage.value = ''
-  try {
-    await api.post(`/leave-monetizations/${id}/reject`)
-    await fetchMonetizations(currentPage.value)
-  } catch (err) {
-    errorMessage.value = err.response?.data?.message || 'Failed to reject'
-  }
 }
 
 function formatDate(dateString) {

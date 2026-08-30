@@ -471,9 +471,12 @@
         <div class="flex items-center justify-between mb-5">
           <div class="flex items-center gap-2">
             <h2 class="font-serif text-lg font-semibold text-navy-deep">Leave Balance</h2>
-            <span class="text-[12.5px] font-semibold text-slate-400">{{
-              new Date().getFullYear()
-            }}</span>
+            <select
+              v-model.number="selectedYear"
+              class="text-[12.5px] font-semibold text-navy-deep bg-white border border-sky-100 rounded-lg px-2 py-1"
+            >
+              <option v-for="y in availableYears" :key="y" :value="y">{{ y }}</option>
+            </select>
           </div>
           <div class="flex gap-2">
             <button
@@ -714,7 +717,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import api from '@/api/axios'
 import EditEmployeeModal from '../../views/modals/EditEmployeeModal.vue'
@@ -758,6 +761,10 @@ const showRetireModal = ref(false)
 const showEditHistoryModal = ref(false)
 const selectedHistory = ref(null)
 
+const currentYear = new Date().getFullYear()
+const selectedYear = ref(currentYear)
+const availableYears = [currentYear + 1, currentYear, currentYear - 1, currentYear - 2]
+
 const { confirm } = useConfirm()
 const balanceError = ref('')
 const isSavingBalance = ref(false)
@@ -772,12 +779,15 @@ async function fetchEmployee() {
 }
 async function fetchLeaveCredits() {
   try {
-    const creditsResponse = await api.get(`/employees/${route.params.id}/leave-credits`)
+    const creditsResponse = await api.get(`/employees/${route.params.id}/leave-credits`, {
+      params: { year: selectedYear.value },
+    })
     leaveCredits.value = creditsResponse.data.credits || creditsResponse.data
   } catch (error) {
     console.error('Error fetching leave credits:', error)
   }
 }
+watch(selectedYear, fetchLeaveCredits)
 
 async function refreshAll() {
   await fetchEmployee()
@@ -795,8 +805,7 @@ async function setOpeningBalance(amount) {
     await api.put(`/employees/${route.params.id}/leave-credits/${selectedCredit.value.id}`, {
       total_credits: amount,
     })
-    const creditsResponse = await api.get(`/employees/${route.params.id}/leave-credits`)
-    leaveCredits.value = creditsResponse.data.credits || creditsResponse.data
+    await fetchLeaveCredits()
     showOpeningBalanceModal.value = false
   } catch (err) {
     balanceError.value = err.response?.data?.message || 'Failed to set opening balance.'
@@ -816,7 +825,9 @@ onMounted(async () => {
       await Promise.all([
         api.get(`/employees/${route.params.id}`),
         api.get('/departments'),
-        api.get(`/employees/${route.params.id}/leave-credits`),
+        api.get(`/employees/${route.params.id}/leave-credits`, {
+          params: { year: selectedYear.value },
+        }),
         api.get('/leave-configurations?active_only=true'),
         api.get('/positions'),
       ])
@@ -866,13 +877,14 @@ async function handleDeactivate() {
 // }
 async function initializeCredits() {
   try {
-    await api.post(`/employees/${route.params.id}/leave-credits/initialize`)
+    await api.post(`/employees/${route.params.id}/leave-credits/initialize`, {
+      year: selectedYear.value,
+    })
     await fetchLeaveCredits()
   } catch (error) {
     console.error('Failed to initialize credits', error)
   }
 }
-
 // const filteredCredits = computed(() => {
 //   const mainCodes = ['VL', 'SL']
 //   const extraCodes = ['SPL', 'WL', 'FL']

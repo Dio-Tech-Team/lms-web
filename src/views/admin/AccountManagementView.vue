@@ -1,14 +1,14 @@
 <template>
   <div>
     <div class="flex items-center justify-between mb-8">
-      <h1 class="text-2xl font-bold text-gray-700">Manage Accounts</h1>
+      <h1 class="font-serif text-2xl font-semibold text-navy-deep">Manage Accounts</h1>
       <button
         @click="showAddModal = true"
         class="bg-navy text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-navy-deep transition-colors shadow-sm"
       >
         + Add Account
       </button>
-    </div>
+    </div>  
 
     <!-- Add Account Modal -->
     <div

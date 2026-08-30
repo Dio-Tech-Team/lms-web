@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="mb-8">
-      <h1 class="text-2xl font-bold text-gray-700">Activity Logs</h1>
+      <h1 class="font-serif text-2xl font-semibold text-navy-deep">Activity Logs</h1>
     </div>
 
     <div class="flex gap-3 mb-4">

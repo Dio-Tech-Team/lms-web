@@ -11,7 +11,7 @@
     </div>
 
     <div class="flex items-center justify-between mb-6">
-      <h1 class="text-2xl font-bold text-gray-700">Leave Monetization</h1>
+      <h1 class="font-serif text-2xl font-semibold text-navy-deep">Leave Monetization</h1>
       <button
         @click="showModal = true"
         class="px-4 py-2 bg-navy text-white rounded-lg text-sm font-semibold hover:bg-navy-deep transition-colors"

@@ -3,7 +3,7 @@
     <div class="mb-6 flex items-center justify-between">
       <div>
         <!-- <p class="text-[11px] uppercase tracking-wider text-teal-600 font-bold mb-1">Leave</p> -->
-        <h1 class="text-2xl font-bold text-gray-700">Leave Records</h1>
+        <h1 class="font-serif text-2xl font-semibold text-navy-deep">Leave Records</h1>
       </div>
       <button
         @click="showSummary = !showSummary"

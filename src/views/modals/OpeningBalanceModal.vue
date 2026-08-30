@@ -16,7 +16,12 @@
           Enter the balance from {{ credit?.leave_type }}'s physical leave card.
         </template>
       </p>
-
+      <div
+        v-if="error"
+        class="bg-rose-100 text-rose-700 text-[13px] rounded-lg px-3.5 py-2.5 mb-4 font-medium"
+      >
+        {{ error }}
+      </div>
       <form @submit.prevent="submit" class="space-y-4">
         <div>
           <label class="block text-[10.5px] uppercase font-bold text-slate-400 mb-1">
@@ -57,13 +62,12 @@
 import { ref, computed, watch } from 'vue'
 import { useConfirm } from '@/composables/useConfirm'
 
-const props = defineProps(['show', 'credit', 'isSaving'])
+const props = defineProps(['show', 'credit', 'isSaving', 'error'])
 const emit = defineEmits(['close', 'save'])
 
 const amount = ref(0)
 
 const { confirm } = useConfirm()
-const isSubmitting = ref(false)
 
 const isEditing = computed(() => Number(props.credit?.total_credits) > 0)
 

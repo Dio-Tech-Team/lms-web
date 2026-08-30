@@ -4,7 +4,7 @@
     <div class="flex items-center justify-between mb-8">
       <div>
         <!-- <p class="text-[11px] uppercase tracking-wider text-teal-600 font-bold mb-1">Records</p> -->
-        <h1 class="text-2xl font-bold text-gray-700">Employees</h1>
+        <h1 class="font-serif text-2xl font-semibold text-navy-deep">Employees</h1>
       </div>
       <button
         v-if="authStore.isSuperAdmin"

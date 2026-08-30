@@ -510,95 +510,98 @@
           </div>
         </div>
 
-        <div v-if="filteredCredits.length > 0" class="grid grid-cols-2 gap-4">
-          <div
-            v-for="credit in filteredCredits"
-            :key="credit.id"
-            class="border border-dashed border-sky-100 rounded-xl p-4"
-          >
-            <div class="flex items-center justify-between mb-3">
-              <span class="font-semibold text-navy-deep">{{ credit.leave_type }}</span>
-              <span
-                class="bg-sky-100 text-navy px-2 py-0.5 rounded-full text-[11px] font-bold font-mono"
+        <div v-if="filteredCredits.length > 0" class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="bg-sky/60 border-b border-sky-100">
+              <tr>
+                <th
+                  class="text-left px-4 py-3 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+                >
+                  No
+                </th>
+                <th
+                  class="text-left px-4 py-3 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+                >
+                  Leave Type
+                </th>
+                <th
+                  class="text-left px-4 py-3 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+                >
+                  Code
+                </th>
+                <th
+                  class="text-right px-4 py-3 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+                >
+                  Total
+                </th>
+                <th
+                  class="text-right px-4 py-3 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+                >
+                  Used
+                </th>
+                <th
+                  class="text-right px-4 py-3 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+                >
+                  Remaining
+                </th>
+                <th
+                  class="text-right px-4 py-3 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+                ></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="(credit, index) in filteredCredits"
+                :key="credit.id"
+                class="border-b border-sky-100 last:border-b-0 hover:bg-sky/40 transition-colors"
               >
-                {{ credit.code }}
-              </span>
-            </div>
-            <div v-if="credit.code !== 'FL'" class="grid grid-cols-3 gap-2 text-center">
-              <div>
-                <p class="text-[10.5px] uppercase tracking-wide text-slate-400 font-bold mb-1">
-                  Total
-                </p>
-                <p class="font-serif text-lg font-semibold text-navy-deep">
-                  {{ Number(credit.total_credits).toFixed(3) }}
-                </p>
-              </div>
-              <div>
-                <p class="text-[10.5px] uppercase tracking-wide text-slate-400 font-bold mb-1">
-                  Used
-                </p>
-                <p class="font-serif text-lg font-semibold text-rose-600">
-                  {{ Number(credit.used_credits).toFixed(3) }}
-                </p>
-              </div>
-              <div>
-                <p class="text-[10.5px] uppercase tracking-wide text-slate-400 font-bold mb-1">
-                  Remaining
-                </p>
-                <p class="font-serif text-lg font-semibold text-teal-700">
-                  {{ Number(credit.remaining_balance).toFixed(3) }}
-                </p>
-              </div>
-            </div>
-            <div v-else class="text-center py-2">
-              <p class="text-[10.5px] uppercase tracking-wide text-slate-400 font-bold mb-1">
-                Days Taken This Year
-              </p>
-              <p class="font-serif text-lg font-semibold text-navy-deep">
-                {{ credit.fl_days_taken ?? 0 }} / {{ credit.fl_days_cap ?? 5 }}
-              </p>
-            </div>
-            <!-- <div class="grid grid-cols-3 gap-2 text-center">
-              <div>
-                <p class="text-[10.5px] uppercase tracking-wide text-slate-400 font-bold mb-1">
-                  Total
-                </p>
-                <p class="font-serif text-lg font-semibold text-navy-deep">
-                  {{ Number(credit.total_credits).toFixed(3) }}
-                </p>
-              </div>
-              <div>
-                <p class="text-[10.5px] uppercase tracking-wide text-slate-400 font-bold mb-1">
-                  Used
-                </p>
-                <p class="font-serif text-lg font-semibold text-rose-600">
-                  {{ Number(credit.used_credits).toFixed(3) }}
-                </p>
-              </div>
-              <div>
-                <p class="text-[10.5px] uppercase tracking-wide text-slate-400 font-bold mb-1">
-                  Remaining
-                </p>
-                <p class="font-serif text-lg font-semibold text-teal-700">
-                  {{ Number(credit.remaining_balance).toFixed(3) }}
-                </p>
-              </div>
-            </div> -->
-            <!-- <button
-              v-if="Number(credit.total_credits) === 0 && ['VL', 'SL'].includes(credit.code)"
-              @click="openOpeningBalanceModal(credit)"
-              class="text-[11px] text-teal-700 hover:text-teal-800 font-semibold mt-3"
-            >
-              Set Opening Balance
-            </button> -->
-            <button
-              v-if="['VL', 'SL'].includes(credit.code)"
-              @click="openOpeningBalanceModal(credit)"
-              class="text-[11px] text-teal-700 hover:text-teal-800 font-semibold mt-3"
-            >
-              {{ Number(credit.total_credits) === 0 ? 'Set Opening Balance' : 'Edit Balance' }}
-            </button>
-          </div>
+                <td class="px-4 py-3 text-slate-500 font-mono text-[12.5px]">{{ index + 1 }}</td>
+                <td class="px-4 py-3 font-semibold text-navy-deep">{{ credit.leave_type }}</td>
+                <td class="px-4 py-3">
+                  <span
+                    class="bg-sky-100 text-navy px-2 py-0.5 rounded-full text-[11px] font-bold font-mono"
+                  >
+                    {{ credit.code }}
+                  </span>
+                </td>
+
+                <!-- FL has no balance of its own: it deducts from VL and is
+                     capped by usage, so Total and Remaining are meaningless
+                     and the count goes in Used. -->
+                <template v-if="credit.code === 'FL'">
+                  <td class="px-4 py-3 text-right text-slate-300">—</td>
+                  <td class="px-4 py-3 text-right font-mono text-navy-deep">
+                    {{ credit.fl_days_taken ?? 0 }} / {{ credit.fl_days_cap ?? 5 }} taken
+                  </td>
+                  <td class="px-4 py-3 text-right text-slate-300">—</td>
+                </template>
+
+                <template v-else>
+                  <td class="px-4 py-3 text-right font-mono text-navy-deep">
+                    {{ Number(credit.total_credits).toFixed(3) }}
+                  </td>
+                  <td class="px-4 py-3 text-right font-mono text-rose-600">
+                    {{ Number(credit.used_credits).toFixed(3) }}
+                  </td>
+                  <td class="px-4 py-3 text-right font-mono font-semibold text-teal-700">
+                    {{ Number(credit.remaining_balance).toFixed(3) }}
+                  </td>
+                </template>
+
+                <td class="px-4 py-3 text-right">
+                  <button
+                    v-if="['VL', 'SL'].includes(credit.code)"
+                    @click="openOpeningBalanceModal(credit)"
+                    class="text-xs text-teal-700 hover:text-teal-800 font-semibold"
+                  >
+                    {{
+                      Number(credit.total_credits) === 0 ? 'Set Opening Balance' : 'Edit Balance'
+                    }}
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
         <div v-else class="text-slate-500 text-sm">
           No leave credits found.
@@ -680,6 +683,7 @@
       :show="showOpeningBalanceModal"
       :credit="selectedCredit"
       :is-saving="isSavingBalance"
+      :error="balanceError"
       @close="showOpeningBalanceModal = false"
       @save="setOpeningBalance"
     />
@@ -755,6 +759,7 @@ const showEditHistoryModal = ref(false)
 const selectedHistory = ref(null)
 
 const { confirm } = useConfirm()
+const balanceError = ref('')
 const isSavingBalance = ref(false)
 
 async function fetchEmployee() {
@@ -780,11 +785,12 @@ async function refreshAll() {
 }
 function openOpeningBalanceModal(credit) {
   selectedCredit.value = credit
+  balanceError.value = ''
   showOpeningBalanceModal.value = true
 }
-
 async function setOpeningBalance(amount) {
   isSavingBalance.value = true
+  balanceError.value = ''
   try {
     await api.put(`/employees/${route.params.id}/leave-credits/${selectedCredit.value.id}`, {
       total_credits: amount,
@@ -793,7 +799,7 @@ async function setOpeningBalance(amount) {
     leaveCredits.value = creditsResponse.data.credits || creditsResponse.data
     showOpeningBalanceModal.value = false
   } catch (err) {
-    alert(err.response?.data?.message || 'Failed to set opening balance')
+    balanceError.value = err.response?.data?.message || 'Failed to set opening balance.'
   } finally {
     isSavingBalance.value = false
   }

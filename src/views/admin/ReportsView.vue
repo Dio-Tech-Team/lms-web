@@ -11,7 +11,7 @@
     </div>
 
     <div class="flex items-center justify-between mb-6">
-      <h1 class="text-2xl font-bold text-gray-700">Reports</h1>
+      <h1 class="font-serif text-2xl font-semibold text-navy-deep">Reports</h1>
       <button
         @click="exportXlsx"
         :disabled="exporting || loading"

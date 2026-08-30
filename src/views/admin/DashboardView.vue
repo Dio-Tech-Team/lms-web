@@ -1,7 +1,23 @@
 <template>
   <div>
+    <div
+      v-if="message"
+      class="text-sm rounded-lg px-3.5 py-2.5 mb-4 font-medium flex items-center justify-between"
+      :class="
+        message.type === 'success' ? 'bg-teal-tint text-teal-700' : 'bg-rose-tint text-rose-700'
+      "
+    >
+      {{ message.text }}
+      <button
+        @click="message = null"
+        class="font-bold ml-3"
+        :class="message.type === 'success' ? 'hover:text-teal-800' : 'hover:text-rose-800'"
+      >
+        ✕
+      </button>
+    </div>
     <div class="mb-7 flex items-center justify-between">
-      <h1 class="text-2xl font-bold text-gray-700">Dashboard</h1>
+      <h1 class="font-serif text-2xl font-semibold text-navy-deep">Dashboard</h1>
       <div class="flex items-center gap-3">
         <button
           @click="handleInitializeAll"
@@ -149,7 +165,10 @@
               :key="dept.name"
               class="flex items-center gap-3"
             >
-              <div class="w-32 text-[12.5px] font-semibold text-navy-deep flex-shrink-0 truncate">
+              <div
+                class="w-44 text-[12.5px] font-semibold text-navy-deep flex-shrink-0 truncate"
+                :title="dept.name"
+              >
                 {{ dept.name }}
               </div>
               <div class="flex-1 h-2 bg-sky-100 rounded-full overflow-hidden">
@@ -288,6 +307,7 @@ const loading = ref(true)
 const hasError = ref(false)
 const { confirm } = useConfirm()
 const initializing = ref(false)
+const message = ref(null)
 
 const currentYear = new Date().getFullYear()
 const selectedYear = ref(currentYear)
@@ -356,15 +376,19 @@ async function handleInitializeAll() {
   if (!ok) return
 
   initializing.value = true
+  message.value = null
   try {
     const res = await api.post('/employees/leave-credits/initialize-all', {
       year: selectedYear.value,
     })
-    alert(res.data.message) // swap for your toast pattern if you have one
+    message.value = { type: 'success', text: res.data.message }
     await fetchLeaveStats()
   } catch (error) {
     console.error('Error initializing credits:', error)
-    alert(error.response?.data?.message || 'Failed to initialize leave credits.')
+    message.value = {
+      type: 'error',
+      text: error.response?.data?.message || 'Failed to initialize leave credits.',
+    }
   } finally {
     initializing.value = false
   }

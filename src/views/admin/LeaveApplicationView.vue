@@ -4,7 +4,7 @@
     <div class="flex items-center justify-between mb-6">
       <div>
         <!-- <p class="text-[11px] uppercase tracking-wider text-teal-600 font-bold mb-1">Leave</p> -->
-        <h1 class="text-2xl font-bold text-gray-700">Leave Applications</h1>
+        <h1 class="font-serif text-2xl font-semibold text-navy-deep">Leave Applications</h1>
       </div>
     </div>
 

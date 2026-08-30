@@ -11,7 +11,7 @@
       class="w-64 bg-gradient-to-b from-navy-deep to-navy text-sky-100 flex flex-col sticky top-0 h-screen overflow-y-auto"
     >
       <!-- Logo -->
-      <div class="px-5 pt-7 pb-6 mb-2 border-b border-white/10 flex items-center gap-3">
+      <!-- <div class="px-5 pt-7 pb-6 mb-2 border-b border-white/10 flex items-center gap-3">
         <div class="w-9 h-9 rounded-2xl bg-teal-600 flex items-center justify-center flex-shrink-0">
           <span class="font-serif font-bold text-white text-lg">L</span>
         </div>
@@ -19,183 +19,35 @@
           <h1 class="font-serif text-lg font-semibold text-white leading-tight">LeaveSync</h1>
           <p class="text-[10px] uppercase tracking-wider text-sky-300/70">LGU Echague, Isabela</p>
         </div>
-      </div>
-      <!-- Logo -->
-      <!-- <div class="px-5 pt-7 pb-6 mb-2 border-b border-white/10 flex items-center gap-3">
+      </div> -->
+      <div class="px-5 pt-7 pb-6 mb-2 border-b border-white/10 flex items-center gap-3">
         <div
-          class="w-9 h-9 rounded-2xl flex items-center justify-center flex-shrink-0 overflow-hidden bg-white/10 p-1"
+          class="w-9 h-9 rounded-full bg-white flex items-center justify-center flex-shrink-0 overflow-hidden"
         >
-          <img src="@/assets/logo.jpe" alt="LeaveSync Logo" class="w-full h-full object-contain" />
+          <img src="@/assets/lgu.png" alt="LGU Echague" class="w-full h-full object-contain" />
         </div>
         <div>
           <h1 class="font-serif text-lg font-semibold text-white leading-tight">LeaveSync</h1>
           <p class="text-[10px] uppercase tracking-wider text-sky-300/70">LGU Echague, Isabela</p>
         </div>
-      </div> -->
+      </div>
 
       <!-- Navigation -->
       <nav class="flex-1 px-4 pb-4">
-        <div class="mb-5">
+        <div v-for="section in visibleSections" :key="section.label" class="mb-5 last:mb-2">
           <p class="px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-sky-300/60">
-            Overview
+            {{ section.label }}
           </p>
           <ul class="space-y-0.5">
-            <li>
+            <li v-for="link in section.links" :key="link.to">
               <RouterLink
-                to="/"
+                :to="link.to"
                 class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm text-sky-100/80 hover:bg-white/5 transition-colors"
-                active-class="!bg-white/10 !text-white font-semibold"
+                :active-class="link.exact ? undefined : ACTIVE_CLASS"
+                :exact-active-class="link.exact ? ACTIVE_CLASS : undefined"
               >
                 <span class="w-1.5 h-1.5 rounded-full bg-current opacity-50"></span>
-                Dashboard
-              </RouterLink>
-            </li>
-          </ul>
-        </div>
-
-        <div class="mb-5">
-          <p class="px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-sky-300/60">
-            Records
-          </p>
-          <ul class="space-y-0.5">
-            <li>
-              <RouterLink
-                to="/employees"
-                class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm text-sky-100/80 hover:bg-white/5 transition-colors"
-                active-class="!bg-white/10 !text-white font-semibold"
-              >
-                <span class="w-1.5 h-1.5 rounded-full bg-current opacity-50"></span>
-                Employees
-              </RouterLink>
-            </li>
-          </ul>
-        </div>
-
-        <div class="mb-5">
-          <p class="px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-sky-300/60">
-            Leave
-          </p>
-          <ul class="space-y-0.5">
-            <li>
-              <RouterLink
-                to="/leave-applications"
-                class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm text-sky-100/80 hover:bg-white/5 transition-colors"
-                active-class="!bg-white/10 !text-white font-semibold"
-              >
-                <span class="w-1.5 h-1.5 rounded-full bg-current opacity-50"></span>
-                Applications
-              </RouterLink>
-            </li>
-            <li>
-              <RouterLink
-                to="/leave-records"
-                class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm text-sky-100/80 hover:bg-white/5 transition-colors"
-                active-class="!bg-white/10 !text-white font-semibold"
-              >
-                <span class="w-1.5 h-1.5 rounded-full bg-current opacity-50"></span>
-                Records
-              </RouterLink>
-            </li>
-
-            <li>
-              <RouterLink
-                to="/leave-monetizations"
-                class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm text-sky-100/80 hover:bg-white/5 transition-colors"
-                active-class="!bg-white/10 !text-white font-semibold"
-              >
-                <span class="w-1.5 h-1.5 rounded-full bg-current opacity-50"></span>
-                Monetization
-              </RouterLink>
-            </li>
-
-            <li>
-              <RouterLink
-                to="/leave-credit-computation"
-                class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm text-sky-100/80 hover:bg-white/5 transition-colors"
-                active-class="!bg-white/10 !text-white font-semibold"
-              >
-                <span class="w-1.5 h-1.5 rounded-full bg-current opacity-50"></span>
-                Credit Computation
-              </RouterLink>
-            </li>
-            <li>
-              <RouterLink
-                to="/reports"
-                class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm text-sky-100/80 hover:bg-white/5 transition-colors"
-                active-class="!bg-white/10 !text-white font-semibold"
-              >
-                <span class="w-1.5 h-1.5 rounded-full bg-current opacity-50"></span>
-                Reports
-              </RouterLink>
-            </li>
-
-            <li v-if="authStore.isSuperAdmin">
-              <RouterLink
-                to="/leave-configurations"
-                class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm text-sky-100/80 hover:bg-white/5 transition-colors"
-                active-class="!bg-white/10 !text-white font-semibold"
-              >
-                <span class="w-1.5 h-1.5 rounded-full bg-current opacity-50"></span>
-                Configuration
-              </RouterLink>
-            </li>
-          </ul>
-        </div>
-
-        <div class="mb-2">
-          <p class="px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-sky-300/60">
-            System
-          </p>
-          <ul class="space-y-0.5">
-            <li v-if="authStore.isSuperAdmin">
-              <RouterLink
-                to="/accounts"
-                class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm text-sky-100/80 hover:bg-white/5 transition-colors"
-                active-class="!bg-white/10 !text-white font-semibold"
-              >
-                <span class="w-1.5 h-1.5 rounded-full bg-current opacity-50"></span>
-                Manage Accounts
-              </RouterLink>
-            </li>
-
-            <li v-if="authStore.isSuperAdmin">
-              <RouterLink
-                to="/holidays"
-                class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm text-sky-100/80 hover:bg-white/5 transition-colors"
-                active-class="!bg-white/10 !text-white font-semibold"
-              >
-                <span class="w-1.5 h-1.5 rounded-full bg-current opacity-50"></span>
-                Holidays
-              </RouterLink>
-            </li>
-            <li v-if="authStore.isSuperAdmin">
-              <RouterLink
-                to="/positions"
-                class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm text-sky-100/80 hover:bg-white/5 transition-colors"
-                active-class="!bg-white/10 !text-white font-semibold"
-              >
-                <span class="w-1.5 h-1.5 rounded-full bg-current opacity-50"></span>
-                Positions
-              </RouterLink>
-            </li>
-            <li v-if="authStore.isSuperAdmin">
-              <RouterLink
-                to="/activity-logs"
-                class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm text-sky-100/80 hover:bg-white/5 transition-colors"
-                active-class="!bg-white/10 !text-white font-semibold"
-              >
-                <span class="w-1.5 h-1.5 rounded-full bg-current opacity-50"></span>
-                Activity Logs
-              </RouterLink>
-            </li>
-            <li>
-              <RouterLink
-                to="/leave-setting"
-                class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm text-sky-100/80 hover:bg-white/5 transition-colors"
-                active-class="!bg-white/10 !text-white font-semibold"
-              >
-                <span class="w-1.5 h-1.5 rounded-full bg-current opacity-50"></span>
-                Settings
+                {{ link.label }}
               </RouterLink>
             </li>
           </ul>
@@ -239,13 +91,64 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useRouter } from 'vue-router'
 
 const authStore = useAuthStore()
 const router = useRouter()
 const isLoading = ref(false)
+
+const ACTIVE_CLASS = '!bg-white/10 !text-white font-semibold'
+
+// Adding a page is one line here rather than twelve lines of markup, and
+// the link styling can only be changed in one place.
+//
+// `exact: true` matters for Dashboard only: it sits at '/', and the default
+// active-class matches by prefix, so without it Dashboard highlights on
+// every page in the app.
+const navSections = [
+  {
+    label: 'Overview',
+    links: [{ to: '/', label: 'Dashboard', exact: true }],
+  },
+  {
+    label: 'Records',
+    links: [{ to: '/employees', label: 'Employees' }],
+  },
+  {
+    label: 'Leave',
+    links: [
+      { to: '/leave-applications', label: 'Applications' },
+      { to: '/leave-records', label: 'Records' },
+      { to: '/leave-monetizations', label: 'Monetization' },
+      { to: '/leave-credit-computation', label: 'Credit Computation' },
+      { to: '/reports', label: 'Reports' },
+      { to: '/leave-configurations', label: 'Configuration', superAdmin: true },
+    ],
+  },
+  {
+    label: 'System',
+    links: [
+      { to: '/accounts', label: 'Manage Accounts', superAdmin: true },
+      { to: '/holidays', label: 'Holidays', superAdmin: true },
+      { to: '/positions', label: 'Positions', superAdmin: true },
+      { to: '/activity-logs', label: 'Activity Logs', superAdmin: true },
+      { to: '/leave-setting', label: 'Settings' },
+    ],
+  },
+]
+
+// A section whose every link is super-admin-only should disappear entirely
+// for HR, not leave a heading with nothing under it.
+const visibleSections = computed(() =>
+  navSections
+    .map((section) => ({
+      ...section,
+      links: section.links.filter((link) => !link.superAdmin || authStore.isSuperAdmin),
+    }))
+    .filter((section) => section.links.length > 0)
+)
 
 router.beforeEach(() => {
   isLoading.value = true
@@ -273,14 +176,6 @@ async function handleLogout() {
 .fade-leave-to {
   opacity: 0;
 }
-/* aside {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-aside::-webkit-scrollbar {
-  display: none;
-} */
 
 aside {
   scrollbar-width: thin;

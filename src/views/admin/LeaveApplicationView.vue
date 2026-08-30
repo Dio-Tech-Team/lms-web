@@ -214,13 +214,6 @@
               </span> -->
               <span v-else class="text-slate-400 text-sm">
                 {{ app.reviewed_by_username ? 'By ' + app.reviewed_by_username : '—' }}
-                <button
-                  v-if="app.status === 'rejected' && app.rejection_reason"
-                  @click="alert(app.rejection_reason)"
-                  class="ml-1.5 text-[11px] font-semibold text-rose-600 hover:text-rose-700 underline underline-offset-2"
-                >
-                  View reason
-                </button>
               </span>
             </td>
             <td class="px-4 py-3.5 text-center">

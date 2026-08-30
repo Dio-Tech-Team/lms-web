@@ -311,7 +311,8 @@ const message = ref(null)
 
 const currentYear = new Date().getFullYear()
 const selectedYear = ref(currentYear)
-const availableYears = [currentYear, currentYear - 1, currentYear - 2, currentYear - 3]
+// const availableYears = [currentYear, currentYear - 1, currentYear - 2, currentYear - 3]
+const availableYears = [currentYear + 1, currentYear, currentYear - 1, currentYear - 2]
 
 const totalEmployees = computed(() => stats.value.total)
 const activeEmployees = computed(() => stats.value.active)

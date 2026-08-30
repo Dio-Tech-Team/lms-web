@@ -21,9 +21,13 @@
         <div class="relative h-full flex flex-col justify-between p-9">
           <div class="flex items-center gap-2.5">
             <div
-              class="w-8 h-8 rounded-xl bg-teal-600 flex items-center justify-center flex-shrink-0"
+              class="w-10 h-10 rounded-full bg-white overflow-hidden flex items-center justify-center flex-shrink-0 p-1"
             >
-              <span class="font-serif font-bold text-white text-sm">L</span>
+              <img
+                :src="lguLogo"
+                alt="Seal of the Local Government Unit of Echague, Isabela"
+                class="w-full h-full object-contain"
+              />
             </div>
             <span class="font-serif text-[15px] font-semibold text-white">LeaveSync</span>
           </div>
@@ -158,6 +162,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import lguLogo from '@/assets/lgu.png'
 
 const router = useRouter()
 const authStore = useAuthStore()

@@ -2,7 +2,7 @@
   <div>
     <div class="flex items-center justify-between mb-8">
       <div>
-     
+        <h1 class="font-serif text-2xl font-semibold text-navy-deep">Holidays</h1>
         <!-- <p class="text-sm text-slate-500 mt-1">
           Dates excluded from leave deduction, in addition to the agency's Mon–Thu work week.
         </p> -->
@@ -14,7 +14,16 @@
         + Add Holiday
       </button>
     </div>
-
+    <div class="w-48 mb-6">
+      <label class="block text-sm font-medium text-navy-deep mb-1.5">Year</label>
+      <select
+        v-model="selectedYear"
+        class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
+        @change="onYearChange"
+      >
+        <option v-for="year in availableYears" :key="year" :value="year">{{ year }}</option>
+      </select>
+    </div>
     <div
       v-if="errorMessage"
       class="bg-rose-tint border border-rose-200 text-rose-700 px-4 py-3 rounded-xl mb-5 text-sm"
@@ -29,7 +38,6 @@
     >
       <div class="bg-white rounded-3xl shadow-xl w-full max-w-md p-7">
         <div class="flex items-center justify-between mb-6">
-          <!-- <h2 class="font-serif text-xl font-semibold text-navy-deep">Add Holiday</h2> -->
           <h2 class="font-serif text-xl font-semibold text-navy-deep">
             {{ editingId ? 'Edit Holiday' : 'Add Holiday' }}
           </h2>
@@ -142,7 +150,7 @@
               {{ (currentPage - 1) * perPage + index + 1 }}
             </td>
             <td class="px-5 py-3.5 font-semibold text-navy-deep">
-              {{ formatDate(holiday.date) }}
+              {{ holiday.is_recurring ? formatMonthDay(holiday.date) : formatDate(holiday.date) }}
             </td>
             <td class="px-5 py-3.5 text-slate-600">{{ holiday.name }}</td>
             <td class="px-5 py-3.5">
@@ -223,6 +231,10 @@ const { confirm } = useConfirm()
 const currentPage = ref(1)
 const perPage = 10
 
+const currentYear = new Date().getFullYear()
+const selectedYear = ref(currentYear)
+const availableYears = [currentYear, currentYear + 1, currentYear + 2]
+
 const isEditing = ref(false)
 const editingId = ref(null)
 
@@ -240,11 +252,26 @@ function formatDate(dateStr) {
   })
 }
 
+// Recurring holidays carry a year in their stored date, but it only records
+// when HR entered them — showing it would imply the holiday belongs to that
+// year alone.
+function formatMonthDay(dateStr) {
+  return new Date(dateStr).toLocaleDateString('en-PH', {
+    month: 'long',
+    day: 'numeric',
+  })
+}
+
+function onYearChange() {
+  currentPage.value = 1
+  fetchHolidays()
+}
+
 async function fetchHolidays() {
   isLoading.value = true
   errorMessage.value = ''
   try {
-    const response = await api.get('/holidays')
+    const response = await api.get('/holidays', { params: { year: selectedYear.value } })
     holidays.value = response.data
   } catch (error) {
     errorMessage.value = 'Failed to load holidays.'

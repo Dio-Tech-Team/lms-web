@@ -231,10 +231,19 @@
             >
               <td class="px-4 py-3.5 text-slate-500 text-[12.5px]">{{ r.sheet }}</td>
               <td class="px-4 py-3.5 font-semibold text-navy-deep">{{ r.employee }}</td>
-              <td class="px-4 py-3.5 font-mono text-[13px] text-navy">{{ r.vl_earned }}</td>
+              <!-- <td class="px-4 py-3.5 font-mono text-[13px] text-navy">{{ r.vl_earned }}</td>
               <td class="px-4 py-3.5 font-mono text-[13px] text-teal-700">{{ r.sl_earned }}</td>
               <td class="px-4 py-3.5 font-mono text-[13px] text-rose-600">
                 {{ r.tardiness_deducted }}
+              </td> -->
+              <td class="px-4 py-3.5 font-mono text-[13px] text-navy">
+                {{ Number(r.vl_earned).toFixed(3) }}
+              </td>
+              <td class="px-4 py-3.5 font-mono text-[13px] text-teal-700">
+                {{ Number(r.sl_earned).toFixed(3) }}
+              </td>
+              <td class="px-4 py-3.5 font-mono text-[13px] text-rose-600">
+                {{ Number(r.tardiness_deducted).toFixed(3) }}
               </td>
               <td class="px-4 py-3.5 font-mono text-[13px] font-bold text-navy-deep">
                 {{ (r.vl_earned - r.tardiness_deducted).toFixed(3) }}

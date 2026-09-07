@@ -90,6 +90,17 @@
           </select>
         </div>
 
+        <!-- Balance for the chosen type, before dates are picked -->
+        <p v-if="selectedTypeBalance" class="text-[13px] text-slate-500 -mt-2">
+          <span class="font-semibold text-navy-deep">
+            {{ selectedTypeBalance.code }} {{ Number(selectedTypeBalance.balance).toFixed(3) }}
+          </span>
+          day(s) available
+          <span v-if="selectedTypeBalance.redirected" class="text-slate-400">
+            — Forced Leave draws from Vacation Leave
+          </span>
+        </p>
+
         <!-- Date Range -->
         <div class="grid grid-cols-2 gap-4">
           <div>
@@ -323,6 +334,26 @@ const daysApplied = computed(() => {
 const selectedConfig = computed(() =>
   (resolvedLeaveTypes.value || []).find((c) => c.id === form.value.leave_configuration_id)
 )
+// FL has no credit row of its own, so report the VL balance instead of
+// its 0/0/0 placeholder — same resolution the backend uses.
+const selectedTypeBalance = computed(() => {
+  const config = selectedConfig.value
+  if (!config) return null
+
+  const redirected = config.code === 'FL'
+  const targetCode = redirected ? 'VL' : config.code
+
+  const year = form.value.start_date
+    ? new Date(form.value.start_date).getFullYear()
+    : new Date().getFullYear()
+
+  const credit = (resolvedCredits.value || []).find(
+    (c) => String(c.code).toUpperCase() === targetCode && Number(c.year) === year
+  )
+  if (!credit) return null
+
+  return { code: targetCode, balance: credit.remaining_balance, redirected }
+})
 
 watch(
   [() => form.value.leave_configuration_id, () => form.value.start_date],

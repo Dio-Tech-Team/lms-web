@@ -12,9 +12,8 @@
         <!-- Employee picker: only when the parent didn't already tell us who -->
         <div v-if="needsPicker" class="relative">
           <label class="block text-[10.5px] uppercase font-bold text-slate-400 mb-1">
-            Employee
+            Step 1 — Search Employee
           </label>
-
           <div
             v-if="selectedEmployee"
             class="flex items-center justify-between border border-sky-100 rounded-lg p-2.5 bg-sky/40"
@@ -76,7 +75,7 @@
         <!-- Leave Type -->
         <div>
           <label class="block text-[10.5px] uppercase font-bold text-slate-400 mb-1"
-            >Leave Type</label
+            >{{ needsPicker ? 'Step 2' : 'Step 1' }} — Select Leave Type</label
           >
           <select
             v-model="form.leave_configuration_id"
@@ -102,6 +101,9 @@
         </p>
 
         <!-- Date Range -->
+        <label class="block text-[10.5px] uppercase font-bold text-slate-400 -mb-1">
+          {{ needsPicker ? 'Step 3' : 'Step 2' }} — Choose Dates
+        </label>
         <div class="grid grid-cols-2 gap-4">
           <div>
             <label class="block text-[10.5px] uppercase font-bold text-slate-400 mb-1"
@@ -167,7 +169,9 @@
 
         <!-- Reason -->
         <div>
-          <label class="block text-[10.5px] uppercase font-bold text-slate-400 mb-1">Reason</label>
+          <label class="block text-[10.5px] uppercase font-bold text-slate-400 mb-1"
+            >{{ needsPicker ? 'Step 4' : 'Step 3' }} — Reason</label
+          >
           <textarea
             v-model="form.reason"
             class="w-full border border-sky-100 rounded-lg p-2.5 text-sm"

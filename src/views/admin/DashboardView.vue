@@ -20,6 +20,12 @@
       <h1 class="font-serif text-2xl font-semibold text-navy-deep">Dashboard</h1>
       <div class="flex items-center gap-3">
         <button
+          @click="showLeaveEntryModal = true"
+          class="text-sm font-semibold text-white bg-navy rounded-lg px-3 py-1.5 hover:bg-navy-deep"
+        >
+          Apply Leave
+        </button>
+        <button
           @click="handleInitializeAll"
           :disabled="initializing"
           class="text-sm font-semibold text-teal-700 border border-teal-200 rounded-lg px-3 py-1.5 bg-white hover:bg-teal-50 disabled:opacity-50"
@@ -255,12 +261,18 @@
         </table>
       </div>
     </template>
+    <LeaveEntryModal
+      :show="showLeaveEntryModal"
+      @close="showLeaveEntryModal = false"
+      @updated="handleLeaveFiled"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue'
 import { useConfirm } from '@/composables/useConfirm' // adjust path if yours differs
+import LeaveEntryModal from '../modals/LeaveEntryModal.vue'
 import api from '@/api/axios'
 import { Line, Doughnut } from 'vue-chartjs'
 import {
@@ -286,6 +298,7 @@ ChartJS.register(
   ArcElement
 )
 
+const showLeaveEntryModal = ref(false)
 const stats = ref({
   total: 0,
   active: 0,
@@ -345,6 +358,12 @@ const trendChartData = computed(() => {
     ],
   }
 })
+
+async function handleLeaveFiled() {
+  const res = await api.get('/leave-applications')
+  applications.value = res.data.data || res.data || []
+  await fetchLeaveStats()
+}
 
 async function fetchLeaveStats() {
   try {

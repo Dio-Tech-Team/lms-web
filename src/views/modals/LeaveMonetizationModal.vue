@@ -107,6 +107,22 @@
             class="w-full border border-sky-100 rounded-lg p-2.5 text-sm"
             required
           />
+          <p v-if="creditsLoading" class="text-[11px] text-slate-400 mt-1">Loading balance...</p>
+          <p v-else-if="selectedCredit" class="text-[11px] text-slate-500 mt-1">
+            Remaining:
+            <span class="font-semibold text-navy-deep">{{
+              Number(selectedCredit.remaining_balance).toFixed(3)
+            }}</span>
+            days · Max monetizable:
+            <span class="font-semibold text-navy-deep">{{ maxMonetizable.toFixed(3) }}</span>
+            <span class="text-slate-400"> ({{ MIN_RETAINED }} must be retained)</span>
+          </p>
+          <p
+            v-else-if="form.leave_configuration_id && form.employee_id"
+            class="text-[11px] text-amber-600 mt-1"
+          >
+            No credit record for this leave type this year.
+          </p>
         </div>
 
         <!-- Reason -->
@@ -160,6 +176,26 @@ const leaveTypes = ref([])
 let searchTimeout = null
 const errorMessage = ref('')
 
+const credits = ref([])
+const creditsLoading = ref(false)
+
+// Mirrors MIN_RETAINED_BALANCE in LeaveMonetizationController.
+// Display only — the backend is still the one that enforces it.
+const MIN_RETAINED = 10
+
+const selectedConfig = computed(() =>
+  leaveTypes.value.find((t) => t.id === form.value.leave_configuration_id)
+)
+
+const selectedCredit = computed(() => {
+  if (!selectedConfig.value) return null
+  return credits.value.find((c) => c.code === selectedConfig.value.code) ?? null
+})
+
+const maxMonetizable = computed(() => {
+  if (!selectedCredit.value) return null
+  return Math.max(0, Number(selectedCredit.value.remaining_balance) - MIN_RETAINED)
+})
 const monetizableTypes = computed(() => leaveTypes.value.filter((t) => t.can_monetize))
 
 function debounceSearch() {
@@ -184,6 +220,21 @@ function selectEmployee(emp) {
   employeeSearch.value = `${emp.first_name} ${emp.surname}`
   employeeResults.value = []
 }
+async function loadCredits(employeeId) {
+  credits.value = []
+  if (!employeeId) return
+  creditsLoading.value = true
+  try {
+    const res = await api.get(`/employees/${employeeId}/leave-credits`)
+    credits.value = res.data.credits ?? []
+  } catch (err) {
+    console.error('Failed to load leave credits:', err)
+  } finally {
+    creditsLoading.value = false
+  }
+}
+
+watch(() => form.value.employee_id, loadCredits)
 async function submit() {
   errorMessage.value = ''
   try {
@@ -200,6 +251,7 @@ function close() {
   employeeSearch.value = ''
   employeeResults.value = []
   errorMessage.value = ''
+  credits.value = []
   emit('close')
 }
 

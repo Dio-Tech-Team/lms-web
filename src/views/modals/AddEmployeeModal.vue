@@ -29,7 +29,9 @@
           </h3>
           <div class="grid grid-cols-2 gap-4 mb-6">
             <div>
-              <label class="block text-sm font-medium text-navy-deep mb-1.5">First Name</label>
+              <label class="block text-sm font-medium text-navy-deep mb-1.5"
+                >First Name <span class="text-rose-500">*</span></label
+              >
               <input
                 v-model="form.first_name"
                 type="text"
@@ -38,15 +40,20 @@
               />
             </div>
             <div>
-              <label class="block text-sm font-medium text-navy-deep mb-1.5">Middle Name</label>
+              <label class="block text-sm font-medium text-navy-deep mb-1.5"
+                >Middle Name<span class="text-rose-500">*</span></label
+              >
               <input
                 v-model="form.middle_name"
                 type="text"
                 class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
+                required
               />
             </div>
             <div>
-              <label class="block text-sm font-medium text-navy-deep mb-1.5">Surname</label>
+              <label class="block text-sm font-medium text-navy-deep mb-1.5"
+                >Surname<span class="text-rose-500">*</span></label
+              >
               <input
                 v-model="form.surname"
                 type="text"
@@ -55,7 +62,9 @@
               />
             </div>
             <div>
-              <label class="block text-sm font-medium text-navy-deep mb-1.5">ID Number</label>
+              <label class="block text-sm font-medium text-navy-deep mb-1.5"
+                >ID Number<span class="text-rose-500">*</span></label
+              >
               <input
                 v-model="form.id_number"
                 type="text"
@@ -64,23 +73,30 @@
               />
             </div>
             <div>
-              <label class="block text-sm font-medium text-navy-deep mb-1.5">Birthdate</label>
+              <label class="block text-sm font-medium text-navy-deep mb-1.5"
+                >Birthdate <span class="text-rose-500">*</span></label
+              >
               <input
                 v-model="form.birthdate"
                 type="date"
                 class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
               />
             </div>
-            <div>
+            <!-- <div>
               <label class="block text-sm font-medium text-navy-deep mb-1.5">Place of Birth</label>
               <input
                 v-model="form.place_of_birth"
                 type="text"
                 class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
               />
+            </div> -->
+            <div class="col-span-2">
+              <AddressPicker v-model="form.place_of_birth" label="Place of Birth" />
             </div>
             <div>
-              <label class="block text-sm font-medium text-navy-deep mb-1.5">Sex</label>
+              <label class="block text-sm font-medium text-navy-deep mb-1.5"
+                >Sex <span class="text-rose-500">*</span></label
+              >
               <select
                 v-model="form.sex"
                 class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
@@ -110,7 +126,7 @@
               <input
                 v-model="form.height"
                 type="text"
-                placeholder="e.g. 5'6&quot;"
+                placeholder="cm"
                 class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
               />
             </div>
@@ -119,7 +135,7 @@
               <input
                 v-model="form.weight"
                 type="text"
-                placeholder="e.g. 65kg"
+                placeholder="kg"
                 class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
               />
             </div>
@@ -156,7 +172,9 @@
           </h3>
           <div class="grid grid-cols-2 gap-4 mb-7">
             <div>
-              <label class="block text-sm font-medium text-navy-deep mb-1.5">Position</label>
+              <label class="block text-sm font-medium text-navy-deep mb-1.5"
+                >Position<span class="text-rose-500">*</span></label
+              >
               <div class="relative position-dropdown">
                 <button
                   type="button"
@@ -265,7 +283,7 @@
             </div>
             <div>
               <label class="block text-sm font-medium text-navy-deep mb-1.5"
-                >Employment Status</label
+                >Employment Status<span class="text-rose-500">*</span></label
               >
               <select
                 v-model="form.employment_status"
@@ -280,7 +298,9 @@
               </select>
             </div>
             <div>
-              <label class="block text-sm font-medium text-navy-deep mb-1.5">Date Hired</label>
+              <label class="block text-sm font-medium text-navy-deep mb-1.5"
+                >Date Hired<span class="text-rose-500">*</span></label
+              >
               <input
                 v-model="form.date_hired"
                 type="date"
@@ -294,7 +314,7 @@
             Contact & Address
           </h3>
           <div class="grid grid-cols-2 gap-4 mb-6">
-            <div>
+            <!-- <div>
               <label class="block text-sm font-medium text-navy-deep mb-1.5"
                 >Residential Address</label
               >
@@ -302,6 +322,13 @@
                 v-model="form.residential_address"
                 type="text"
                 class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
+              />
+            </div> -->
+            <div class="col-span-2">
+              <AddressPicker
+                v-model="form.residential_address"
+                label="Residential Address"
+                :with-barangay="true"
               />
             </div>
             <div>
@@ -453,6 +480,7 @@
 import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { useConfirm } from '@/composables/useConfirm'
 import api from '@/api/axios'
+import AddressPicker from '@/components/AddressPicker.vue'
 
 const props = defineProps({
   show: { type: Boolean, default: false },

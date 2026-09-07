@@ -132,23 +132,41 @@
           </div>
           <div>
             <label class="block text-sm font-medium text-navy-deep mb-1.5">Blood Type</label>
-            <input
+            <!-- <input
               v-model="form.bloodtype"
               type="text"
               class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
-            />
+            /> -->
+            <select
+              v-model="form.bloodtype"
+              class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
+            >
+              <option value="">Select</option>
+              <option v-for="t in bloodTypes" :key="t" :value="t">{{ t }}</option>
+            </select>
           </div>
           <div>
             <label class="block text-sm font-medium text-navy-deep mb-1.5">Education</label>
-            <input
+            <!-- <input
               v-model="form.highest_educational_attainment"
               type="text"
               class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
-            />
+            /> -->
+            <select
+              v-model="form.highest_educational_attainment"
+              class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
+            >
+              <option value="">Select</option>
+              <option value="elementary">Elementary</option>
+              <option value="secondary">Secondary</option>
+              <option value="vocational">Vocational</option>
+              <option value="college">College</option>
+              <option value="graduate">Graduate</option>
+            </select>
           </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-4 mb-6">
+        <!-- <div class="grid grid-cols-2 gap-4 mb-6">
           <div>
             <label class="block text-sm font-medium text-navy-deep mb-1.5">Place of Birth</label>
             <input
@@ -167,8 +185,15 @@
               class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
             />
           </div>
+        </div> -->
+        <div class="grid grid-cols-1 gap-4 mb-6">
+          <AddressPicker v-model="form.place_of_birth" label="Place of Birth" />
+          <AddressPicker
+            v-model="form.residential_address"
+            label="Residential Address"
+            :with-barangay="true"
+          />
         </div>
-
         <h3
           class="text-[11px] font-bold text-teal-600 mb-3 uppercase tracking-wider border-t border-sky-100 pt-5"
         >
@@ -280,6 +305,7 @@
 <script setup>
 import { ref, watch } from 'vue'
 import api from '@/api/axios'
+import AddressPicker from '@/components/AddressPicker.vue'
 
 const props = defineProps({
   show: { type: Boolean, default: false },
@@ -288,6 +314,7 @@ const props = defineProps({
   departments: { type: Array, default: () => [] },
   positions: { type: Array, default: () => [] },
 })
+const bloodTypes = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']
 
 const emit = defineEmits(['close', 'updated'])
 

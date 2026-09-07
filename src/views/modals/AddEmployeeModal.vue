@@ -141,12 +141,19 @@
             </div>
             <div>
               <label class="block text-sm font-medium text-navy-deep mb-1.5">Blood Type</label>
-              <input
+              <!-- <input
                 v-model="form.bloodtype"
                 type="text"
                 placeholder="e.g. O+"
                 class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
-              />
+              /> -->
+              <select
+                v-model="form.bloodtype"
+                class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
+              >
+                <option value="">Select Blood Type</option>
+                <option v-for="t in bloodTypes" :key="t" :value="t">{{ t }}</option>
+              </select>
             </div>
             <div>
               <label class="block text-sm font-medium text-navy-deep mb-1.5"
@@ -228,7 +235,9 @@
               </div>
             </div>
             <div>
-              <label class="block text-sm font-medium text-navy-deep mb-1.5">Department</label>
+              <label class="block text-sm font-medium text-navy-deep mb-1.5"
+                >Department<span class="text-rose-500">*</span></label
+              >
               <div class="relative department-dropdown">
                 <button
                   type="button"
@@ -487,6 +496,8 @@ const props = defineProps({
   departments: { type: Array, default: () => [] },
   positions: { type: Array, default: () => [] },
 })
+
+const bloodTypes = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']
 
 const emit = defineEmits(['close', 'created'])
 

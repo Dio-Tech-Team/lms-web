@@ -94,6 +94,18 @@ const router = createRouter({
           component: () => import('@/views/admin/ActivityLogView.vue'),
           meta: { roles: ['super_admin'] },
         },
+        {
+          path: 'settings',
+          component: () => import('@/views/admin/SettingsView.vue'),
+          meta: { roles: ['super_admin'] },
+          children: [
+            {
+              path: 'signatories',
+              name: 'settings-signatories',
+              component: () => import('@/views/admin/settings/SignatoriesView.vue'),
+            },
+          ],
+        },
       ],
     },
   ],

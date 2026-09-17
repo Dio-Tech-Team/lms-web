@@ -39,8 +39,50 @@
             {{ section.label }}
           </p>
           <ul class="space-y-0.5">
-            <li v-for="link in section.links" :key="link.to">
+            <!-- <li v-for="link in section.links" :key="link.to">
               <RouterLink
+                :to="link.to"
+                class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm text-sky-100/80 hover:bg-white/5 transition-colors"
+                :active-class="link.exact ? undefined : ACTIVE_CLASS"
+                :exact-active-class="link.exact ? ACTIVE_CLASS : undefined"
+              >
+                <span class="w-1.5 h-1.5 rounded-full bg-current opacity-50"></span>
+                {{ link.label }}
+              </RouterLink>
+            </li> -->
+            <li v-for="link in section.links" :key="link.to ?? link.label">
+              <!-- expandable group -->
+              <template v-if="link.children">
+                <button
+                  @click="toggleGroup(link.label)"
+                  class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm text-sky-100/80 hover:bg-white/5 transition-colors"
+                >
+                  <span class="w-1.5 h-1.5 rounded-full bg-current opacity-50"></span>
+                  {{ link.label }}
+                  <span
+                    class="ml-auto text-[10px] transition-transform"
+                    :class="openGroups.includes(link.label) ? 'rotate-90' : ''"
+                  >
+                    ▸
+                  </span>
+                </button>
+
+                <ul v-show="openGroups.includes(link.label)" class="ml-4 mt-0.5 space-y-0.5">
+                  <li v-for="child in link.children" :key="child.to">
+                    <RouterLink
+                      :to="child.to"
+                      class="block px-3 py-2 rounded-xl text-sm text-sky-100/70 hover:bg-white/5 transition-colors"
+                      :active-class="ACTIVE_CLASS"
+                    >
+                      {{ child.label }}
+                    </RouterLink>
+                  </li>
+                </ul>
+              </template>
+
+              <!-- plain link -->
+              <RouterLink
+                v-else
                 :to="link.to"
                 class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm text-sky-100/80 hover:bg-white/5 transition-colors"
                 :active-class="link.exact ? undefined : ACTIVE_CLASS"
@@ -134,7 +176,11 @@ const navSections = [
       { to: '/holidays', label: 'Holidays', superAdmin: true },
       { to: '/positions', label: 'Positions', superAdmin: true },
       { to: '/activity-logs', label: 'Activity Logs', superAdmin: true },
-      { to: '/leave-setting', label: 'Settings' },
+      {
+        label: 'Settings',
+        superAdmin: true,
+        children: [{ to: '/settings/signatories', label: 'Leave Form Signatories' }],
+      },
     ],
   },
 ]
@@ -149,6 +195,13 @@ const visibleSections = computed(() =>
     }))
     .filter((section) => section.links.length > 0)
 )
+
+const openGroups = ref([])
+
+function toggleGroup(label) {
+  const i = openGroups.value.indexOf(label)
+  i === -1 ? openGroups.value.push(label) : openGroups.value.splice(i, 1)
+}
 
 router.beforeEach(() => {
   isLoading.value = true

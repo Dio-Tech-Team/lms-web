@@ -353,6 +353,30 @@ async function fetchEmployees(page = 1) {
   //   return
   // }
 
+  // Filter by on_leave status (currently commented out)
+  //   const onLeaveFilter = ref('')
+
+  //   <select
+  //   v-model="onLeaveFilter"
+  //   class="border border-sky-100 rounded-xl px-3.5 py-2.5 text-sm w-44 bg-white text-navy-deep focus:outline-none focus:ring-2 focus:ring-teal-600 transition-colors"
+  // >
+  //   <option value="">All Employees</option>
+  //   <option value="1">Currently on Leave</option>
+  //   <option value="0">Available</option>
+  // </select>
+
+  // params: {
+  //   page: page,
+  //   department_id: selectedDepartment.value,
+  //   sex: selectedSex.value,
+  //   search: search.value,
+  //   on_leave: onLeaveFilter.value,
+  // },
+
+  // watch(onLeaveFilter, () => {
+  //   fetchEmployees(1)
+  // })
+
   try {
     const employeeResponse = await api.get(`/employees`, {
       params: {

@@ -64,10 +64,14 @@
         <option value="male">Male</option>
         <option value="female">Female</option>
       </select>
-
+      <!-- 
       <select
         v-model="stepIncrementYear"
         @change="fetchEmployees(1)"
+        class="border border-sky-100 rounded-xl px-3.5 py-2.5 text-sm w-56 bg-white text-navy-deep focus:outline-none focus:ring-2 focus:ring-teal-600 transition-colors"
+      > -->
+      <select
+        v-model="stepIncrementYear"
         class="border border-sky-100 rounded-xl px-3.5 py-2.5 text-sm w-56 bg-white text-navy-deep focus:outline-none focus:ring-2 focus:ring-teal-600 transition-colors"
       >
         <option value="">Step Increment</option>
@@ -157,7 +161,8 @@
             class="border-b border-sky-100 last:border-b-0 hover:bg-sky/40 transition-colors"
           >
             <td class="px-5 py-3.5 text-slate-500">
-              {{ (currentPage - 1) * 10 + index + 1 }}
+              <!-- {{ (currentPage - 1) * 10 + index + 1 }} -->
+              {{ (currentPage - 1) * perPage + index + 1 }}
             </td>
             <td
               v-if="!stepIncrementYear"
@@ -207,10 +212,11 @@
           </tr>
 
           <tr v-if="employees.length === 0">
-            <td
+            <!-- <td
               :colspan="stepIncrementYear ? 7 : 7"
               class="px-5 py-12 text-center text-slate-400 text-sm"
-            >
+            > -->
+            <td colspan="8" class="px-5 py-12 text-center text-slate-400 text-sm">
               {{
                 stepIncrementYear
                   ? `No step increments scheduled for ${stepIncrementYear}`
@@ -268,6 +274,7 @@ const lastPage = ref(1)
 const total = ref(0)
 const departments = ref([])
 const positions = ref([])
+const perPage = ref(10)
 
 // current year + next 2 years as quick filter options
 const stepIncrementYearOptions = computed(() => {
@@ -275,12 +282,16 @@ const stepIncrementYearOptions = computed(() => {
   return Array.from({ length: 3 }, (_, i) => current + i)
 })
 
+let requestId = 0
+
 async function fetchEmployees(page = 1) {
+  const myId = ++requestId
   if (stepIncrementYear.value) {
     try {
       const response = await api.get('/employees/step-increment-forecast', {
         params: { year: stepIncrementYear.value },
       })
+      if (myId !== requestId) return
 
       let results = response.data.employees.map((e) => {
         const [first_name, ...rest] = e.name.split(' ')
@@ -294,7 +305,7 @@ async function fetchEmployees(page = 1) {
           next_step: e.next_step,
           next_step_date: e.next_step_date,
           id_number: '',
-          sex: e.sex, // ADD THIS — see note below
+          sex: e.sex,
         }
       })
 
@@ -305,6 +316,10 @@ async function fetchEmployees(page = 1) {
 
       if (selectedSex.value) {
         results = results.filter((e) => e.sex === selectedSex.value)
+      }
+      if (search.value) {
+        const q = search.value.toLowerCase()
+        results = results.filter((e) => `${e.first_name} ${e.surname}`.toLowerCase().includes(q))
       }
 
       employees.value = results
@@ -386,7 +401,9 @@ async function fetchEmployees(page = 1) {
         search: search.value,
       },
     })
+    if (myId !== requestId) return
     employees.value = employeeResponse.data.data
+    perPage.value = employeeResponse.data.per_page
     currentPage.value = employeeResponse.data.current_page
     lastPage.value = employeeResponse.data.last_page
     total.value = employeeResponse.data.total
@@ -415,6 +432,9 @@ watch(selectedDepartment, () => {
   fetchEmployees(1)
 })
 watch(selectedSex, () => {
+  fetchEmployees(1)
+})
+watch(stepIncrementYear, () => {
   fetchEmployees(1)
 })
 let searchTimeout = null

@@ -60,11 +60,31 @@
             @change="fetchApplications(1)"
           />
         </div> -->
-        <div>
+        <!-- <div>
           <label class="block text-sm font-medium text-navy-deep mb-1.5">Month</label>
           <input
             v-model="selectedMonth"
             type="month"
+            class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
+            @change="fetchApplications(1)"
+          />
+        </div> -->
+
+        <div>
+          <label class="block text-sm font-medium text-navy-deep mb-1.5">Month</label>
+          <input
+            v-model="dateFrom"
+            type="date"
+            class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
+            @change="fetchApplications(1)"
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-navy-deep mb-1.5"></label>
+          <input
+            v-model="dateTo"
+            type="date"
             class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
             @change="fetchApplications(1)"
           />
@@ -303,7 +323,14 @@ const total = ref(0)
 const search = ref('')
 const selectedDepartment = ref('')
 const now = new Date()
-const selectedMonth = ref(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`)
+const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0)
+
+const toDateInput = (d) => d.toISOString().split('T')[0]
+
+const dateFrom = ref(toDateInput(startOfMonth))
+const dateTo = ref(toDateInput(endOfMonth))
+// const selectedMonth = ref(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`)
 
 const departments = ref([])
 let searchTimeout = null
@@ -322,12 +349,14 @@ async function fetchApplications(page = 1) {
     if (filterStatus.value) params.append('status', filterStatus.value)
     if (search.value) params.append('search', search.value)
     if (selectedDepartment.value) params.append('department_id', selectedDepartment.value)
+    if (dateFrom.value) params.append('date_from', dateFrom.value)
+    if (dateTo.value) params.append('date_to', dateTo.value)
     // if (selectedYear.value) params.append('year', selectedYear.value)
-    if (selectedMonth.value) {
-      const [year, month] = selectedMonth.value.split('-')
-      params.append('year', year)
-      params.append('month', month)
-    }
+    // if (selectedMonth.value) {
+    //   const [year, month] = selectedMonth.value.split('-')
+    //   params.append('year', year)
+    //   params.append('month', month)
+    // }
 
     const response = await api.get(`/leave-applications?${params}`)
     applications.value = response.data.data

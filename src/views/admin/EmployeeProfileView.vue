@@ -24,7 +24,7 @@
               {{ employee.department?.name || employee.department || 'LGU Echague' }}
             </p>
             <h1 class="font-serif text-2xl font-semibold text-navy-deep">
-              {{ employee.first_name }} {{ employee.middle_name }}. {{ employee.surname }}
+              {{ employee.first_name }} {{ employee.middle_name }} {{ employee.surname }}
             </h1>
             <p class="text-slate-500 text-sm mt-1">{{ employee.position }}</p>
             <div class="flex gap-2 mt-3">

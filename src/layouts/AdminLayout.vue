@@ -179,7 +179,10 @@ const navSections = [
       {
         label: 'Settings',
         superAdmin: true,
-        children: [{ to: '/settings/signatories', label: 'Leave Form Signatories' }],
+        children: [
+          { to: '/settings/signatories', label: 'Leave Form Signatories' },
+          { to: '/settings/initialize-credits', label: 'Initialize Leave Credits' },
+        ],
       },
     ],
   },

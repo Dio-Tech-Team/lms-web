@@ -1,21 +1,5 @@
 <template>
   <div>
-    <div
-      v-if="message"
-      class="text-sm rounded-lg px-3.5 py-2.5 mb-4 font-medium flex items-center justify-between"
-      :class="
-        message.type === 'success' ? 'bg-teal-tint text-teal-700' : 'bg-rose-tint text-rose-700'
-      "
-    >
-      {{ message.text }}
-      <button
-        @click="message = null"
-        class="font-bold ml-3"
-        :class="message.type === 'success' ? 'hover:text-teal-800' : 'hover:text-rose-800'"
-      >
-        ✕
-      </button>
-    </div>
     <div class="mb-7 flex items-center justify-between">
       <h1 class="font-serif text-2xl font-semibold text-navy-deep">Dashboard</h1>
       <div class="flex items-center gap-3">
@@ -24,13 +8,6 @@
           class="text-sm font-semibold text-white bg-navy rounded-lg px-3 py-1.5 hover:bg-navy-deep"
         >
           Apply Leave
-        </button>
-        <button
-          @click="handleInitializeAll"
-          :disabled="initializing"
-          class="text-sm font-semibold text-teal-700 border border-teal-200 rounded-lg px-3 py-1.5 bg-white hover:bg-teal-50 disabled:opacity-50"
-        >
-          {{ initializing ? 'Initializing…' : 'Initialize Credits' }}
         </button>
         <select
           v-model="selectedYear"
@@ -271,7 +248,6 @@
 
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue'
-import { useConfirm } from '@/composables/useConfirm' // adjust path if yours differs
 import LeaveEntryModal from '../modals/LeaveEntryModal.vue'
 import api from '@/api/axios'
 import { Line, Doughnut } from 'vue-chartjs'
@@ -318,10 +294,6 @@ const leaveStats = ref({
 const applications = ref([])
 const loading = ref(true)
 const hasError = ref(false)
-const { confirm } = useConfirm()
-const initializing = ref(false)
-const message = ref(null)
-
 const currentYear = new Date().getFullYear()
 const selectedYear = ref(currentYear)
 // const availableYears = [currentYear, currentYear - 1, currentYear - 2, currentYear - 3]
@@ -387,32 +359,6 @@ const typeChartData = computed(() => {
     ],
   }
 })
-
-async function handleInitializeAll() {
-  const ok = await confirm({
-    title: 'Initialize Leave Credits',
-    message: `This will initialize leave credits for every active employee for ${selectedYear.value}. Employees who already have credits for this year are skipped. Continue?`,
-  })
-  if (!ok) return
-
-  initializing.value = true
-  message.value = null
-  try {
-    const res = await api.post('/employees/leave-credits/initialize-all', {
-      year: selectedYear.value,
-    })
-    message.value = { type: 'success', text: res.data.message }
-    await fetchLeaveStats()
-  } catch (error) {
-    console.error('Error initializing credits:', error)
-    message.value = {
-      type: 'error',
-      text: error.response?.data?.message || 'Failed to initialize leave credits.',
-    }
-  } finally {
-    initializing.value = false
-  }
-}
 
 const chartOptions = {
   responsive: true,

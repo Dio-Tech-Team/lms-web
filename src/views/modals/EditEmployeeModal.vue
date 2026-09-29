@@ -77,6 +77,7 @@
               v-model="form.civil_status"
               class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
             >
+              <option :value="null">Select</option>
               <option value="single">Single</option>
               <option value="married">Married</option>
               <option value="widowed">Widowed</option>
@@ -156,7 +157,7 @@
               v-model="form.highest_educational_attainment"
               class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
             >
-              <option value="">Select</option>
+              <option :value="null">Select</option>
               <option value="elementary">Elementary</option>
               <option value="secondary">Secondary</option>
               <option value="vocational">Vocational</option>

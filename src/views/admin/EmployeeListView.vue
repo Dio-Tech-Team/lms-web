@@ -64,6 +64,16 @@
         <option value="male">Male</option>
         <option value="female">Female</option>
       </select>
+
+      <select
+        v-if="!stepIncrementYear"
+        v-model="onLeaveFilter"
+        class="border border-sky-100 rounded-xl px-3.5 py-2.5 text-sm w-44 bg-white text-navy-deep focus:outline-none focus:ring-2 focus:ring-teal-600 transition-colors"
+      >
+        <option value="">All Employees</option>
+        <option value="1">On Leave</option>
+        <option value="0">Not On Leave</option>
+      </select>
       <!-- 
       <select
         v-model="stepIncrementYear"
@@ -267,6 +277,7 @@ const employees = ref([])
 const search = ref('')
 const selectedDepartment = ref('')
 const selectedSex = ref('')
+const onLeaveFilter = ref('')
 const stepIncrementYear = ref('')
 const showAddModal = ref(false)
 const currentPage = ref(1)
@@ -335,62 +346,6 @@ async function fetchEmployees(page = 1) {
     }
     return
   }
-  // if (stepIncrementYear.value) {
-  //   try {
-  //     const response = await api.get('/employees/step-increment-forecast', {
-  //       params: { year: stepIncrementYear.value },
-  //     })
-
-  //     employees.value = response.data.employees.map((e) => {
-  //       const [first_name, ...rest] = e.name.split(' ')
-  //       return {
-  //         id: e.employee_id,
-  //         first_name,
-  //         surname: rest.join(' '),
-  //         position: e.position,
-  //         department_name: e.department,
-  //         current_step: e.current_step,
-  //         next_step: e.next_step,
-  //         next_step_date: e.next_step_date,
-  //         id_number: '',
-  //       }
-  //     })
-  //     currentPage.value = 1
-  //     lastPage.value = 1
-  //     total.value = employees.value.length
-  //   } catch (error) {
-  //     console.error('Error fetching step increment forecast:', error)
-  //     employees.value = []
-  //     currentPage.value = 1
-  //     lastPage.value = 1
-  //     total.value = 0
-  //   }
-  //   return
-  // }
-
-  // Filter by on_leave status (currently commented out)
-  //   const onLeaveFilter = ref('')
-
-  //   <select
-  //   v-model="onLeaveFilter"
-  //   class="border border-sky-100 rounded-xl px-3.5 py-2.5 text-sm w-44 bg-white text-navy-deep focus:outline-none focus:ring-2 focus:ring-teal-600 transition-colors"
-  // >
-  //   <option value="">All Employees</option>
-  //   <option value="1">Currently on Leave</option>
-  //   <option value="0">Available</option>
-  // </select>
-
-  // params: {
-  //   page: page,
-  //   department_id: selectedDepartment.value,
-  //   sex: selectedSex.value,
-  //   search: search.value,
-  //   on_leave: onLeaveFilter.value,
-  // },
-
-  // watch(onLeaveFilter, () => {
-  //   fetchEmployees(1)
-  // })
 
   try {
     const employeeResponse = await api.get(`/employees`, {
@@ -399,6 +354,7 @@ async function fetchEmployees(page = 1) {
         department_id: selectedDepartment.value,
         sex: selectedSex.value,
         search: search.value,
+        on_leave: onLeaveFilter.value,
       },
     })
     if (myId !== requestId) return
@@ -432,6 +388,9 @@ watch(selectedDepartment, () => {
   fetchEmployees(1)
 })
 watch(selectedSex, () => {
+  fetchEmployees(1)
+})
+watch(onLeaveFilter, () => {
   fetchEmployees(1)
 })
 watch(stepIncrementYear, () => {

@@ -7,7 +7,13 @@
     >
       <div class="bg-white rounded-3xl shadow-xl w-full max-w-2xl p-7 max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between mb-6">
-          <h2 class="font-serif text-xl font-semibold text-navy-deep">Add New Employee</h2>
+          <div>
+            <h2 class="font-serif text-xl font-semibold text-navy-deep">Add New Employee</h2>
+            <p class="text-xs text-slate-500 mt-1">
+              Fields marked with <span class="text-rose-500">*</span> are required.
+            </p>
+          </div>
+
           <button
             @click="closeAddModal"
             class="w-8 h-8 rounded-xl flex items-center justify-center text-slate-400 hover:bg-sky hover:text-navy transition-colors text-lg"
@@ -80,6 +86,7 @@
                 v-model="form.birthdate"
                 type="date"
                 class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
+                required
               />
             </div>
             <!-- <div>
@@ -112,7 +119,6 @@
               <select
                 v-model="form.civil_status"
                 class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
-                required
               >
                 <option value="">Select Civil Status</option>
                 <option value="single">Single</option>
@@ -122,7 +128,7 @@
               </select>
             </div>
             <div>
-              <label class="block text-sm font-medium text-navy-deep mb-1.5">Height</label>
+              <label class="block text-sm font-medium text-navy-deep mb-1.5">Height(cm)</label>
               <input
                 v-model="form.height"
                 type="text"
@@ -131,7 +137,7 @@
               />
             </div>
             <div>
-              <label class="block text-sm font-medium text-navy-deep mb-1.5">Weight</label>
+              <label class="block text-sm font-medium text-navy-deep mb-1.5">Weight(kg)</label>
               <input
                 v-model="form.weight"
                 type="text"
@@ -162,7 +168,6 @@
               <select
                 v-model="form.highest_educational_attainment"
                 class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
-                required
               >
                 <option value="">Select</option>
                 <option value="elementary">Elementary</option>
@@ -405,7 +410,9 @@
           </h3>
           <div class="grid grid-cols-2 gap-4 mb-6">
             <div>
-              <label class="block text-sm font-medium text-navy-deep mb-1.5">Username</label>
+              <label class="block text-sm font-medium text-navy-deep mb-1.5"
+                >Username<span class="text-rose-500">*</span></label
+              >
               <input
                 v-model="form.username"
                 type="text"
@@ -605,6 +612,11 @@ onMounted(() => document.addEventListener('click', handleClickOutside))
 onUnmounted(() => document.removeEventListener('click', handleClickOutside))
 
 async function handleAddEmployee() {
+  if (!form.value.position || !form.value.department_id) {
+    formError.value = 'Please select a position and department.'
+    return
+  }
+
   formLoading.value = true
   formError.value = ''
   try {

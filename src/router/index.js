@@ -104,6 +104,12 @@ const router = createRouter({
               name: 'settings-signatories',
               component: () => import('@/views/admin/settings/SignatoriesView.vue'),
             },
+
+            {
+              path: 'initialize-credits',
+              name: 'initialize-credits',
+              component: () => import('@/views/admin/settings/InitializeCreditsView.vue'),
+            },
           ],
         },
       ],

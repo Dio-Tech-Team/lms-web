@@ -256,12 +256,29 @@
 
     <!-- History / Filter Section -->
     <div class="bg-white rounded-2xl border border-sky-100 p-6">
-      <h2 class="font-serif text-lg font-semibold text-navy-deep mb-5">
-        Past Attendance Records
-        <span v-if="historyRecords.length" class="font-sans font-normal text-sm text-slate-400 ml-1"
-          >({{ historyRecords.length }})</span
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="font-serif text-lg font-semibold text-navy-deep">
+          Past Attendance Records
+          <span
+            v-if="historyRecords.length"
+            class="font-sans font-normal text-sm text-slate-400 ml-1"
+            >({{ historyRecords.length }})</span
+          >
+        </h2>
+        <button
+          @click="reverseAll"
+          :disabled="!reverseTarget || reversingAll"
+          class="px-4 py-2 rounded-xl text-sm font-semibold border border-rose-200 text-rose-600 hover:bg-rose-tint transition-colors disabled:opacity-40 disabled:hover:bg-transparent whitespace-nowrap"
         >
-      </h2>
+          {{
+            reversingAll
+              ? 'Reversing...'
+              : reverseTarget
+              ? `Reverse All — ${months[reverseTarget.month]} ${reverseTarget.year}`
+              : 'Reverse All'
+          }}
+        </button>
+      </div>
 
       <div class="grid grid-cols-4 gap-4 mb-5">
         <div>
@@ -400,8 +417,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useConfirm } from '@/composables/useConfirm'
+
 import api from '@/api/axios'
 
 const months = {
@@ -440,6 +458,18 @@ const results = ref([])
 const errors = ref([])
 const skipped = ref([])
 const reversingId = ref(null)
+
+const reversingAll = ref(false)
+// Filtered month if one is picked, otherwise the most recent upload
+const reverseTarget = computed(() => {
+  if (filter.value.month && filter.value.year) {
+    return { month: Number(filter.value.month), year: Number(filter.value.year) }
+  }
+  const latest = historyRecords.value[0]
+  if (!latest) return null
+  const month = Number(Object.keys(months).find((k) => months[k] === latest.month))
+  return { month, year: Number(latest.year) }
+})
 
 let searchTimer = null
 
@@ -539,6 +569,34 @@ async function reverseAttendance(record) {
     uploadError.value = err.response?.data?.message || 'Failed to reverse attendance record.'
   } finally {
     reversingId.value = null
+  }
+}
+async function reverseAll() {
+  const target = reverseTarget.value
+  if (!target) return
+  const periodLabel = `${months[target.month]} ${target.year}`
+  const ok = await confirm({
+    title: `Reverse all attendance for ${periodLabel}?`,
+    message: `This undoes the credits earned and tardiness deducted for EVERY employee with attendance in ${periodLabel}, including any hidden by the search or department filter. Re-upload the corrected file afterwards.`,
+  })
+  if (!ok) return
+
+  reversingAll.value = true
+  uploadError.value = ''
+  try {
+    await api.post('/attendance/reverse-month', {
+      month: target.month,
+      year: target.year,
+    })
+    await fetchHistory()
+    results.value = []
+    errors.value = []
+    skipped.value = []
+    missingData.value = null
+  } catch (err) {
+    uploadError.value = err.response?.data?.message || 'Failed to reverse attendance records.'
+  } finally {
+    reversingAll.value = false
   }
 }
 

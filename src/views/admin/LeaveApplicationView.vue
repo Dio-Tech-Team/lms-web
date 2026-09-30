@@ -27,7 +27,7 @@
 
     <!-- Filters -->
     <div class="bg-white rounded-2xl border border-sky-100 p-5 mb-6">
-      <div class="grid grid-cols-3 gap-4">
+      <div class="grid grid-cols-4 gap-4">
         <div>
           <label class="block text-sm font-medium text-navy-deep mb-1.5">Search Employee</label>
           <input
@@ -71,7 +71,7 @@
         </div> -->
 
         <div>
-          <label class="block text-sm font-medium text-navy-deep mb-1.5">Month</label>
+          <label class="block text-sm font-medium text-navy-deep mb-1.5">Date From</label>
           <input
             v-model="dateFrom"
             type="date"
@@ -81,10 +81,11 @@
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-navy-deep mb-1.5"></label>
+          <label class="block text-sm font-medium text-navy-deep mb-1.5">Date To</label>
           <input
             v-model="dateTo"
             type="date"
+            :min="dateFrom"
             class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
             @change="fetchApplications(1)"
           />
@@ -322,14 +323,8 @@ const total = ref(0)
 
 const search = ref('')
 const selectedDepartment = ref('')
-const now = new Date()
-const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
-const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0)
-
-const toDateInput = (d) => d.toISOString().split('T')[0]
-
-const dateFrom = ref(toDateInput(startOfMonth))
-const dateTo = ref(toDateInput(endOfMonth))
+const dateFrom = ref('')
+const dateTo = ref('')
 // const selectedMonth = ref(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`)
 
 const departments = ref([])

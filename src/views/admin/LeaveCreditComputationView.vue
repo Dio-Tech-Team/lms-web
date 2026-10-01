@@ -189,7 +189,7 @@
       </div>
       <div class="max-h-[28rem] overflow-y-auto rounded-xl border border-sky-100">
         <table class="w-full text-sm">
-          <thead class="bg-sky/60 border-b border-sky-100 sticky top-0 z-10">
+          <thead class="bg-sky border-b border-sky-100 sticky top-0 z-10">
             <tr>
               <th
                 class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
@@ -336,7 +336,7 @@
         class="max-h-[28rem] overflow-y-auto rounded-xl border border-sky-100"
       >
         <table class="w-full text-sm">
-          <thead class="bg-sky/60 border-b border-sky-100 sticky top-0 z-10">
+          <thead class="bg-sky border-b border-sky-100 sticky top-0 z-10">
             <tr>
               <th
                 class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"

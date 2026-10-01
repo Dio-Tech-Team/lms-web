@@ -270,8 +270,121 @@
       <!-- Career Milestones -->
       <div class="bg-white rounded-2xl border border-sky-100 p-6 mb-6">
         <h2 class="font-serif text-lg font-semibold text-navy-deep mb-4">Career Progression</h2>
-        <div class="grid grid-cols-3 gap-4 items-start">
+        <div class="grid grid-cols-4 gap-4 items-start">
+          <!-- Years of Service -->
+          <div class="border border-sky-100 rounded-xl p-4 bg-sky/30">
+            <p class="text-[10.5px] uppercase tracking-wide text-slate-400 font-bold mb-1">
+              Years of Service
+            </p>
+            <template v-if="service">
+              <p class="font-serif text-2xl font-semibold text-navy-deep">
+                {{ service.years }} yrs
+                <span v-if="service.months" class="text-base text-slate-500"
+                  >{{ service.months }} mos</span
+                >
+              </p>
+              <p class="text-xs text-slate-500 mt-2">Since {{ prettyDate(employee.date_hired) }}</p>
+            </template>
+            <p v-else class="text-sm text-slate-400 italic">No hire date recorded</p>
+          </div>
+
           <!-- Step Increment -->
+          <div class="border border-sky-100 rounded-xl p-4 bg-sky/30">
+            <p class="text-[10.5px] uppercase tracking-wide text-slate-400 font-bold mb-1">
+              Step Increment
+            </p>
+            <p
+              v-if="employee.step_increment?.current_step"
+              class="font-serif text-2xl font-semibold text-navy-deep"
+            >
+              Step {{ employee.step_increment.current_step }}
+            </p>
+            <p v-else class="text-sm text-slate-400 italic">
+              {{ employee.step_increment?.message || 'N/A' }}
+            </p>
+            <p v-if="employee.step_increment?.next_step_date" class="text-xs text-slate-500 mt-2">
+              Next step on {{ prettyDate(employee.step_increment.next_step_date) }}
+            </p>
+            <button
+              v-if="employee.step_increment?.all_steps?.length > 0"
+              @click="showAllSteps = !showAllSteps"
+              class="text-xs text-teal-700 hover:text-teal-800 font-semibold mt-2.5"
+            >
+              {{ showAllSteps ? 'Hide all steps' : 'View all steps' }}
+            </button>
+            <div
+              v-if="showAllSteps && employee.step_increment?.all_steps?.length > 0"
+              class="mt-3 pt-3 border-t border-sky-100 space-y-1.5"
+            >
+              <div
+                v-for="s in employee.step_increment.all_steps"
+                :key="s.step"
+                class="flex justify-between text-xs"
+                :class="{
+                  'text-slate-600': s.status === 'reached',
+                  'text-navy-deep font-bold bg-teal-tint -mx-2 px-2 rounded':
+                    s.status === 'current',
+                  'text-slate-500': s.status === 'upcoming',
+                }"
+              >
+                <span>Step {{ s.step }}</span>
+                <span>{{ prettyDate(s.date) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Loyalty Pay -->
+          <div class="border border-sky-100 rounded-xl p-4 bg-sky/30">
+            <p class="text-[10.5px] uppercase tracking-wide text-slate-400 font-bold mb-1">
+              Loyalty Pay
+            </p>
+            <template v-if="employee.loyalty_pay?.years_until_next !== null">
+              <p class="font-serif text-2xl font-semibold text-navy-deep">
+                {{ employee.loyalty_pay?.years_served?.toFixed(0) ?? 0 }} yrs
+              </p>
+              <p class="text-xs text-slate-500 mt-2">Permanent service</p>
+              <p
+                v-if="employee.loyalty_pay?.eligible"
+                class="text-xs text-teal-700 font-semibold mt-1"
+              >
+                Received {{ employee.loyalty_pay.milestones_received }}
+                {{ employee.loyalty_pay.milestones_received === 1 ? 'time' : 'times' }}
+              </p>
+              <p class="text-xs text-slate-500 mt-1">
+                Next at {{ employee.loyalty_pay?.next_milestone }} yrs · in
+                {{ employee.loyalty_pay?.years_until_next?.toFixed(1) }} yrs
+              </p>
+            </template>
+            <p v-else class="text-sm text-slate-400 italic">
+              {{ employee.loyalty_pay?.message || 'N/A' }}
+            </p>
+          </div>
+
+          <!-- Retirement -->
+          <div class="border border-sky-100 rounded-xl p-4 bg-sky/30">
+            <p class="text-[10.5px] uppercase tracking-wide text-slate-400 font-bold mb-1">
+              Retirement
+            </p>
+            <p
+              v-if="!employee.retirement?.eligible_now"
+              class="font-serif text-2xl font-semibold text-navy-deep"
+            >
+              {{ employee.retirement?.years_remaining ?? 'N/A' }} yrs left
+            </p>
+            <p v-else class="font-serif text-2xl font-semibold text-rose-600">Eligible</p>
+            <p v-if="employee.retirement?.retirement_date" class="text-xs text-slate-500 mt-2">
+              {{ employee.retirement?.eligible_now ? 'Eligible since' : 'Retires on' }}
+              {{ prettyDate(employee.retirement.retirement_date) }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Career Milestones -->
+      <!-- <div class="bg-white rounded-2xl border border-sky-100 p-6 mb-6">
+        <h2 class="font-serif text-lg font-semibold text-navy-deep mb-4">Career Progression</h2>
+        <div class="grid grid-cols-3 gap-4 items-start">
+         
           <div class="border border-sky-100 rounded-xl p-4 bg-sky/30">
             <p class="text-[10.5px] uppercase tracking-wide text-slate-400 font-bold mb-1">
               Step Increment
@@ -319,7 +432,7 @@
             </div>
           </div>
 
-          <!-- Loyalty Pay -->
+       
           <div class="border border-sky-100 rounded-xl p-4 bg-sky/30">
             <p class="text-[10.5px] uppercase tracking-wide text-slate-400 font-bold mb-1">
               Loyalty Pay
@@ -350,7 +463,6 @@
             </p>
           </div>
 
-          <!-- Retirement -->
           <div class="border border-sky-100 rounded-xl p-4 bg-sky/30">
             <p class="text-[10.5px] uppercase tracking-wide text-slate-400 font-bold mb-1">
               Retirement
@@ -371,7 +483,7 @@
             </p>
           </div>
         </div>
-      </div>
+      </div> -->
 
       <!-- Employment History -->
       <div class="bg-white rounded-2xl border border-sky-100 p-6">
@@ -918,6 +1030,30 @@ function formatDate(dateStr) {
   if (!dateStr) return 'N/A'
   return dateStr.includes('T') ? dateStr.split('T')[0] : dateStr
 }
+// "2027-01-10" → "Jan 10, 2027". Parsed as local date, not UTC,
+// so it doesn't shift a day in PH time.
+function prettyDate(dateStr) {
+  if (!dateStr) return 'N/A'
+  const [y, m, d] = formatDate(dateStr).split('-').map(Number)
+  if (!y || !m || !d) return dateStr
+  return new Date(y, m - 1, d).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  })
+}
+
+// Total service from original hire date, in whole years + months
+const service = computed(() => {
+  const hired = employee.value?.date_hired
+  if (!hired) return null
+  const [y, m, d] = formatDate(hired).split('-').map(Number)
+  const now = new Date()
+  let months = (now.getFullYear() - y) * 12 + (now.getMonth() - (m - 1))
+  if (now.getDate() < d) months--
+  months = Math.max(0, months)
+  return { years: Math.floor(months / 12), months: months % 12 }
+})
 
 function goBack() {
   router.push('/employees')

@@ -33,6 +33,18 @@
     </div>
 
     <template v-else>
+      <div
+        v-if="autoInitMessage"
+        class="flex items-center justify-between bg-teal-tint border border-teal-200 text-teal-700 px-4 py-3 rounded-xl mb-6 text-sm"
+      >
+        <span>{{ autoInitMessage }}</span>
+        <button
+          @click="autoInitMessage = null"
+          class="text-teal-700 hover:text-teal-800 font-semibold text-xs"
+        >
+          Dismiss
+        </button>
+      </div>
       <!-- Stat Row -->
       <div class="grid grid-cols-4 gap-4 mb-6">
         <div class="bg-white rounded-2xl border border-sky-100 p-5">
@@ -294,6 +306,7 @@ const leaveStats = ref({
 const applications = ref([])
 const loading = ref(true)
 const hasError = ref(false)
+const autoInitMessage = ref(null)
 const currentYear = new Date().getFullYear()
 const selectedYear = ref(currentYear)
 // const availableYears = [currentYear, currentYear - 1, currentYear - 2, currentYear - 3]
@@ -341,6 +354,7 @@ async function fetchLeaveStats() {
   try {
     const res = await api.get('/dashboard/leave-stats', { params: { year: selectedYear.value } })
     leaveStats.value = res.data
+    if (res.data.auto_initialized) autoInitMessage.value = res.data.auto_initialized
   } catch (error) {
     console.error('Error fetching leave stats:', error)
     hasError.value = true
@@ -375,9 +389,12 @@ onMounted(async () => {
       api.get('/leave-applications'),
     ])
     stats.value = statsResponse.data
+    // leaveStats.value = leaveStatsResponse.data
+    // applications.value = appResponse.data.data || appResponse.data || []
+    // await fetchLeaveStats()
     leaveStats.value = leaveStatsResponse.data
+    autoInitMessage.value = leaveStatsResponse.data.auto_initialized
     applications.value = appResponse.data.data || appResponse.data || []
-    await fetchLeaveStats()
   } catch (error) {
     console.error('Error fetching dashboard data:', error)
     hasError.value = true

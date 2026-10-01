@@ -2,7 +2,8 @@
   <div>
     <h1 class="font-serif text-2xl font-semibold text-navy-deep mb-2">Initialize Leave Credits</h1>
     <p class="text-sm text-slate-500 mb-6 max-w-xl">
-      Creates credits for all active employees for the selected year. Unused Forced Leave from the
+      Credits for the current year are created automatically the first time HR opens the Dashboard.
+      Use this page to initialize a year manually or in advance. Unused Forced Leave from the
       previous year is deducted from Vacation Leave. Employees who already have credits are skipped.
     </p>
 

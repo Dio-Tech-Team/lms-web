@@ -179,13 +179,31 @@
     </div>
     <!-- Results -->
     <div v-if="results.length > 0" class="bg-white rounded-2xl border border-sky-100 p-6 mb-6">
-      <div class="flex items-center justify-between mb-5">
+      <!-- <div class="flex items-center justify-between mb-5">
         <h2 class="font-serif text-lg font-semibold text-navy-deep">
           Computation Results
           <span class="font-sans font-normal text-sm text-slate-400 ml-1"
             >({{ results.length }} employees processed)</span
           >
         </h2>
+      </div> -->
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="font-serif text-lg font-semibold text-navy-deep">
+          Computation Results
+          <span class="font-sans font-normal text-sm text-slate-400 ml-1"
+            >({{ results.length }} employees processed)</span
+          >
+          <span
+            v-if="flaggedCount"
+            class="font-sans text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full ml-2"
+          >
+            {{ flaggedCount }} need review
+          </span>
+        </h2>
+        <label v-if="flaggedCount" class="flex items-center gap-2 text-sm text-slate-600">
+          <input type="checkbox" v-model="showFlaggedOnly" />
+          Show only flagged
+        </label>
       </div>
       <div class="max-h-[28rem] overflow-y-auto rounded-xl border border-sky-100">
         <table class="w-full text-sm">
@@ -204,12 +222,7 @@
               <th
                 class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
               >
-                VL Earned
-              </th>
-              <th
-                class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
-              >
-                SL Earned
+                LWOP Days
               </th>
               <th
                 class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
@@ -219,32 +232,53 @@
               <th
                 class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
               >
+                VL Earned
+              </th>
+              <th
+                class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+              >
+                SL Earned
+              </th>
+
+              <th
+                class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+              >
                 Total Earned VL Credits
               </th>
             </tr>
           </thead>
           <tbody>
-            <tr
+            <!-- <tr
               v-for="(r, index) in results"
               :key="index"
               class="border-b border-sky-100 last:border-b-0 hover:bg-sky/40 transition-colors"
+            > -->
+            <tr
+              v-for="(r, index) in displayedResults"
+              :key="index"
+              class="border-b border-sky-100 last:border-b-0 transition-colors"
+              :class="isFlagged(r) ? 'bg-amber-50 hover:bg-amber-100' : 'hover:bg-sky/40'"
             >
               <td class="px-4 py-3.5 text-slate-500 text-[12.5px]">{{ r.sheet }}</td>
               <td class="px-4 py-3.5 font-semibold text-navy-deep">{{ r.employee }}</td>
+              <td class="px-4 py-3.5 font-mono text-[13px] text-slate-600">
+                {{ r.lwop_days }}
+              </td>
               <!-- <td class="px-4 py-3.5 font-mono text-[13px] text-navy">{{ r.vl_earned }}</td>
               <td class="px-4 py-3.5 font-mono text-[13px] text-teal-700">{{ r.sl_earned }}</td>
               <td class="px-4 py-3.5 font-mono text-[13px] text-rose-600">
                 {{ r.tardiness_deducted }}
               </td> -->
+              <td class="px-4 py-3.5 font-mono text-[13px] text-rose-600">
+                {{ Number(r.tardiness_deducted).toFixed(3) }}
+              </td>
               <td class="px-4 py-3.5 font-mono text-[13px] text-navy">
                 {{ Number(r.vl_earned).toFixed(3) }}
               </td>
               <td class="px-4 py-3.5 font-mono text-[13px] text-teal-700">
                 {{ Number(r.sl_earned).toFixed(3) }}
               </td>
-              <td class="px-4 py-3.5 font-mono text-[13px] text-rose-600">
-                {{ Number(r.tardiness_deducted).toFixed(3) }}
-              </td>
+
               <td class="px-4 py-3.5 font-mono text-[13px] font-bold text-navy-deep">
                 {{ (r.vl_earned - r.tardiness_deducted).toFixed(3) }}
               </td>
@@ -356,7 +390,7 @@
               <th
                 class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
               >
-                VL Earned
+                LWOP Days
               </th>
               <th
                 class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
@@ -366,7 +400,18 @@
               <th
                 class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
               >
+                VL Earned
+              </th>
+
+              <th
+                class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+              >
                 SL Earned
+              </th>
+              <th
+                class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
+              >
+                Total Earned VL
               </th>
               <th
                 class="text-right px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
@@ -385,15 +430,25 @@
               <td class="px-4 py-3.5 text-slate-600">
                 {{ record.employee?.department?.name || 'N/A' }}
               </td>
-              <td class="px-4 py-3.5 font-mono text-[12.5px] text-slate-500">
+              <!-- <td class="px-4 py-3.5 font-mono text-[12.5px] text-slate-500">
+                {{ record.month }} {{ record.year }}
+              </td> -->
+              <td class="px-4 py-3.5 font-mono text-[12.5px] text-slate-500 whitespace-nowrap">
                 {{ record.month }} {{ record.year }}
               </td>
-              <td class="px-4 py-3.5 font-mono text-[13px] text-navy">{{ record.vl_earned }}</td>
+              <td class="px-4 py-3.5 font-mono text-[13px] text-slate-600">
+                {{ record.absent_without_leave_days }}
+              </td>
               <td class="px-4 py-3.5 font-mono text-[13px] text-rose-600">
                 {{ record.tardiness_equivalent_days }}
               </td>
+              <td class="px-4 py-3.5 font-mono text-[13px] text-navy">{{ record.vl_earned }}</td>
+
               <td class="px-4 py-3.5 font-mono text-[13px] text-teal-700">
                 {{ record.sl_earned }}
+              </td>
+              <td class="px-4 py-3.5 font-mono text-[13px] font-bold text-navy-deep">
+                {{ (record.vl_earned - record.tardiness_equivalent_days).toFixed(3) }}
               </td>
               <td class="px-4 py-3.5 text-right">
                 <button
@@ -460,6 +515,17 @@ const skipped = ref([])
 const reversingId = ref(null)
 
 const reversingAll = ref(false)
+const showFlaggedOnly = ref(false)
+
+function isFlagged(r) {
+  const tardiness = Number(r.tardiness_deducted)
+  return Number(r.lwop_days) > 0 || tardiness >= 1 || tardiness > Number(r.vl_earned)
+}
+
+const flaggedCount = computed(() => results.value.filter(isFlagged).length)
+const displayedResults = computed(() =>
+  showFlaggedOnly.value ? results.value.filter(isFlagged) : results.value
+)
 // Filtered month if one is picked, otherwise the most recent upload
 const reverseTarget = computed(() => {
   if (filter.value.month && filter.value.year) {
@@ -593,6 +659,7 @@ async function reverseAll() {
     errors.value = []
     skipped.value = []
     missingData.value = null
+    showFlaggedOnly.value = false
   } catch (err) {
     uploadError.value = err.response?.data?.message || 'Failed to reverse attendance records.'
   } finally {

@@ -37,14 +37,25 @@
         <label class="block text-[12.5px] font-semibold text-slate-600 mb-1.5">
           Reason for rejection
         </label>
+        <select
+          v-model="selectedReason"
+          class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
+        >
+          <option value="">Select a reason</option>
+          <option v-for="r in REJECTION_REASONS" :key="r" :value="r">{{ r }}</option>
+          <option :value="OTHER_REASON">Other (please specify)</option>
+        </select>
+
         <textarea
-          v-model="rejectionReason"
+          v-if="selectedReason === OTHER_REASON"
+          v-model="otherReason"
           rows="3"
           placeholder="The employee sees this, so say what went wrong."
-          class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors resize-none"
+          class="w-full mt-2 border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors resize-none"
         ></textarea>
+
         <p class="text-[12px] text-slate-400 mt-1.5">
-          Required — this is the only place the employee learns why.
+          Required. This is the only place the employee learns why.
         </p>
       </div>
 
@@ -74,6 +85,7 @@
 <script setup>
 import { ref, watch, computed } from 'vue'
 import api from '@/api/axios'
+import { REJECTION_REASONS, OTHER_REASON, buildReason } from '@/constants/leaveReasons'
 
 const props = defineProps({
   show: Boolean,
@@ -87,7 +99,8 @@ const props = defineProps({
 
 const emit = defineEmits(['close', 'updated'])
 
-const rejectionReason = ref('')
+const selectedReason = ref('')
+const otherReason = ref('')
 const submitting = ref(false)
 const error = ref('')
 
@@ -103,18 +116,25 @@ watch(
   () => props.show,
   (open) => {
     if (!open) return
-    rejectionReason.value = ''
+    selectedReason.value = ''
+    otherReason.value = ''
     error.value = ''
     submitting.value = false
-  },
+  }
 )
 
 async function submit() {
   if (submitting.value) return
 
-  if (props.mode === 'reject' && !rejectionReason.value.trim()) {
-    error.value = 'A rejection reason is required.'
-    return
+  if (props.mode === 'reject') {
+    if (!selectedReason.value) {
+      error.value = 'Select a reason for rejection.'
+      return
+    }
+    if (selectedReason.value === OTHER_REASON && !otherReason.value.trim()) {
+      error.value = 'Please specify the reason.'
+      return
+    }
   }
 
   submitting.value = true
@@ -123,7 +143,9 @@ async function submit() {
   try {
     const path = props.mode === 'approve' ? 'approve' : 'reject'
     const body =
-      props.mode === 'approve' ? {} : { rejection_reason: rejectionReason.value.trim() }
+      props.mode === 'approve'
+        ? {}
+        : { rejection_reason: buildReason(selectedReason.value, otherReason.value) }
 
     await api.post(`/leave-applications/${props.applicationId}/${path}`, body)
     emit('updated')

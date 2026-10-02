@@ -93,6 +93,13 @@
       </div>
     </div>
 
+    <div
+      v-if="actionMessage"
+      class="flex items-center justify-between bg-teal-tint border border-teal-200 text-teal-700 px-4 py-3 rounded-xl mb-4 text-sm"
+    >
+      <span>{{ actionMessage }}</span>
+      <button @click="actionMessage = ''" class="font-semibold text-xs">Dismiss</button>
+    </div>
     <!-- Loading -->
     <div v-if="loading" class="flex items-center justify-center gap-3 py-24">
       <div
@@ -213,6 +220,21 @@
                 ></span>
                 {{ app.status }}
               </span>
+
+              <p
+                v-if="app.cancelled_at && app.status === 'approved'"
+                class="text-[11px] text-slate-400 mt-1"
+                :title="app.cancellation_reason"
+              >
+                Shortened
+              </p>
+              <p
+                v-else-if="app.cancelled_at && app.status === 'cancelled'"
+                class="text-[11px] text-slate-400 mt-1"
+                :title="app.cancellation_reason"
+              >
+                After approval
+              </p>
             </td>
             <td class="px-4 py-3.5">
               <div v-if="app.status === 'pending'" class="flex gap-3">
@@ -233,9 +255,22 @@
               <!-- <span v-else class="text-slate-400 text-sm">
                 {{ app.reviewed_by_username ? 'By ' + app.reviewed_by_username : '—' }}
               </span> -->
-              <span v-else class="text-slate-400 text-sm">
+              <!-- <span v-else class="text-slate-400 text-sm">
                 {{ app.reviewed_by_username ? 'By ' + app.reviewed_by_username : '—' }}
-              </span>
+              </span> -->
+
+              <div v-else class="flex flex-col gap-1">
+                <span class="text-slate-400 text-sm">
+                  {{ app.reviewed_by_username ? 'By ' + app.reviewed_by_username : '—' }}
+                </span>
+                <button
+                  v-if="canCancel(app)"
+                  @click="openCancel(app)"
+                  class="text-rose-600 hover:text-rose-700 font-semibold text-xs text-left transition-colors"
+                >
+                  Cancel Leave
+                </button>
+              </div>
             </td>
             <td class="px-4 py-3.5 text-center">
               <button
@@ -289,6 +324,12 @@
       @close="reviewModal.show = false"
       @updated="fetchApplications(currentPage)"
     />
+    <CancelApprovedModal
+      :show="cancelModal.show"
+      :application="cancelModal.app"
+      @close="cancelModal.show = false"
+      @updated="onCancelled"
+    />
     <!-- PDF Preview -->
     <div v-if="pdfUrl" class="mt-6 bg-white rounded-2xl border border-sky-100 overflow-hidden">
       <div class="flex items-center justify-between px-5 py-3.5 bg-sky/60 border-b border-sky-100">
@@ -311,6 +352,7 @@
 import { ref, onMounted } from 'vue'
 import api from '@/api/axios'
 import ReviewApplicationModal from '../../views/modals/ReviewApplicationModal.vue'
+import CancelApprovedModal from '../../views/modals/CancelApprovedModal.vue'
 
 const applications = ref([])
 const loading = ref(true)
@@ -475,6 +517,30 @@ function openReview(app, mode) {
     daysApplied: app.days_applied,
     remainingBalance: app.remaining_balance,
   }
+}
+
+const cancelModal = ref({ show: false, app: null })
+const actionMessage = ref('')
+
+// Local date, not toISOString() — avoids the PH off-by-one
+const todayStr = (() => {
+  const d = new Date()
+  const pad = (n) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
+})()
+
+// Only approved leave that hasn't ended yet can be cancelled
+function canCancel(app) {
+  return app.status === 'approved' && formatDate(app.end_date) >= todayStr
+}
+
+function openCancel(app) {
+  cancelModal.value = { show: true, app }
+}
+
+function onCancelled(message) {
+  actionMessage.value = message
+  fetchApplications(currentPage.value)
 }
 
 onMounted(async () => {

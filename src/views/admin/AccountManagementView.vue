@@ -8,7 +8,7 @@
       >
         + Add Account
       </button>
-    </div>  
+    </div>
 
     <!-- Add Account Modal -->
     <div
@@ -96,9 +96,44 @@
       </div>
     </div>
 
-    <!-- Accounts Table -->
+    <!-- Password Reset Result Modal -->
+    <div
+      v-if="resetResult"
+      class="fixed inset-0 bg-navy-deep/40 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+    >
+      <div class="bg-white rounded-3xl shadow-xl w-full max-w-md p-7">
+        <h2 class="font-serif text-xl font-semibold text-navy-deep mb-1">Password Reset</h2>
+        <p class="text-[13px] text-slate-500 mb-5">
+          Share this temporary password with the user. They'll be required to change it on login.
+        </p>
+        <div class="bg-sky/50 rounded-xl p-4 space-y-2.5 mb-6 font-mono text-[13px]">
+          <div class="flex justify-between">
+            <span class="text-slate-400">Username</span>
+            <span class="text-navy-deep font-semibold">{{ resetResult.username }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-400">Temporary Password</span>
+            <span class="text-navy-deep font-semibold">{{ resetResult.temporary_password }}</span>
+          </div>
+        </div>
+        <button
+          @click="resetResult = null"
+          class="w-full bg-navy text-white py-2.5 rounded-xl font-semibold text-sm hover:bg-navy-deep transition-colors"
+        >
+          Done
+        </button>
+      </div>
+    </div>
 
-    <div class="flex items-center justify-between mb-4">
+    <!-- Accounts Table -->
+    <div class="flex items-center gap-3 mb-4">
+      <input
+        v-model="search"
+        @input="debounceSearch"
+        type="text"
+        placeholder="Search username or email..."
+        class="w-72 border border-sky-200 rounded-lg px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-teal-600"
+      />
       <select
         v-model="selectedRole"
         @change="fetchAccounts(1)"
@@ -147,19 +182,28 @@
             :key="acct.id"
             class="border-b border-sky-100 last:border-b-0 hover:bg-sky/40 transition-colors"
           >
-            <td class="px-5 py-3.5 text-slate-500">{{ (currentPage - 1) * 15 + index + 1 }}</td>
+            <td class="px-5 py-3.5 text-slate-500">{{ (currentPage - 1) * 20 + index + 1 }}</td>
             <td class="px-5 py-3.5 font-semibold text-navy-deep">{{ acct.username }}</td>
             <td class="px-5 py-3.5 text-slate-600">{{ acct.email }}</td>
             <td class="px-5 py-3.5 text-slate-600 capitalize">
               {{ acct.role?.replace('_', ' ') }}
             </td>
             <td class="px-5 py-3.5">
-              <button
-                @click="handleDelete(acct.id)"
-                class="text-rose-600 hover:text-rose-700 font-semibold text-sm transition-colors"
-              >
-                Delete
-              </button>
+              <div class="flex gap-4">
+                <button
+                  v-if="acct.id !== authStore.user?.id"
+                  @click="handleResetPassword(acct)"
+                  class="text-teal-700 hover:text-teal-800 font-semibold text-sm transition-colors"
+                >
+                  Reset Password
+                </button>
+                <button
+                  @click="handleDelete(acct.id)"
+                  class="text-rose-600 hover:text-rose-700 font-semibold text-sm transition-colors"
+                >
+                  Delete
+                </button>
+              </div>
             </td>
           </tr>
           <tr v-if="accounts.length === 0">
@@ -198,11 +242,15 @@
 import { ref, onMounted } from 'vue'
 import api from '@/api/axios'
 import { useConfirm } from '@/composables/useConfirm'
+import { useAuthStore } from '@/stores/auth'
+
+const authStore = useAuthStore()
 
 const accounts = ref([])
 const showAddModal = ref(false)
 const formError = ref(null)
 const formLoading = ref(false)
+const resetResult = ref(null)
 
 const currentPage = ref(1)
 const lastPage = ref(1)
@@ -217,10 +265,18 @@ const form = ref({
   role: '',
 })
 
+const search = ref('')
+let searchTimer = null
+
+function debounceSearch() {
+  clearTimeout(searchTimer)
+  searchTimer = setTimeout(() => fetchAccounts(1), 400)
+}
+
 async function fetchAccounts(page = 1) {
   try {
     const response = await api.get('/users', {
-      params: { page, role: selectedRole.value || undefined },
+      params: { page, role: selectedRole.value || undefined, search: search.value || undefined },
     })
     accounts.value = response.data.data
     currentPage.value = response.data.current_page
@@ -229,6 +285,7 @@ async function fetchAccounts(page = 1) {
     console.error('Error fetching accounts:', error)
   }
 }
+
 async function handleAddAccount() {
   formLoading.value = true
   formError.value = ''
@@ -256,6 +313,21 @@ async function handleDelete(id) {
     await fetchAccounts(currentPage.value)
   } catch (error) {
     alert(error.response?.data?.message || 'Failed to delete account.')
+  }
+}
+
+async function handleResetPassword(acct) {
+  const ok = await confirm({
+    title: 'Reset password?',
+    message: `${acct.username} will be logged out and must set a new password on next login.`,
+  })
+  if (!ok) return
+
+  try {
+    const res = await api.post(`/users/${acct.id}/reset-password`)
+    resetResult.value = res.data
+  } catch (error) {
+    alert(error.response?.data?.message || 'Failed to reset password.')
   }
 }
 

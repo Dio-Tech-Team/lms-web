@@ -10,6 +10,11 @@ const router = createRouter({
       component: () => import('@/views/auth/LoginView.vue'),
       meta: { guestOnly: true },
     },
+    {
+      path: '/download',
+      name: 'download',
+      component: () => import('@/views/DownloadView.vue'),
+    },
 
     {
       path: '/change-password',

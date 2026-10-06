@@ -153,6 +153,12 @@
                 ></span>
                 {{ m.status }}
               </span>
+              <p
+                v-if="m.status === 'cancelled' && m.cancellation_reason"
+                class="text-[11.5px] text-slate-400 mt-1 max-w-[14rem]"
+              >
+                {{ m.cancellation_reason }}
+              </p>
             </td>
             <td class="px-4 py-3.5">
               <div v-if="m.status === 'pending'" class="flex gap-3">
@@ -169,6 +175,13 @@
                   Reject
                 </button>
               </div>
+              <button
+                v-else-if="m.status === 'approved'"
+                @click="openReverse(m)"
+                class="text-rose-600 hover:text-rose-700 font-semibold text-sm transition-colors"
+              >
+                Reverse
+              </button>
               <span v-else class="text-slate-400 text-sm">—</span>
             </td>
           </tr>
@@ -199,6 +212,54 @@
             class="px-3.5 py-1.5 text-[12.5px] font-semibold border border-sky-100 rounded-lg bg-white hover:bg-sky text-navy transition-colors disabled:opacity-40 disabled:hover:bg-white"
           >
             Next →
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reverse approved monetization -->
+    <div
+      v-if="reverseModal.show"
+      class="fixed inset-0 bg-navy-deep/40 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+    >
+      <div class="bg-white rounded-3xl shadow-xl w-full max-w-md p-7">
+        <h2 class="font-serif text-xl font-semibold text-navy-deep mb-1">Reverse monetization?</h2>
+        <p class="text-[13px] text-slate-500 mb-5">
+          {{ reverseModal.days }} day(s) of {{ reverseModal.type }} will be returned to
+          {{ reverseModal.employeeName }}'s balance.
+        </p>
+
+        <div
+          v-if="reverseModal.error"
+          class="bg-rose-tint border border-rose-200 text-rose-700 px-4 py-3 rounded-xl mb-4 text-sm"
+        >
+          {{ reverseModal.error }}
+        </div>
+
+        <label class="block text-sm font-medium text-navy-deep mb-1.5"
+          >Reason<span class="text-rose-500">*</span></label
+        >
+        <textarea
+          v-model="reverseModal.reason"
+          rows="3"
+          maxlength="1000"
+          class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors mb-6"
+        ></textarea>
+
+        <div class="flex justify-end gap-3">
+          <button
+            @click="reverseModal.show = false"
+            :disabled="reverseModal.saving"
+            class="px-5 py-2.5 text-sm font-semibold text-navy border border-sky-100 rounded-xl hover:bg-sky transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            @click="submitReverse"
+            :disabled="reverseModal.saving || !reverseModal.reason.trim()"
+            class="px-5 py-2.5 text-sm font-semibold bg-rose-600 text-white rounded-xl hover:bg-rose-700 transition-colors disabled:opacity-50"
+          >
+            {{ reverseModal.saving ? 'Reversing...' : 'Reverse' }}
           </button>
         </div>
       </div>
@@ -249,6 +310,46 @@ const reviewModal = ref({
   remainingBalance: null,
   employeeName: '',
 })
+
+const reverseModal = ref({
+  show: false,
+  id: null,
+  days: 0,
+  type: '',
+  employeeName: '',
+  reason: '',
+  error: '',
+  saving: false,
+})
+
+function openReverse(m) {
+  reverseModal.value = {
+    show: true,
+    id: m.id,
+    days: m.approved_days ?? m.days_monetized,
+    type: m.leave_type_code,
+    employeeName: `${m.first_name} ${m.surname}`,
+    reason: '',
+    error: '',
+    saving: false,
+  }
+}
+
+async function submitReverse() {
+  reverseModal.value.saving = true
+  reverseModal.value.error = ''
+  try {
+    await api.post(`/leave-monetizations/${reverseModal.value.id}/cancel-approved`, {
+      cancellation_reason: reverseModal.value.reason.trim(),
+    })
+    reverseModal.value.show = false
+    await fetchMonetizations(currentPage.value)
+  } catch (err) {
+    reverseModal.value.error = err.response?.data?.message || 'Failed to reverse monetization.'
+  } finally {
+    reverseModal.value.saving = false
+  }
+}
 
 function openReview(m, mode) {
   reviewModal.value = {

@@ -51,7 +51,8 @@
           />
         </div>
 
-        <div v-if="activeReport === 'leave-utilization'">
+        <!-- <div v-if="activeReport === 'leave-utilization'"> -->
+        <div v-if="activeReport === 'leave-utilization' || activeReport === 'lwop'">
           <label class="block text-sm font-medium text-navy-deep mb-1.5">Month</label>
           <select
             v-model="filters.month"
@@ -146,6 +147,22 @@
         </div>
       </div>
 
+      <!-- LWOP summary -->
+      <div v-if="activeReport === 'lwop' && data?.summary" class="grid grid-cols-4 gap-4 mb-6">
+        <div class="bg-white rounded-2xl border border-sky-100 p-5">
+          <p class="text-[10.5px] uppercase tracking-wider text-slate-400 font-bold mb-1">
+            Employees with LWOP
+          </p>
+          <p class="text-2xl font-bold text-navy-deep">{{ data.summary.employees }}</p>
+        </div>
+        <div class="bg-white rounded-2xl border border-sky-100 p-5">
+          <p class="text-[10.5px] uppercase tracking-wider text-slate-400 font-bold mb-1">
+            Total LWOP days
+          </p>
+          <p class="text-2xl font-bold text-rose-600">{{ data.summary.total_lwop_days }}</p>
+        </div>
+      </div>
+
       <!-- Table -->
       <div class="bg-white rounded-2xl border border-sky-100 overflow-hidden">
         <div
@@ -220,6 +237,26 @@
                   <td class="px-4 py-3 text-slate-600">{{ row.email }}</td>
                 </template>
 
+                <!-- LWOP -->
+                <template v-else-if="activeReport === 'lwop'">
+                  <td class="px-4 py-3 font-semibold text-navy-deep whitespace-nowrap">
+                    {{ row.name }}
+                  </td>
+                  <td class="px-4 py-3 font-mono text-[12.5px] text-slate-500">
+                    {{ row.id_number }}
+                  </td>
+                  <td class="px-4 py-3 text-slate-600">{{ row.department }}</td>
+                  <td class="px-4 py-3 text-slate-600">{{ row.employment_status }}</td>
+                  <td class="px-4 py-3 text-slate-600 whitespace-nowrap">{{ row.period }}</td>
+                  <td class="px-4 py-3 text-slate-600">{{ row.source }}</td>
+                  <td class="px-4 py-3 font-mono text-[12.5px] text-slate-500 whitespace-nowrap">
+                    {{ row.dates || '—' }}
+                  </td>
+                  <td class="px-4 py-3 font-mono text-[12.5px] text-rose-600 font-semibold">
+                    {{ row.lwop_days }}
+                  </td>
+                </template>
+
                 <!-- Utilization -->
                 <template v-else>
                   <td class="px-4 py-3 font-semibold text-navy-deep whitespace-nowrap">
@@ -273,6 +310,7 @@ const reports = [
   { key: 'leave-balances', label: 'Leave Balances' },
   { key: 'leave-utilization', label: 'Leave Utilization' },
   { key: 'employee-masterlist', label: 'Employee Masterlist' },
+  { key: 'lwop', label: 'Leave Without Pay' },
 ]
 
 const months = [
@@ -329,7 +367,18 @@ const columns = computed(() => {
       'Email',
     ]
   }
-
+  if (activeReport.value === 'lwop') {
+    return [
+      'Employee',
+      'ID Number',
+      'Department',
+      'Status',
+      'Period',
+      'Source',
+      'Dates',
+      'LWOP Days',
+    ]
+  }
   return ['Employee', 'ID Number', 'Department', 'Type', 'Start', 'End', 'Days', 'Without Pay']
 })
 
@@ -344,8 +393,13 @@ function buildParams(extra = {}) {
     params.append('year', filters.value.year)
   }
 
+  // if (activeReport.value === 'leave-utilization') {
+  //   if (filters.value.month) params.append('month', filters.value.month)
+  if (['leave-utilization', 'lwop'].includes(activeReport.value) && filters.value.month) {
+    params.append('month', filters.value.month)
+  }
+
   if (activeReport.value === 'leave-utilization') {
-    if (filters.value.month) params.append('month', filters.value.month)
     if (filters.value.leave_configuration_id) {
       params.append('leave_configuration_id', filters.value.leave_configuration_id)
     }

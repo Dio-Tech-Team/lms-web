@@ -321,6 +321,7 @@
       :leave-type-code="reviewModal.leaveTypeCode"
       :days-applied="reviewModal.daysApplied"
       :remaining-balance="reviewModal.remainingBalance"
+      :schedule-type="reviewModal.scheduleType"
       @close="reviewModal.show = false"
       @updated="fetchApplications(currentPage)"
     />
@@ -505,6 +506,7 @@ const reviewModal = ref({
   leaveTypeCode: '',
   daysApplied: 0,
   remainingBalance: null,
+  scheduleType: '4day',
 })
 
 function openReview(app, mode) {
@@ -516,6 +518,7 @@ function openReview(app, mode) {
     leaveTypeCode: app.leave_type_code,
     daysApplied: app.days_applied,
     remainingBalance: app.remaining_balance,
+    scheduleType: app.schedule_type,
   }
 }
 

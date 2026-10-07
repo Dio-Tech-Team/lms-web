@@ -117,7 +117,7 @@
             <span class="font-semibold text-navy-deep">{{ fmt(preview.days_cancelled) }}</span>
           </div>
           <div v-if="preview.credits_returned > 0" class="flex justify-between">
-            <span class="text-slate-400">Returned to {{ preview.credit_code }}</span>
+            <span class="text-slate-400">Credits returned to {{ preview.credit_code }}</span>
             <span class="font-semibold text-teal-700">+{{ fmt(preview.credits_returned) }}</span>
           </div>
           <div v-if="preview.lwop_removed > 0" class="flex justify-between">

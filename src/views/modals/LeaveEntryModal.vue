@@ -94,7 +94,7 @@
           <span class="font-semibold text-navy-deep">
             {{ selectedTypeBalance.code }} {{ Number(selectedTypeBalance.balance).toFixed(3) }}
           </span>
-          day(s) available
+          credit(s) available
           <span v-if="selectedTypeBalance.redirected" class="text-slate-400">
             — Forced Leave draws from Vacation Leave
           </span>
@@ -151,6 +151,13 @@
                     ? 'excludes weekends and holidays'
                     : 'calendar days'
                 }})
+              </span>
+            </p>
+
+            <p v-if="Number(preview.credit_factor) !== 1" class="mt-0.5">
+              = <span class="font-semibold">{{ Number(preview.credits).toFixed(3) }} credits</span>
+              <span class="text-slate-500">
+                ({{ preview.days_applied }} × {{ preview.credit_factor }}, 4-day work week)
               </span>
             </p>
             <p v-if="preview.remaining_balance !== null" class="mt-0.5">

@@ -10,6 +10,7 @@
       </h2>
       <p class="text-[13px] text-slate-500 mb-5">
         {{ employeeName }} · {{ leaveTypeCode }} · {{ daysApplied }} day(s)
+        <span v-if="factor !== 1"> = {{ credits.toFixed(3) }} credits</span>
       </p>
 
       <div
@@ -24,9 +25,9 @@
           v-if="shortfall > 0"
           class="bg-amber-tint text-amber-700 text-[13px] rounded-lg px-3.5 py-3 font-medium leading-relaxed"
         >
-          This employee has {{ Number(remainingBalance).toFixed(2) }} day(s) remaining but applied
-          for {{ daysApplied }}. {{ shortfall.toFixed(2) }} day(s) will be recorded as Leave Without
-          Pay.
+          This employee has {{ Number(remainingBalance).toFixed(3) }} credit(s) remaining but this
+          leave needs {{ credits.toFixed(3) }}. {{ shortfall.toFixed(3) }} day(s) will be recorded
+          as Leave Without Pay.
         </div>
         <p v-else class="text-[13px] text-slate-500">
           Credits will be deducted and the leave record created. This cannot be undone.
@@ -95,6 +96,7 @@ const props = defineProps({
   leaveTypeCode: String,
   daysApplied: [Number, String],
   remainingBalance: [Number, String, null],
+  scheduleType: { type: String, default: '4day' },
 })
 
 const emit = defineEmits(['close', 'updated'])
@@ -104,12 +106,19 @@ const otherReason = ref('')
 const submitting = ref(false)
 const error = ref('')
 
+// Same rule as the backend's creditFactor(): only VL and SL scale with the
+// work schedule; FL and special leaves are 1:1.
+const factor = computed(() =>
+  ['VL', 'SL'].includes(props.leaveTypeCode) && props.scheduleType !== '5day' ? 1.25 : 1
+)
+const credits = computed(() => Number(props.daysApplied) * factor.value)
+
 // Approving past the balance is allowed — the backend records the excess as
 // LWOP — but HR should see the figure before it happens, not after.
 const shortfall = computed(() => {
   if (props.remainingBalance === null || props.remainingBalance === undefined) return 0
-  const diff = Number(props.daysApplied) - Number(props.remainingBalance)
-  return diff > 0 ? diff : 0
+  const diff = credits.value - Number(props.remainingBalance)
+  return diff > 0 ? diff / factor.value : 0 // back to days for LWOP
 })
 
 watch(

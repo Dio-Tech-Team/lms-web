@@ -313,6 +313,19 @@
             </div>
             <div>
               <label class="block text-sm font-medium text-navy-deep mb-1.5"
+                >Work Schedule<span class="text-rose-500">*</span></label
+              >
+              <select
+                v-model="form.schedule_type"
+                class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
+                required
+              >
+                <option value="4day">4-day week (Mon–Thu)</option>
+                <option value="5day">5-day week (Mon–Fri)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-navy-deep mb-1.5"
                 >Date Hired<span class="text-rose-500">*</span></label
               >
               <input
@@ -542,6 +555,7 @@ const emptyForm = () => ({
   position: '',
   department_id: '',
   employment_status: '',
+  schedule_type: '4day',
   date_hired: '',
   umid_id: '',
   pagibig_id: '',
@@ -553,7 +567,8 @@ const emptyForm = () => ({
 const form = ref(emptyForm())
 
 function hasUnsavedData() {
-  return Object.values(form.value).some((v) => v !== '' && v !== null)
+  const blank = emptyForm()
+  return Object.entries(form.value).some(([k, v]) => v !== blank[k] && v !== null)
 }
 
 const selectedDepartmentName = computed(() => {

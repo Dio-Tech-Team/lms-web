@@ -45,12 +45,13 @@
               />
             </div>
             <div>
-              <label class="block text-sm font-medium text-navy-deep mb-1.5">Email</label>
+              <label class="block text-sm font-medium text-navy-deep mb-1.5">
+                Email <span class="text-slate-400 font-normal">(optional)</span>
+              </label>
               <input
                 v-model="form.email"
                 type="email"
                 class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
-                required
               />
             </div>
             <div>
@@ -184,7 +185,7 @@
           >
             <td class="px-5 py-3.5 text-slate-500">{{ (currentPage - 1) * 20 + index + 1 }}</td>
             <td class="px-5 py-3.5 font-semibold text-navy-deep">{{ acct.username }}</td>
-            <td class="px-5 py-3.5 text-slate-600">{{ acct.email }}</td>
+            <td class="px-5 py-3.5 text-slate-600">{{ acct.email || '—' }}</td>
             <td class="px-5 py-3.5 text-slate-600 capitalize">
               {{ acct.role?.replace('_', ' ') }}
             </td>
@@ -198,6 +199,7 @@
                   Reset Password
                 </button>
                 <button
+                  v-if="acct.id !== authStore.user?.id"
                   @click="handleDelete(acct.id)"
                   class="text-rose-600 hover:text-rose-700 font-semibold text-sm transition-colors"
                 >
@@ -290,7 +292,10 @@ async function handleAddAccount() {
   formLoading.value = true
   formError.value = ''
   try {
-    await api.post('/users', form.value)
+    await api.post('/users', {
+      ...form.value,
+      email: form.value.email.trim() || null,
+    })
     showAddModal.value = false
     Object.keys(form.value).forEach((key) => (form.value[key] = ''))
     await fetchAccounts(currentPage.value)

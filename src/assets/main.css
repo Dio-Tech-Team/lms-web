@@ -25,6 +25,11 @@
   --font-mono: 'IBM Plex Mono', ui-monospace, monospace; */
 }
 
+input::-ms-reveal,
+input::-ms-clear {
+  display: none;
+}
+
 /* Add this to the <head> of index.html (or import in main.css): */
 /*
 <link rel="preconnect" href="https://fonts.googleapis.com">

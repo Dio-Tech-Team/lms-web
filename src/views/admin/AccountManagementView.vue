@@ -56,12 +56,58 @@
             </div>
             <div>
               <label class="block text-sm font-medium text-navy-deep mb-1.5">Password</label>
-              <input
-                v-model="form.password"
-                type="password"
-                class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
-                required
-              />
+              <div class="relative">
+                <input
+                  v-model="form.password"
+                  :type="showPassword ? 'text' : 'password'"
+                  class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 pr-11 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
+                  required
+                />
+                <button
+                  type="button"
+                  @click="showPassword = !showPassword"
+                  class="absolute inset-y-0 right-0 flex items-center px-3 text-slate-400 hover:text-slate-600"
+                  :aria-label="showPassword ? 'Hide password' : 'Show password'"
+                >
+                  <!-- eye -->
+                  <svg
+                    v-if="!showPassword"
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M2.04 12.32a1 1 0 010-.64C3.42 7.51 7.36 4.5 12 4.5c4.64 0 8.58 3.01 9.96 7.18a1 1 0 010 .64C20.58 16.49 16.64 19.5 12 19.5c-4.64 0-8.58-3.01-9.96-7.18z"
+                    />
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                  </svg>
+                  <!-- eye-off -->
+                  <svg
+                    v-else
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M3.98 8.22A10.48 10.48 0 002.04 12.32C3.42 16.49 7.36 19.5 12 19.5c.99 0 1.95-.14 2.86-.4M6.23 6.23A10.45 10.45 0 0112 4.5c4.64 0 8.58 3.01 9.96 7.18a10.52 10.52 0 01-4.29 5.55M6.23 6.23L3 3m3.23 3.23l3.65 3.65m7.89 7.89L21 21m-3.23-3.23l-3.65-3.65m0 0a3 3 0 10-4.24-4.24m4.24 4.24L9.88 9.88"
+                    />
+                  </svg>
+                </button>
+              </div>
             </div>
             <div>
               <label class="block text-sm font-medium text-navy-deep mb-1.5">Role</label>
@@ -241,7 +287,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import api from '@/api/axios'
 import { useConfirm } from '@/composables/useConfirm'
 import { useAuthStore } from '@/stores/auth'
@@ -257,6 +303,8 @@ const resetResult = ref(null)
 const currentPage = ref(1)
 const lastPage = ref(1)
 const selectedRole = ref('')
+
+const showPassword = ref(false)
 
 const { confirm } = useConfirm()
 
@@ -335,6 +383,9 @@ async function handleResetPassword(acct) {
     alert(error.response?.data?.message || 'Failed to reset password.')
   }
 }
+watch(showAddModal, (open) => {
+  if (!open) showPassword.value = false
+})
 
 onMounted(() => fetchAccounts())
 </script>

@@ -493,7 +493,7 @@
             @click="showPromotionModal = true"
             class="bg-navy text-white px-3.5 py-2 rounded-xl text-sm font-semibold hover:bg-navy-deep transition-colors"
           >
-            Update Employment Status
+            Add Employment Record
           </button>
         </div>
 

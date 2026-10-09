@@ -166,19 +166,18 @@ const navSections = [
       { to: '/leave-monetizations', label: 'Monetization' },
       { to: '/leave-credit-computation', label: 'Credit Computation' },
       { to: '/reports', label: 'Reports' },
-      { to: '/leave-configurations', label: 'Configuration', superAdmin: true },
+      { to: '/leave-configurations', label: 'Configuration' },
     ],
   },
   {
     label: 'System',
     links: [
       { to: '/accounts', label: 'Manage Accounts', superAdmin: true },
-      { to: '/holidays', label: 'Holidays', superAdmin: true },
-      { to: '/positions', label: 'Positions', superAdmin: true },
+      { to: '/holidays', label: 'Holidays' },
+      { to: '/positions', label: 'Positions' },
       { to: '/activity-logs', label: 'Activity Logs', superAdmin: true },
       {
         label: 'Settings',
-        superAdmin: true,
         children: [
           { to: '/settings/signatories', label: 'Leave Form Signatories' },
           { to: '/settings/initialize-credits', label: 'Initialize Leave Credits' },

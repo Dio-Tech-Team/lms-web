@@ -46,19 +46,16 @@ const router = createRouter({
           path: 'leave-configurations',
           name: 'leave-configurations',
           component: () => import('@/views/admin/LeaveConfigurationView.vue'),
-          meta: { roles: ['super_admin'] }, // ← overrides parent, super_admin only
         },
         {
           path: '/holidays',
           name: 'holidays',
           component: () => import('@/views/admin/HolidaysView.vue'),
-          meta: { requiresAuth: true, roles: ['super_admin'] }, // match whatever meta your other protected routes use
         },
         {
           path: '/positions',
           name: 'positions',
           component: () => import('@/views/admin/PositionView.vue'),
-          meta: { requiresAuth: true, roles: ['super_admin'] },
         },
         {
           path: 'leave-records',
@@ -102,7 +99,6 @@ const router = createRouter({
         {
           path: 'settings',
           component: () => import('@/views/admin/SettingsView.vue'),
-          meta: { roles: ['super_admin'] },
           children: [
             {
               path: 'signatories',

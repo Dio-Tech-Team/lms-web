@@ -47,13 +47,22 @@
 
       <div v-else class="mb-5">
         <label class="block text-[12.5px] font-semibold text-slate-600 mb-1.5">
-          Reason for rejection
+          Reason for rejection <span class="font-normal text-slate-400">(optional)</span>
         </label>
+        <select
+          v-model="selectedReason"
+          class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
+        >
+          <option value="">No reason given</option>
+          <option v-for="r in MONETIZATION_REJECTION_REASONS" :key="r" :value="r">{{ r }}</option>
+          <option :value="OTHER_REASON">Other (please specify)</option>
+        </select>
         <textarea
-          v-model="rejectionReason"
+          v-if="selectedReason === OTHER_REASON"
+          v-model="otherReason"
           rows="3"
           placeholder="The employee sees this, so say what went wrong."
-          class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors resize-none"
+          class="w-full mt-2 border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors resize-none"
         ></textarea>
       </div>
 
@@ -89,6 +98,7 @@
 <script setup>
 import { ref, watch, computed } from 'vue'
 import api from '@/api/axios'
+import { MONETIZATION_REJECTION_REASONS, OTHER_REASON, buildReason } from '@/constants/leaveReasons'
 
 const props = defineProps({
   show: Boolean,
@@ -102,7 +112,8 @@ const props = defineProps({
 const emit = defineEmits(['close', 'updated'])
 
 const approvedDays = ref('')
-const rejectionReason = ref('')
+const selectedReason = ref('')
+const otherReason = ref('')
 const submitting = ref(false)
 const error = ref('')
 
@@ -120,7 +131,8 @@ watch(
   (open) => {
     if (!open) return
     approvedDays.value = props.requestedDays ?? ''
-    rejectionReason.value = ''
+    selectedReason.value = ''
+    otherReason.value = ''
     error.value = ''
     submitting.value = false
   }
@@ -149,7 +161,7 @@ async function submit() {
     const body =
       props.mode === 'approve'
         ? { approved_days: parseFloat(approvedDays.value) }
-        : { rejection_reason: rejectionReason.value.trim() || null }
+        : { rejection_reason: buildReason(selectedReason.value, otherReason.value) }
 
     await api.post(`/leave-monetizations/${props.monetizationId}/${path}`, body)
     emit('updated')

@@ -159,6 +159,12 @@
               >
                 {{ m.cancellation_reason }}
               </p>
+              <p
+                v-else-if="m.status === 'rejected' && m.rejection_reason"
+                class="text-[11.5px] text-slate-400 mt-1 max-w-[14rem]"
+              >
+                {{ m.rejection_reason }}
+              </p>
             </td>
             <td class="px-4 py-3.5">
               <div v-if="m.status === 'pending'" class="flex gap-3">
@@ -235,16 +241,27 @@
         >
           {{ reverseModal.error }}
         </div>
-
-        <label class="block text-sm font-medium text-navy-deep mb-1.5"
-          >Reason<span class="text-rose-500">*</span></label
+        <label class="block text-sm font-medium text-navy-deep mb-1.5">
+          Reason <span class="font-normal text-slate-400">(optional)</span>
+        </label>
+        <select
+          v-model="reverseModal.selectedReason"
+          class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
         >
+          <option value="">No reason given</option>
+          <option v-for="r in MONETIZATION_CANCELLATION_REASONS" :key="r" :value="r">
+            {{ r }}
+          </option>
+          <option :value="OTHER_REASON">Other (please specify)</option>
+        </select>
         <textarea
-          v-model="reverseModal.reason"
+          v-if="reverseModal.selectedReason === OTHER_REASON"
+          v-model="reverseModal.otherReason"
           rows="3"
           maxlength="1000"
-          class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors mb-6"
+          class="w-full mt-2 border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors resize-none"
         ></textarea>
+        <div class="mb-6"></div>
 
         <div class="flex justify-end gap-3">
           <button
@@ -256,7 +273,7 @@
           </button>
           <button
             @click="submitReverse"
-            :disabled="reverseModal.saving || !reverseModal.reason.trim()"
+            :disabled="reverseModal.saving"
             class="px-5 py-2.5 text-sm font-semibold bg-rose-600 text-white rounded-xl hover:bg-rose-700 transition-colors disabled:opacity-50"
           >
             {{ reverseModal.saving ? 'Reversing...' : 'Reverse' }}
@@ -288,6 +305,11 @@ import { ref, onMounted } from 'vue'
 import api from '@/api/axios'
 import LeaveMonetizationModal from '../../views/modals/LeaveMonetizationModal.vue'
 import ReviewMonetizationModal from '../../views/modals/ReviewMonetizationModal.vue'
+import {
+  MONETIZATION_CANCELLATION_REASONS,
+  OTHER_REASON,
+  buildReason,
+} from '@/constants/leaveReasons'
 
 const monetizations = ref([])
 const loading = ref(true)
@@ -317,7 +339,8 @@ const reverseModal = ref({
   days: 0,
   type: '',
   employeeName: '',
-  reason: '',
+  selectedReason: '',
+  otherReason: '',
   error: '',
   saving: false,
 })
@@ -329,7 +352,8 @@ function openReverse(m) {
     days: m.approved_days ?? m.days_monetized,
     type: m.leave_type_code,
     employeeName: `${m.first_name} ${m.surname}`,
-    reason: '',
+    selectedReason: '',
+    otherReason: '',
     error: '',
     saving: false,
   }
@@ -340,7 +364,10 @@ async function submitReverse() {
   reverseModal.value.error = ''
   try {
     await api.post(`/leave-monetizations/${reverseModal.value.id}/cancel-approved`, {
-      cancellation_reason: reverseModal.value.reason.trim(),
+      cancellation_reason: buildReason(
+        reverseModal.value.selectedReason,
+        reverseModal.value.otherReason
+      ),
     })
     reverseModal.value.show = false
     await fetchMonetizations(currentPage.value)

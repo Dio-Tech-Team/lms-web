@@ -1,4 +1,5 @@
 // Common reasons shown as dropdown options. "Other" opens a text box.
+// Every reason is optional — HR may leave it blank.
 export const REJECTION_REASONS = [
   // Office / service needs
   'Exigency of service: employee needed during the requested dates',
@@ -27,10 +28,31 @@ export const CANCELLATION_REASONS = [
   'Duplicate application',
 ]
 
+export const MONETIZATION_REJECTION_REASONS = [
+  'Remaining balance would fall below the required minimum',
+  'Insufficient leave credits',
+  'No available funds for monetization at this time',
+  'Requested days exceed the allowable limit',
+  'Incomplete supporting documents or justification',
+  'Duplicate request',
+]
+
+export const MONETIZATION_CANCELLATION_REASONS = [
+  'Approved in error',
+  'Employee withdrew the request',
+  'Funds no longer available',
+  'Wrong number of days approved; to be re-filed',
+  'Duplicate request',
+]
 export const OTHER_REASON = 'Other'
 
-// Turns the dropdown choice + optional text into the string sent to the API
-export function buildReason(selected, otherText) {
-  if (selected === OTHER_REASON) return `Other: ${otherText.trim()}`
+// Turns the dropdown choice + optional text into the string sent to the API.
+// Returns null when nothing was given, since the reason is optional.
+export function buildReason(selected, otherText = '') {
+  if (!selected) return null
+  if (selected === OTHER_REASON) {
+    const text = (otherText || '').trim()
+    return text ? `Other: ${text}` : null
+  }
   return selected
 }

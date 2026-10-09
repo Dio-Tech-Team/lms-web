@@ -36,13 +36,13 @@
 
       <div v-else class="mb-5">
         <label class="block text-[12.5px] font-semibold text-slate-600 mb-1.5">
-          Reason for rejection
+          Reason for rejection <span class="font-normal text-slate-400">(optional)</span>
         </label>
         <select
           v-model="selectedReason"
           class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
         >
-          <option value="">Select a reason</option>
+          <option value="">No reason given</option>
           <option v-for="r in REJECTION_REASONS" :key="r" :value="r">{{ r }}</option>
           <option :value="OTHER_REASON">Other (please specify)</option>
         </select>
@@ -56,7 +56,7 @@
         ></textarea>
 
         <p class="text-[12px] text-slate-400 mt-1.5">
-          Required. This is the only place the employee learns why.
+          The employee sees this on their application history.
         </p>
       </div>
 
@@ -134,17 +134,6 @@ watch(
 
 async function submit() {
   if (submitting.value) return
-
-  if (props.mode === 'reject') {
-    if (!selectedReason.value) {
-      error.value = 'Select a reason for rejection.'
-      return
-    }
-    if (selectedReason.value === OTHER_REASON && !otherReason.value.trim()) {
-      error.value = 'Please specify the reason.'
-      return
-    }
-  }
 
   submitting.value = true
   error.value = ''

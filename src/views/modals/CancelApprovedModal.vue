@@ -55,13 +55,13 @@
 
         <div class="mb-5">
           <label class="block text-[12.5px] font-semibold text-slate-600 mb-1.5">
-            Reason for cancellation
+            Reason for cancellation <span class="font-normal text-slate-400">(optional)</span>
           </label>
           <select
             v-model="selectedReason"
             class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
           >
-            <option value="">Select a reason</option>
+            <option value="">No reason given</option>
             <option v-for="r in CANCELLATION_REASONS" :key="r" :value="r">{{ r }}</option>
             <option :value="OTHER_REASON">Other (please specify)</option>
           </select>
@@ -129,7 +129,10 @@
         <div class="text-[12.5px] mb-5">
           <p class="text-slate-400 mb-1">Reason</p>
           <p class="text-navy-deep">
-            {{ selectedReason === OTHER_REASON ? otherReason.trim() : selectedReason }}
+            {{
+              (selectedReason === OTHER_REASON ? otherReason.trim() : selectedReason) ||
+              'No reason given'
+            }}
           </p>
           <p class="text-slate-400 mt-3">
             This cannot be undone. Check the numbers before confirming.
@@ -248,9 +251,6 @@ function buildBody(dryRun) {
 }
 
 function validate() {
-  if (!selectedReason.value) return 'Select a reason for cancellation.'
-  if (selectedReason.value === OTHER_REASON && !otherReason.value.trim())
-    return 'Please specify the reason.'
   if (started.value && !noneTaken.value && !lastDay.value)
     return 'Enter the last day actually taken, or tick "No days were taken".'
   return ''

@@ -97,8 +97,11 @@
                       {{ row.period }}
                     </td>
                     <td class="px-2.5 py-2 text-slate-600">{{ row.particulars }}</td>
-                    <td class="px-2 py-2 text-right font-mono text-navy">
-                      {{ row.earned > 0 ? row.earned.toFixed(3) : '' }}
+                    <td
+                      class="px-2 py-2 text-right font-mono"
+                      :class="row.earned < 0 ? 'text-rose-600' : 'text-navy'"
+                    >
+                      {{ row.earned !== 0 ? row.earned.toFixed(3) : '' }}
                     </td>
                     <td class="px-2 py-2 text-right font-mono text-amber-700">
                       {{ row.abs_wp > 0 ? row.abs_wp.toFixed(3) : '' }}
@@ -179,8 +182,11 @@
                       {{ row.period }}
                     </td>
                     <td class="px-2.5 py-2 text-slate-600">{{ row.particulars }}</td>
-                    <td class="px-2 py-2 text-right font-mono text-teal-700">
-                      {{ row.earned > 0 ? row.earned.toFixed(3) : '' }}
+                    <td
+                      class="px-2 py-2 text-right font-mono"
+                      :class="row.earned < 0 ? 'text-rose-600' : 'text-teal-700'"
+                    >
+                      {{ row.earned !== 0 ? row.earned.toFixed(3) : '' }}
                     </td>
                     <td class="px-2 py-2 text-right font-mono text-amber-700">
                       {{ row.abs_wp > 0 ? row.abs_wp.toFixed(3) : '' }}

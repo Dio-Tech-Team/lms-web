@@ -36,6 +36,11 @@
           <h2 class="font-serif text-lg font-semibold text-navy-deep">Upload Attendance File</h2>
         </div>
 
+        <p class="text-sm text-slate-500 -mt-3 mb-5">
+          The monthly 1.250 VL and SL credits are added automatically on each employee's hiring-date
+          anniversary. This upload only applies tardiness and absences without leave.
+        </p>
+
         <div
           v-if="uploadError"
           class="bg-rose-tint border border-rose-200 text-rose-700 px-4 py-3 rounded-xl mb-5 text-sm"
@@ -262,18 +267,18 @@
                 <th
                   class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
                 >
-                  VL Earned
+                  VL Rate
                 </th>
                 <th
                   class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
                 >
-                  SL Earned
+                  SL Rate
                 </th>
 
                 <th
                   class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
                 >
-                  Total Earned VL Credits
+                  VL Deducted
                 </th>
               </tr>
             </thead>
@@ -308,9 +313,8 @@
                 <td class="px-4 py-3.5 font-mono text-[13px] text-teal-700">
                   {{ Number(r.sl_earned).toFixed(3) }}
                 </td>
-
-                <td class="px-4 py-3.5 font-mono text-[13px] font-bold text-navy-deep">
-                  {{ (r.vl_earned - r.tardiness_deducted).toFixed(3) }}
+                <td class="px-4 py-3.5 font-mono text-[13px] font-bold text-rose-600">
+                  {{ (1.25 - Number(r.vl_earned) + Number(r.tardiness_deducted)).toFixed(3) }}
                 </td>
               </tr>
             </tbody>
@@ -430,18 +434,18 @@
                 <th
                   class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
                 >
-                  VL Earned
+                  VL Rate
                 </th>
 
                 <th
                   class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
                 >
-                  SL Earned
+                  SL Rate
                 </th>
                 <th
                   class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
                 >
-                  Total Earned VL
+                  VL Deducted
                 </th>
                 <th
                   class="text-right px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
@@ -477,8 +481,14 @@
                 <td class="px-4 py-3.5 font-mono text-[13px] text-teal-700">
                   {{ record.sl_earned }}
                 </td>
-                <td class="px-4 py-3.5 font-mono text-[13px] font-bold text-navy-deep">
-                  {{ (record.vl_earned - record.tardiness_equivalent_days).toFixed(3) }}
+                <td class="px-4 py-3.5 font-mono text-[13px] font-bold text-rose-600">
+                  {{
+                    (
+                      1.25 -
+                      Number(record.vl_earned) +
+                      Number(record.tardiness_equivalent_days)
+                    ).toFixed(3)
+                  }}
                 </td>
                 <td class="px-4 py-3.5 text-right">
                   <button
@@ -615,8 +625,8 @@ async function handleUpload() {
     title: `Upload attendance for ${periodLabel}?`,
     message:
       form.value.year !== currentYear
-        ? `Credits will be computed against ${form.value.year} balances, not ${currentYear}. Make sure the year is correct.`
-        : `VL and SL credits will be computed for ${periodLabel} and added to employee balances.`,
+        ? `Deductions will be applied to ${form.value.year} balances, not ${currentYear}. Make sure the year is correct.`
+        : `Tardiness and absences without leave for ${periodLabel} will be deducted from employee balances.`,
   })
   if (!ok) return
 
@@ -655,7 +665,7 @@ async function reverseAttendance(record) {
   const name = `${record.employee?.first_name} ${record.employee?.surname}`
   const ok = await confirm({
     title: 'Reverse this attendance record?',
-    message: `This undoes the credits earned and tardiness deducted for ${name} — ${record.month} ${record.year}. Re-upload the corrected file afterwards.`,
+    message: `This undoes the tardiness and LWOP deductions for ${name} — ${record.month} ${record.year}. Re-upload the corrected file afterwards.`,
   })
   if (!ok) return
 
@@ -675,7 +685,7 @@ async function reverseAll() {
   const periodLabel = `${months[target.month]} ${target.year}`
   const ok = await confirm({
     title: `Reverse all attendance for ${periodLabel}?`,
-    message: `This undoes the credits earned and tardiness deducted for EVERY employee with attendance in ${periodLabel}, including any hidden by the search or department filter. Re-upload the corrected file afterwards.`,
+    message: `This undoes the tardiness and LWOP deductions for EVERY employee with attendance in ${periodLabel}, including any hidden by the search or department filter. Re-upload the corrected file afterwards.`,
   })
   if (!ok) return
 

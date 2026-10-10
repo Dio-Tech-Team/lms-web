@@ -44,6 +44,18 @@ export const MONETIZATION_CANCELLATION_REASONS = [
   'Wrong number of days approved; to be re-filed',
   'Duplicate request',
 ]
+
+// Reasons offered when filing, per leave type. Types not listed get only "Other".
+export const LEAVE_REASONS = {
+  VL: [
+    'Personal matters',
+    'Family matters',
+    'Vacation (within the Philippines)',
+    'Vacation (abroad)',
+  ],
+  SL: ['Illness', 'Medical check-up', 'Hospitalization', 'Recovery after procedure'],
+  FL: ['Mandatory leave'],
+}
 export const OTHER_REASON = 'Other'
 
 // Turns the dropdown choice + optional text into the string sent to the API.

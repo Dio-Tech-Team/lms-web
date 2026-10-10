@@ -1021,6 +1021,7 @@ const filteredCredits = computed(() => {
     const code = String(credit.code || '')
       .toUpperCase()
       .trim()
+    if (employee.value?.employment_status === 'job_order') return code === 'WL'
     if (showAllCredits.value) {
       return [...mainCodes, ...extraCodes].includes(code)
     }

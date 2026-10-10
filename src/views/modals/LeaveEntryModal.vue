@@ -123,6 +123,7 @@
             <input
               type="date"
               v-model="form.end_date"
+              :min="form.start_date || undefined"
               class="w-full border border-sky-100 rounded-lg p-2 text-sm"
               required
             />
@@ -173,20 +174,27 @@
             </p>
           </template>
         </div>
-
-        <!-- Reason -->
+        <!-- Reason (optional) -->
         <div>
-          <label class="block text-[10.5px] uppercase font-bold text-slate-400 mb-1"
-            >{{ needsPicker ? 'Step 4' : 'Step 3' }} — Reason</label
-          >
-          <textarea
-            v-model="form.reason"
+          <label class="block text-[10.5px] uppercase font-bold text-slate-400 mb-1">
+            {{ needsPicker ? 'Step 4' : 'Step 3' }} — Reason
+            <span class="normal-case font-normal">(optional)</span>
+          </label>
+          <select
+            v-model="reasonChoice"
             class="w-full border border-sky-100 rounded-lg p-2.5 text-sm"
-            rows="3"
-            required
+          >
+            <option value="">No reason given</option>
+            <option v-for="r in reasonOptions" :key="r" :value="r">{{ r }}</option>
+          </select>
+          <textarea
+            v-if="reasonChoice === OTHER_REASON"
+            v-model="reasonOther"
+            class="w-full border border-sky-100 rounded-lg p-2.5 text-sm mt-2"
+            rows="2"
+            placeholder="Specify the reason"
           ></textarea>
         </div>
-
         <!-- Admin Paper Toggle -->
         <div v-if="isAdmin" class="flex items-center gap-2 py-2">
           <input
@@ -231,13 +239,15 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
+import { LEAVE_REASONS, OTHER_REASON, buildReason } from '@/constants/leaveReasons'
 import api from '@/api/axios'
 
 const props = defineProps(['show', 'employeeId', 'leaveTypes', 'leaveCredits', 'isAdmin'])
 const emit = defineEmits(['close', 'updated'])
 const isSubmitting = ref(false)
 const formError = ref('')
-
+const reasonChoice = ref('')
+const reasonOther = ref('')
 const form = ref({
   leave_configuration_id: '',
   start_date: '',
@@ -345,8 +355,21 @@ const daysApplied = computed(() => {
 const selectedConfig = computed(() =>
   (resolvedLeaveTypes.value || []).find((c) => c.id === form.value.leave_configuration_id)
 )
-// FL has no credit row of its own, so report the VL balance instead of
-// its 0/0/0 placeholder — same resolution the backend uses.
+
+const reasonOptions = computed(() => [
+  ...(LEAVE_REASONS[selectedConfig.value?.code] || []),
+  OTHER_REASON,
+])
+
+// A VL reason makes no sense on SL, so start over when the type changes
+watch(
+  () => form.value.leave_configuration_id,
+  () => {
+    reasonChoice.value = ''
+    reasonOther.value = ''
+  }
+)
+
 const selectedTypeBalance = computed(() => {
   const config = selectedConfig.value
   if (!config) return null
@@ -389,10 +412,6 @@ watch(
   }
 )
 
-/* ---------- Days / credits preview ---------- */
-// The day count comes from the backend, not from daysApplied above, so the
-// number shown is the number deducted. Local math would drift the moment
-// the working week or holiday rules change.
 const preview = ref(null)
 const previewLoading = ref(false)
 let previewTimer = null
@@ -447,6 +466,7 @@ async function submitApplication() {
   try {
     await api.post(`/leave-applications`, {
       ...form.value,
+      reason: buildReason(reasonChoice.value, reasonOther.value),
       days_applied: daysApplied.value,
       employee_id: resolvedEmployeeId.value,
     })
@@ -485,6 +505,8 @@ function close() {
   fetchedCredits.value = []
   preview.value = null
   formError.value = ''
+  reasonChoice.value = ''
+  reasonOther.value = ''
   emit('close')
 }
 </script>

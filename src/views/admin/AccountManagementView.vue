@@ -143,6 +143,72 @@
       </div>
     </div>
 
+    <!-- Edit Account Modal -->
+    <div
+      v-if="editing"
+      class="fixed inset-0 bg-navy-deep/40 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+    >
+      <div class="bg-white rounded-3xl shadow-xl w-full max-w-md p-7">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="font-serif text-xl font-semibold text-navy-deep">Edit Account</h2>
+          <button
+            @click="editing = null"
+            class="w-8 h-8 rounded-xl flex items-center justify-center text-slate-400 hover:bg-sky hover:text-navy transition-colors text-lg"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div
+          v-if="editError"
+          class="bg-rose-tint border border-rose-200 text-rose-700 px-4 py-3 rounded-xl mb-5 text-sm"
+        >
+          {{ editError }}
+        </div>
+
+        <form @submit.prevent="handleEdit">
+          <div class="space-y-4 mb-6">
+            <div>
+              <label class="block text-sm font-medium text-navy-deep mb-1.5">Username</label>
+              <input
+                v-model="editForm.username"
+                type="text"
+                class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
+                required
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-navy-deep mb-1.5">
+                Email <span class="text-slate-400 font-normal">(optional)</span>
+              </label>
+              <input
+                v-model="editForm.email"
+                type="email"
+                class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
+              />
+            </div>
+          </div>
+
+          <div class="flex justify-end gap-3">
+            <button
+              type="button"
+              @click="editing = null"
+              class="px-5 py-2.5 text-sm font-semibold text-navy border border-sky-100 rounded-xl hover:bg-sky transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              :disabled="editLoading"
+              class="px-5 py-2.5 text-sm font-semibold bg-navy text-white rounded-xl hover:bg-navy-deep transition-colors disabled:opacity-50"
+            >
+              {{ editLoading ? 'Saving...' : 'Save Changes' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <!-- Password Reset Result Modal -->
     <div
       v-if="resetResult"
@@ -229,7 +295,9 @@
             :key="acct.id"
             class="border-b border-sky-100 last:border-b-0 hover:bg-sky/40 transition-colors"
           >
-            <td class="px-5 py-3.5 text-slate-500">{{ (currentPage - 1) * 20 + index + 1 }}</td>
+            <td class="px-5 py-3.5 text-slate-500">
+              {{ (currentPage - 1) * perPage + index + 1 }}
+            </td>
             <td class="px-5 py-3.5 font-semibold text-navy-deep">{{ acct.username }}</td>
             <td class="px-5 py-3.5 text-slate-600">{{ acct.email || '—' }}</td>
             <td class="px-5 py-3.5 text-slate-600 capitalize">
@@ -237,6 +305,12 @@
             </td>
             <td class="px-5 py-3.5">
               <div class="flex gap-4">
+                <button
+                  @click="openEdit(acct)"
+                  class="text-navy hover:text-navy-deep font-semibold text-sm transition-colors"
+                >
+                  Edit
+                </button>
                 <button
                   v-if="acct.id !== authStore.user?.id"
                   @click="handleResetPassword(acct)"
@@ -302,6 +376,7 @@ const resetResult = ref(null)
 
 const currentPage = ref(1)
 const lastPage = ref(1)
+const perPage = ref(10)
 const selectedRole = ref('')
 
 const showPassword = ref(false)
@@ -331,6 +406,7 @@ async function fetchAccounts(page = 1) {
     accounts.value = response.data.data
     currentPage.value = response.data.current_page
     lastPage.value = response.data.last_page
+    perPage.value = response.data.per_page
   } catch (error) {
     console.error('Error fetching accounts:', error)
   }
@@ -381,6 +457,40 @@ async function handleResetPassword(acct) {
     resetResult.value = res.data
   } catch (error) {
     alert(error.response?.data?.message || 'Failed to reset password.')
+  }
+}
+
+// Edit username / email
+const editing = ref(null)
+const editForm = ref({ username: '', email: '' })
+const editError = ref('')
+const editLoading = ref(false)
+
+function openEdit(acct) {
+  editing.value = acct
+  editForm.value = { username: acct.username, email: acct.email || '' }
+  editError.value = ''
+}
+
+async function handleEdit() {
+  editLoading.value = true
+  editError.value = ''
+  try {
+    await api.put(`/users/${editing.value.id}`, {
+      username: editForm.value.username.trim(),
+      email: editForm.value.email.trim() || null,
+    })
+    // Keep the sidebar name current when editing your own account
+    if (editing.value.id === authStore.user?.id) {
+      authStore.user.username = editForm.value.username.trim()
+      authStore.user.email = editForm.value.email.trim() || null
+    }
+    editing.value = null
+    await fetchAccounts(currentPage.value)
+  } catch (error) {
+    editError.value = error.response?.data?.message || 'Failed to update account.'
+  } finally {
+    editLoading.value = false
   }
 }
 watch(showAddModal, (open) => {

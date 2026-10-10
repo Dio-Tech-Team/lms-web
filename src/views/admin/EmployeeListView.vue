@@ -6,12 +6,27 @@
         <!-- <p class="text-[11px] uppercase tracking-wider text-teal-600 font-bold mb-1">Records</p> -->
         <h1 class="font-serif text-2xl font-semibold text-navy-deep">Employees</h1>
       </div>
-      <button
-        @click="showAddModal = true"
-        class="bg-navy text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-navy-deep transition-colors shadow-sm"
-      >
-        + Add Employee
-      </button>
+      <div class="flex gap-2">
+        <button
+          @click="openScheduleModal"
+          class="bg-white border border-sky-100 text-navy px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-sky transition-colors"
+        >
+          Work Schedule
+        </button>
+        <button
+          @click="showAddModal = true"
+          class="bg-navy text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-navy-deep transition-colors shadow-sm"
+        >
+          + Add Employee
+        </button>
+      </div>
+    </div>
+
+    <div
+      v-if="scheduleNotice"
+      class="mb-5 bg-teal-tint text-teal-700 text-[13px] font-medium rounded-xl px-4 py-3"
+    >
+      {{ scheduleNotice }}
     </div>
 
     <AddEmployeeModal
@@ -21,6 +36,117 @@
       @close="showAddModal = false"
       @created="fetchEmployees(currentPage)"
     />
+
+    <!-- Bulk work schedule -->
+    <div
+      v-if="showScheduleModal"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-navy/20 backdrop-blur-sm p-4"
+    >
+      <div class="bg-white rounded-2xl w-full max-w-md p-6 shadow-xl border border-sky-100">
+        <h2 class="font-serif text-lg font-semibold text-navy-deep mb-1">Work Schedule</h2>
+        <p class="text-xs text-slate-500 mb-4">
+          Untick anyone who should keep their current schedule.
+        </p>
+
+        <div class="grid grid-cols-2 gap-3 mb-4">
+          <div>
+            <label class="block text-[10.5px] uppercase font-bold text-slate-400 mb-1">
+              Switch to
+            </label>
+            <select
+              v-model="scheduleForm.schedule_type"
+              class="w-full border border-sky-100 rounded-lg p-2.5 text-sm"
+            >
+              <option value="5day">5-day (Mon–Fri)</option>
+              <option value="4day">4-day (Mon–Thu)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[10.5px] uppercase font-bold text-slate-400 mb-1">
+              Department
+            </label>
+            <select
+              v-model="scheduleForm.department_id"
+              class="w-full border border-sky-100 rounded-lg p-2.5 text-sm"
+            >
+              <option value="">All departments</option>
+              <option v-for="dept in departments" :key="dept.id" :value="dept.id">
+                {{ dept.name }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Who would change -->
+        <div class="border border-sky-100 rounded-lg">
+          <div
+            class="flex items-center justify-between px-3 py-2 border-b border-sky-100 bg-sky/40"
+          >
+            <span class="text-[12px] font-semibold text-navy-deep">
+              {{ selectedIds.length }} of {{ previewEmployees.length }} selected
+            </span>
+            <button
+              v-if="previewEmployees.length"
+              type="button"
+              @click="toggleAll"
+              class="text-[12px] text-teal-700 font-semibold"
+            >
+              {{ selectedIds.length === previewEmployees.length ? 'Untick all' : 'Tick all' }}
+            </button>
+          </div>
+          <div class="max-h-60 overflow-y-auto">
+            <p v-if="loadingPreview" class="px-3 py-4 text-[13px] text-slate-400">Loading…</p>
+            <p
+              v-else-if="previewEmployees.length === 0"
+              class="px-3 py-4 text-[13px] text-slate-400"
+            >
+              Everyone here is already on this schedule.
+            </p>
+            <label
+              v-else
+              v-for="emp in previewEmployees"
+              :key="emp.id"
+              class="flex items-center gap-2.5 px-3 py-2 border-b border-sky-100 last:border-b-0 hover:bg-sky/40 cursor-pointer"
+            >
+              <input type="checkbox" :value="emp.id" v-model="selectedIds" />
+              <span class="text-sm text-navy-deep flex-1 truncate">{{ emp.name }}</span>
+              <span class="text-[11px] text-slate-400 truncate max-w-[45%]">
+                {{ emp.department }}
+              </span>
+            </label>
+          </div>
+        </div>
+
+        <p
+          class="text-[12px] bg-amber-tint text-amber-700 rounded-lg px-3 py-2.5 mt-4 leading-snug"
+        >
+          Approved leaves keep their original deduction. Pending applications are recounted under
+          the new schedule when approved.
+        </p>
+
+        <p v-if="scheduleError" class="text-[13px] text-rose-700 font-medium mt-3">
+          {{ scheduleError }}
+        </p>
+
+        <div class="flex justify-end gap-2 mt-5">
+          <button
+            type="button"
+            @click="showScheduleModal = false"
+            class="px-4 py-2 text-sm text-slate-500 hover:text-navy"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            @click="saveSchedule"
+            :disabled="savingSchedule || selectedIds.length === 0"
+            class="px-4 py-2 bg-navy text-white rounded-lg text-sm font-semibold hover:bg-navy-deep transition-colors disabled:opacity-50"
+          >
+            {{ savingSchedule ? 'Saving...' : `Switch ${selectedIds.length}` }}
+          </button>
+        </div>
+      </div>
+    </div>
 
     <!-- Search + Filter -->
     <div class="mb-5 flex gap-3">
@@ -283,6 +409,76 @@ const total = ref(0)
 const departments = ref([])
 const positions = ref([])
 const perPage = ref(10)
+
+const showScheduleModal = ref(false)
+const savingSchedule = ref(false)
+const scheduleError = ref('')
+const scheduleForm = ref({ schedule_type: '5day', department_id: '' })
+const previewEmployees = ref([])
+const selectedIds = ref([])
+const loadingPreview = ref(false)
+const scheduleNotice = ref('')
+
+function openScheduleModal() {
+  scheduleForm.value = { schedule_type: '5day', department_id: '' }
+  scheduleError.value = ''
+  showScheduleModal.value = true
+  loadSchedulePreview()
+}
+
+// Who would change for the chosen schedule and department; all ticked
+async function loadSchedulePreview() {
+  loadingPreview.value = true
+  try {
+    const res = await api.post('/employees/bulk-schedule', {
+      schedule_type: scheduleForm.value.schedule_type,
+      department_id: scheduleForm.value.department_id || null,
+      dry_run: true,
+    })
+    previewEmployees.value = res.data.employees || []
+    selectedIds.value = previewEmployees.value.map((e) => e.id)
+  } catch (err) {
+    previewEmployees.value = []
+    selectedIds.value = []
+    scheduleError.value = err.response?.data?.message || 'Failed to load employees.'
+  } finally {
+    loadingPreview.value = false
+  }
+}
+
+watch(
+  () => [scheduleForm.value.schedule_type, scheduleForm.value.department_id],
+  () => {
+    if (showScheduleModal.value) loadSchedulePreview()
+  }
+)
+
+function toggleAll() {
+  selectedIds.value =
+    selectedIds.value.length === previewEmployees.value.length
+      ? []
+      : previewEmployees.value.map((e) => e.id)
+}
+
+async function saveSchedule() {
+  savingSchedule.value = true
+  scheduleError.value = ''
+  try {
+    const res = await api.post('/employees/bulk-schedule', {
+      schedule_type: scheduleForm.value.schedule_type,
+      department_id: scheduleForm.value.department_id || null,
+      employee_ids: selectedIds.value,
+    })
+    showScheduleModal.value = false
+    scheduleNotice.value = res.data.message
+    setTimeout(() => (scheduleNotice.value = ''), 4000)
+    fetchEmployees(currentPage.value)
+  } catch (err) {
+    scheduleError.value = err.response?.data?.message || 'Failed to update work schedules.'
+  } finally {
+    savingSchedule.value = false
+  }
+}
 
 // current year + next 2 years as quick filter options
 const stepIncrementYearOptions = computed(() => {

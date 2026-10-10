@@ -705,13 +705,11 @@
 
                 <td class="px-4 py-3 text-right">
                   <button
-                    v-if="['VL', 'SL'].includes(credit.code)"
+                    v-if="['VL', 'SL', 'SPL', 'WL', 'FL'].includes(credit.code)"
                     @click="openOpeningBalanceModal(credit)"
                     class="text-xs text-teal-700 hover:text-teal-800 font-semibold"
                   >
-                    {{
-                      Number(credit.total_credits) === 0 ? 'Set Opening Balance' : 'Edit Balance'
-                    }}
+                    {{ balanceButtonLabel(credit) }}
                   </button>
                 </td>
               </tr>
@@ -910,13 +908,17 @@ function openOpeningBalanceModal(credit) {
   balanceError.value = ''
   showOpeningBalanceModal.value = true
 }
-async function setOpeningBalance(amount) {
+function balanceButtonLabel(credit) {
+  if (['SPL', 'WL'].includes(credit.code)) return 'Set Remaining'
+  if (credit.code === 'FL') return 'Set Days Taken'
+  return Number(credit.total_credits) === 0 ? 'Set Opening Balance' : 'Edit Balance'
+}
+
+async function setOpeningBalance(payload) {
   isSavingBalance.value = true
   balanceError.value = ''
   try {
-    await api.put(`/employees/${route.params.id}/leave-credits/${selectedCredit.value.id}`, {
-      total_credits: amount,
-    })
+    await api.put(`/employees/${route.params.id}/leave-credits/${selectedCredit.value.id}`, payload)
     await fetchLeaveCredits()
     showOpeningBalanceModal.value = false
   } catch (err) {

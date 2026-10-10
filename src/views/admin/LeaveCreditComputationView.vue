@@ -213,15 +213,8 @@
         </ul>
       </div>
       <!-- Results -->
+      <!-- Results -->
       <div v-if="results.length > 0" class="bg-white rounded-2xl border border-sky-100 p-6 mb-6">
-        <!-- <div class="flex items-center justify-between mb-5">
-        <h2 class="font-serif text-lg font-semibold text-navy-deep">
-          Computation Results
-          <span class="font-sans font-normal text-sm text-slate-400 ml-1"
-            >({{ results.length }} employees processed)</span
-          >
-        </h2>
-      </div> -->
         <div class="flex items-center justify-between mb-5">
           <h2 class="font-serif text-lg font-semibold text-navy-deep">
             Computation Results
@@ -245,49 +238,22 @@
             <thead class="bg-sky border-b border-sky-100 sticky top-0 z-10">
               <tr>
                 <th
+                  v-for="h in [
+                    'Department',
+                    'Employee',
+                    'Absent w/o leave',
+                    'Tardiness',
+                    'VL deducted',
+                    'Excess (LWOP)',
+                  ]"
+                  :key="h"
                   class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
                 >
-                  Department
-                </th>
-                <th
-                  class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
-                >
-                  Employee
-                </th>
-                <th
-                  class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
-                >
-                  LWOP Days
-                </th>
-                <th
-                  class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
-                >
-                  Tardiness Deducted
-                </th>
-                <th
-                  class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
-                >
-                  VL Rate
-                </th>
-                <th
-                  class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
-                >
-                  SL Rate
-                </th>
-
-                <th
-                  class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
-                >
-                  VL Deducted
+                  {{ h }}
                 </th>
               </tr>
             </thead>
             <tbody>
-              <!-- <tr
-              v-for="(r, index) in results"
-              :key="index"
-              class="border-b border-sky-100 last:border-b-0 hover:bg-sky/40 transition-colors"
-            > -->
               <tr
                 v-for="(r, index) in displayedResults"
                 :key="index"
@@ -297,31 +263,25 @@
                 <td class="px-4 py-3.5 text-slate-500 text-[12.5px]">{{ r.sheet }}</td>
                 <td class="px-4 py-3.5 font-semibold text-navy-deep">{{ r.employee }}</td>
                 <td class="px-4 py-3.5 font-mono text-[13px] text-slate-600">
-                  {{ r.lwop_days }}
+                  {{ Number(r.absent_days) || 0 }}
+                  <span v-if="isReduced(r.vl_earned)" class="text-[11.5px] text-amber-700">
+                    (earned {{ fmt(r.vl_earned) }})
+                  </span>
                 </td>
-                <!-- <td class="px-4 py-3.5 font-mono text-[13px] text-navy">{{ r.vl_earned }}</td>
-              <td class="px-4 py-3.5 font-mono text-[13px] text-teal-700">{{ r.sl_earned }}</td>
-              <td class="px-4 py-3.5 font-mono text-[13px] text-rose-600">
-                {{ r.tardiness_deducted }}
-              </td> -->
-                <td class="px-4 py-3.5 font-mono text-[13px] text-rose-600">
-                  {{ Number(r.tardiness_deducted).toFixed(3) }}
-                </td>
-                <td class="px-4 py-3.5 font-mono text-[13px] text-navy">
-                  {{ Number(r.vl_earned).toFixed(3) }}
-                </td>
-                <td class="px-4 py-3.5 font-mono text-[13px] text-teal-700">
-                  {{ Number(r.sl_earned).toFixed(3) }}
+                <td class="px-4 py-3.5 font-mono text-[13px] text-slate-600">
+                  {{ fmt(r.tardiness_deducted) }}
                 </td>
                 <td class="px-4 py-3.5 font-mono text-[13px] font-bold text-rose-600">
-                  {{ (1.25 - Number(r.vl_earned) + Number(r.tardiness_deducted)).toFixed(3) }}
+                  {{ fmt(vlDeducted(r.absence_credits, r.tardiness_deducted, r.tardiness_lwop)) }}
+                </td>
+                <td class="px-4 py-3.5 font-mono text-[13px] text-amber-700">
+                  {{ excessLabel(r.absence_lwop, r.tardiness_lwop) }}
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
-
       <!-- History / Filter Section -->
       <div class="bg-white rounded-2xl border border-sky-100 p-6">
         <div class="flex items-center justify-between mb-5">
@@ -407,49 +367,21 @@
             <thead class="bg-sky border-b border-sky-100 sticky top-0 z-10">
               <tr>
                 <th
+                  v-for="h in [
+                    'Employee',
+                    'Department',
+                    'Month/Year',
+                    'Absent w/o leave',
+                    'Tardiness',
+                    'VL deducted',
+                    'Excess (LWOP)',
+                  ]"
+                  :key="h"
                   class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
                 >
-                  Employee
+                  {{ h }}
                 </th>
-                <th
-                  class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
-                >
-                  Department
-                </th>
-                <th
-                  class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
-                >
-                  Month/Year
-                </th>
-                <th
-                  class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
-                >
-                  LWOP Days
-                </th>
-                <th
-                  class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
-                >
-                  Tardiness
-                </th>
-                <th
-                  class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
-                >
-                  VL Rate
-                </th>
-
-                <th
-                  class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
-                >
-                  SL Rate
-                </th>
-                <th
-                  class="text-left px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
-                >
-                  VL Deducted
-                </th>
-                <th
-                  class="text-right px-4 py-3.5 text-[10.5px] uppercase tracking-wider text-slate-400 font-bold"
-                ></th>
+                <th class="px-4 py-3.5"></th>
               </tr>
             </thead>
             <tbody>
@@ -464,31 +396,31 @@
                 <td class="px-4 py-3.5 text-slate-600">
                   {{ record.employee?.department?.name || 'N/A' }}
                 </td>
-                <!-- <td class="px-4 py-3.5 font-mono text-[12.5px] text-slate-500">
-                {{ record.month }} {{ record.year }}
-              </td> -->
                 <td class="px-4 py-3.5 font-mono text-[12.5px] text-slate-500 whitespace-nowrap">
                   {{ record.month }} {{ record.year }}
                 </td>
                 <td class="px-4 py-3.5 font-mono text-[13px] text-slate-600">
-                  {{ record.absent_without_leave_days }}
+                  {{ Number(record.absent_without_leave_days) || 0 }}
+                  <span v-if="isReduced(record.vl_earned)" class="text-[11.5px] text-amber-700">
+                    (earned {{ fmt(record.vl_earned) }})
+                  </span>
                 </td>
-                <td class="px-4 py-3.5 font-mono text-[13px] text-rose-600">
-                  {{ record.tardiness_equivalent_days }}
-                </td>
-                <td class="px-4 py-3.5 font-mono text-[13px] text-navy">{{ record.vl_earned }}</td>
-
-                <td class="px-4 py-3.5 font-mono text-[13px] text-teal-700">
-                  {{ record.sl_earned }}
+                <td class="px-4 py-3.5 font-mono text-[13px] text-slate-600">
+                  {{ fmt(record.tardiness_equivalent_days) }}
                 </td>
                 <td class="px-4 py-3.5 font-mono text-[13px] font-bold text-rose-600">
                   {{
-                    (
-                      1.25 -
-                      Number(record.vl_earned) +
-                      Number(record.tardiness_equivalent_days)
-                    ).toFixed(3)
+                    fmt(
+                      vlDeducted(
+                        record.absence_credits,
+                        record.tardiness_equivalent_days,
+                        record.lwop_days
+                      )
+                    )
                   }}
+                </td>
+                <td class="px-4 py-3.5 font-mono text-[13px] text-amber-700">
+                  {{ excessLabel(record.absence_lwop_days, record.lwop_days) }}
                 </td>
                 <td class="px-4 py-3.5 text-right">
                   <button
@@ -503,7 +435,6 @@
             </tbody>
           </table>
         </div>
-
         <p v-else class="text-sm text-slate-400 italic py-8 text-center">
           No records found. Try adjusting your filters or upload a new attendance file above.
         </p>
@@ -558,12 +489,31 @@ const reversingId = ref(null)
 const reversingAll = ref(false)
 const activeTab = ref('attendance')
 const showFlaggedOnly = ref(false)
+const fmt = (v) => Number(v || 0).toFixed(3)
 
-function isFlagged(r) {
-  const tardiness = Number(r.tardiness_deducted)
-  return Number(r.lwop_days) > 0 || tardiness >= 1 || tardiness > Number(r.vl_earned)
+// Casual employees earn less than 1.250 in a month with unpaid absences
+const isReduced = (earned) => earned != null && Number(earned) < 1.25
+
+// Absences charged to VL plus the tardiness VL actually absorbed
+const vlDeducted = (absenceCredits, tardiness, tardinessLwop) =>
+  Number(absenceCredits || 0) + Number(tardiness || 0) - Number(tardinessLwop || 0)
+
+// Days VL couldn't cover (absences + tardiness), or a dash when none
+function excessLabel(absenceLwop, tardinessLwop) {
+  const days = Number(absenceLwop || 0) + Number(tardinessLwop || 0)
+  return days > 0 ? `${fmt(days)} day(s)` : '—'
 }
 
+// Worth a second look: absences, a full day or more of tardiness, or anything unpaid
+function isFlagged(r) {
+  const tardiness = Number(r.tardiness_deducted)
+  return (
+    Number(r.absent_days) > 0 ||
+    tardiness >= 1 ||
+    Number(r.tardiness_lwop) > 0 ||
+    Number(r.absence_lwop) > 0
+  )
+}
 const flaggedCount = computed(() => results.value.filter(isFlagged).length)
 const displayedResults = computed(() =>
   showFlaggedOnly.value ? results.value.filter(isFlagged) : results.value
@@ -665,7 +615,7 @@ async function reverseAttendance(record) {
   const name = `${record.employee?.first_name} ${record.employee?.surname}`
   const ok = await confirm({
     title: 'Reverse this attendance record?',
-    message: `This undoes the tardiness and LWOP deductions for ${name} — ${record.month} ${record.year}. Re-upload the corrected file afterwards.`,
+    message: `This undoes the absence, tardiness and LWOP deductions for ${name} — ${record.month} ${record.year}. Re-upload the corrected file afterwards.`,
   })
   if (!ok) return
 
@@ -685,7 +635,7 @@ async function reverseAll() {
   const periodLabel = `${months[target.month]} ${target.year}`
   const ok = await confirm({
     title: `Reverse all attendance for ${periodLabel}?`,
-    message: `This undoes the tardiness and LWOP deductions for EVERY employee with attendance in ${periodLabel}, including any hidden by the search or department filter. Re-upload the corrected file afterwards.`,
+    message: `This undoes the absence, tardiness and LWOP deductions for EVERY employee with attendance in ${periodLabel}, including any hidden by the search or department filter. Re-upload the corrected file afterwards.`,
   })
   if (!ok) return
 

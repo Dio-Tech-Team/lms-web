@@ -290,6 +290,17 @@
               <option value="5day">5-day week (Mon–Fri)</option>
             </select>
           </div>
+          <div v-if="employee?.employment_status === 'casual'">
+            <label class="block text-sm font-medium text-navy-deep mb-1.5">Appointment End</label>
+            <input
+              v-model="form.appointment_end"
+              type="date"
+              class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
+            />
+            <p class="text-xs text-slate-400 mt-1">
+              To correct a typo. Use Renew for an actual renewal.
+            </p>
+          </div>
         </div>
 
         <div class="flex justify-end gap-3">
@@ -357,8 +368,8 @@ const form = ref({
   department_id: '',
   date_hired: '',
   schedule_type: '4day',
+  appointment_end: '',
 })
-
 watch(
   () => props.show,
   (visible) => {
@@ -388,6 +399,7 @@ watch(
         department_id: props.employee.department_id,
         date_hired: props.employee.date_hired,
         schedule_type: props.employee.schedule_type ?? '4day',
+        appointment_end: props.employee.appointment_end ?? '',
       }
       editError.value = ''
     }

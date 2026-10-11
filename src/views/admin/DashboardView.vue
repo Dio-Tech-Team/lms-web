@@ -211,6 +211,44 @@
         </div>
       </div>
 
+      <!-- Casual Appointments Due -->
+      <div
+        v-if="appointmentsDue.length > 0"
+        class="bg-white rounded-2xl border border-sky-100 p-6 mb-6"
+      >
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="font-serif text-lg font-semibold text-navy-deep">Casual Appointments Due</h2>
+          <span class="font-mono text-[10.5px] text-slate-400">ENDING WITHIN 30 DAYS</span>
+        </div>
+        <table class="w-full text-sm">
+          <tbody>
+            <tr
+              v-for="a in appointmentsDue"
+              :key="a.id"
+              class="border-b border-sky-100 last:border-b-0"
+            >
+              <td class="py-2.5 pr-3">
+                <RouterLink
+                  :to="`/employees/${a.id}`"
+                  class="font-semibold text-navy-deep hover:text-teal-700"
+                >
+                  {{ a.name }}
+                </RouterLink>
+                <p class="text-[12px] text-slate-400">{{ a.department }}</p>
+              </td>
+              <td class="py-2.5 text-right">
+                <span
+                  class="px-2.5 py-1 rounded-full text-[11px] font-bold"
+              :class="a.expired ? 'bg-rose-50 text-rose-700' : 'bg-amber-tint text-amber-700'"
+                >
+                  {{ a.expired ? 'Expired' : 'Ends' }} {{ prettyDate(a.appointment_end) }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
       <!-- Low Credit Alerts -->
       <div class="bg-white rounded-2xl border border-sky-100 p-6">
         <div class="flex items-center justify-between mb-4">
@@ -287,6 +325,27 @@ ChartJS.register(
 )
 
 const showLeaveEntryModal = ref(false)
+const appointmentsDue = ref([])
+
+// Separate from the main load, so a failure here never blanks the Dashboard
+async function fetchAppointmentsDue() {
+  try {
+    const res = await api.get('/employees/appointments-due')
+    appointmentsDue.value = res.data
+  } catch (error) {
+    console.error('Error fetching appointments due:', error)
+  }
+}
+
+// "2026-12-31" → "Dec 31, 2026", parsed as a local date
+function prettyDate(s) {
+  const [y, m, d] = String(s).split('T')[0].split('-').map(Number)
+  return new Date(y, m - 1, d).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  })
+}
 const stats = ref({
   total: 0,
   active: 0,
@@ -382,6 +441,7 @@ const chartOptions = {
 const doughnutOptions = { responsive: true, maintainAspectRatio: false }
 
 onMounted(async () => {
+  fetchAppointmentsDue()
   try {
     const [statsResponse, leaveStatsResponse, appResponse] = await Promise.all([
       api.get('/employees/stats'),

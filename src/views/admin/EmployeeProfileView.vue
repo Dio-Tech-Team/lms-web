@@ -16,6 +16,13 @@
 
     <!-- Profile Content -->
     <div v-else-if="employee">
+      <div
+        v-if="renewNotice"
+        class="bg-teal-tint border border-teal-100 text-teal-700 px-4 py-3 rounded-xl mb-4 text-sm font-medium"
+      >
+        {{ renewNotice }}
+      </div>
+
       <!-- Profile Header -->
       <div class="bg-white rounded-2xl border border-sky-100 p-7 mb-6">
         <div class="flex items-center justify-between">
@@ -75,6 +82,13 @@
               Rehire
             </button>
             <template v-else-if="employee.employment_status !== 'retired'">
+              <button
+                v-if="employee.employment_status === 'casual' && employee.is_active"
+                @click="showRenewModal = true"
+                class="bg-teal-600 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-[#256F63] transition-colors"
+              >
+                Renew
+              </button>
               <button
                 @click="showResignModal = true"
                 class="bg-rose-600 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-rose-700 transition-colors"
@@ -214,6 +228,20 @@
                 </p>
                 <p class="font-mono text-[13px] text-navy-deep">
                   {{ formatDate(employee?.date_hired) }}
+                </p>
+              </div>
+              <div v-if="employee.employment_status === 'casual'" class="col-span-2">
+                <p class="text-[10.5px] uppercase tracking-wide text-slate-400 font-bold mb-1">
+                  Appointment Ends
+                </p>
+                <p class="font-mono text-[13px] text-navy-deep">
+                  {{ employee.appointment_end ? prettyDate(employee.appointment_end) : 'Not set' }}
+                  <span
+                    v-if="appointmentExpired"
+                    class="ml-2 px-2 py-0.5 rounded-full text-[11px] font-bold font-sans bg-rose-50 text-rose-700"
+                  >
+                    Expired
+                  </span>
                 </p>
               </div>
             </div>
@@ -542,6 +570,9 @@
                 </td>
                 <td class="px-4 py-3 text-slate-600 capitalize">
                   {{ employment.new_employment_status?.replace('_', ' ') }}
+                  <span v-if="isRenewal(employment)" class="normal-case text-slate-400">
+                    (Renewed)</span
+                  >
                 </td>
                 <td class="px-4 py-3 text-slate-500 font-mono text-[12.5px]">
                   {{ employment.effective_date }}
@@ -816,6 +847,13 @@
       @close="showMonetizationModal = false"
       @updated="refreshAll"
     />
+    <RenewModal
+      :show="showRenewModal"
+      :employee-id="route.params.id"
+      :employee="employee"
+      @close="showRenewModal = false"
+      @updated="onRenewed"
+    />
     <GrantLeaveModal
       :show="showGrantLeaveModal"
       :employee-id="Number(route.params.id)"
@@ -842,6 +880,7 @@ import RetireModal from '../../views/modals/RetireModal.vue'
 import { useConfirm } from '@/composables/useConfirm'
 import EditHistoryModal from '../../views/modals/EditHistoryModal.vue'
 import GrantLeaveModal from '../../views/modals/GrantLeaveModal.vue'
+import RenewModal from '../../views/modals/RenewModal.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -1057,6 +1096,33 @@ const service = computed(() => {
   months = Math.max(0, months)
   return { years: Math.floor(months / 12), months: months % 12 }
 })
+
+// ---- Casual appointment renewal ----
+const showRenewModal = ref(false)
+const renewNotice = ref('')
+
+const appointmentExpired = computed(() => {
+  const end = employee.value?.appointment_end
+  if (!end) return false
+  const now = new Date()
+  const p = (n) => String(n).padStart(2, '0')
+  const today = `${now.getFullYear()}-${p(now.getMonth() + 1)}-${p(now.getDate())}`
+  return formatDate(end) < today
+})
+
+async function onRenewed(message) {
+  renewNotice.value = message
+  setTimeout(() => (renewNotice.value = ''), 5000)
+  await refreshAll()
+}
+// Casual → casual in the same position is an appointment renewal
+function isRenewal(h) {
+  return (
+    h.previous_employment_status === 'casual' &&
+    h.new_employment_status === 'casual' &&
+    h.previous_position === h.new_position
+  )
+}
 
 function goBack() {
   router.push('/employees')

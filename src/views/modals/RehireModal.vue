@@ -78,6 +78,21 @@
               required
             />
           </div>
+          <div v-if="form.employment_status === 'casual'">
+            <label class="block text-sm font-medium text-navy-deep mb-1.5">
+              Appointment End <span class="text-rose-600">*</span>
+            </label>
+            <input
+              v-model="form.appointment_end"
+              type="date"
+              :min="form.effective_date"
+              class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
+              required
+            />
+            <p class="text-xs text-slate-400 mt-1">
+              Pre-filled as 6 months; change it to match the appointment paper.
+            </p>
+          </div>
           <div>
             <label class="block text-sm font-medium text-navy-deep mb-1.5"
               >Remarks (optional)</label
@@ -145,11 +160,28 @@ watch(
         position: props.employee.position || '',
         employment_status: 'permanent',
         department_id: null,
-        effective_date: new Date().toISOString().split('T')[0],
+        effective_date: toYmd(new Date()),
         remarks: '',
+        appointment_end: '',
       }
       rehireError.value = ''
     }
+  }
+)
+
+// Local date as YYYY-MM-DD (toISOString is UTC and can land on yesterday)
+function toYmd(dt) {
+  const p = (n) => String(n).padStart(2, '0')
+  return `${dt.getFullYear()}-${p(dt.getMonth() + 1)}-${p(dt.getDate())}`
+}
+
+// Casual: pre-fill 6 months from the effective date (Jul 1 → Dec 31)
+watch(
+  () => [form.value.employment_status, form.value.effective_date],
+  ([status, start]) => {
+    if (status !== 'casual' || !start) return
+    const [y, m, d] = start.split('-').map(Number)
+    form.value.appointment_end = toYmd(new Date(y, m - 1 + 6, d - 1))
   }
 )
 
@@ -159,6 +191,7 @@ async function handleSubmit() {
   try {
     const payload = { ...form.value }
     if (!payload.department_id) delete payload.department_id
+    if (payload.employment_status !== 'casual') delete payload.appointment_end
     await api.post(`/employees/${props.employeeId}/rehire`, payload)
     emit('updated')
     emit('close')

@@ -67,19 +67,47 @@
           </div>
         </div>
 
+        <!-- Filters -->
+        <div v-if="rows.length > 0" class="flex gap-3 mb-3">
+          <input
+            v-model="search"
+            type="text"
+            placeholder="Search name..."
+            class="flex-1 min-w-0 border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white"
+          />
+          <select
+            v-if="departments.length > 1"
+            v-model="department"
+            class="flex-1 min-w-0 border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white"
+          >
+            <option value="">All departments ({{ rows.length }})</option>
+            <option v-for="d in departments" :key="d" :value="d">
+              {{ d }} ({{ rows.filter((r) => r.department === d).length }})
+            </option>
+          </select>
+        </div>
+
         <div v-if="loadingList" class="text-sm text-slate-400 py-6 text-center">Loading...</div>
         <div v-else-if="rows.length === 0" class="text-sm text-slate-400 italic py-6 text-center">
           No casual appointments due.
+        </div>
+        <div
+          v-else-if="visibleRows.length === 0"
+          class="text-sm text-slate-400 italic py-6 text-center"
+        >
+          No employees match.
         </div>
         <div v-else class="border border-sky-100 rounded-xl overflow-hidden mb-5">
           <label
             class="flex items-center gap-3 px-4 py-2.5 bg-sky/60 border-b border-sky-100 text-[11px] uppercase tracking-wider text-slate-500 font-bold cursor-pointer"
           >
             <input type="checkbox" :checked="allChecked" @change="toggleAll" />
-            Select all ({{ selected.length }}/{{ rows.length }})
+            Select all ({{ visibleRows.filter((r) => selected.includes(r.id)).length }}/{{
+              visibleRows.length
+            }})
           </label>
           <label
-            v-for="r in rows"
+            v-for="r in visibleRows"
             :key="r.id"
             class="flex items-center gap-3 px-4 py-2.5 border-b border-sky-100 last:border-b-0 text-sm cursor-pointer hover:bg-sky/40"
           >
@@ -137,6 +165,7 @@ const saving = ref(false)
 const error = ref('')
 const result = ref('')
 
+// Local-date helpers, so nothing shifts a day in PH time
 function toYmd(dt) {
   const p = (n) => String(n).padStart(2, '0')
   return `${dt.getFullYear()}-${p(dt.getMonth() + 1)}-${p(dt.getDate())}`
@@ -145,6 +174,7 @@ function parseYmd(s) {
   const [y, m, d] = String(s).split('T')[0].split('-').map(Number)
   return new Date(y, m - 1, d)
 }
+// Appointments end on Jun 30 or Dec 31 of the semester the date falls in
 function semesterEnd(ymd) {
   const [y, m] = ymd.split('-').map(Number)
   return m <= 6 ? `${y}-06-30` : `${y}-12-31`
@@ -165,13 +195,34 @@ function gapFor(r) {
   return Math.max(0, Math.round((parseYmd(form.value.renewal_date) - start) / 86400000))
 }
 
+// ---- Filters ----
+const search = ref('')
+const department = ref('')
+const departments = computed(() =>
+  [...new Set(rows.value.map((r) => r.department).filter(Boolean))].sort()
+)
+const visibleRows = computed(() => {
+  const q = search.value.trim().toLowerCase()
+  return rows.value.filter(
+    (r) =>
+      (!department.value || r.department === department.value) &&
+      (!q || r.name.toLowerCase().includes(q))
+  )
+})
+
+// Select all applies to the rows shown; ticks hidden by a filter stay
 const allChecked = computed(
-  () => rows.value.length > 0 && selected.value.length === rows.value.length
+  () =>
+    visibleRows.value.length > 0 && visibleRows.value.every((r) => selected.value.includes(r.id))
 )
 function toggleAll() {
-  selected.value = allChecked.value ? [] : rows.value.map((r) => r.id)
+  const ids = visibleRows.value.map((r) => r.id)
+  selected.value = allChecked.value
+    ? selected.value.filter((id) => !ids.includes(id))
+    : [...new Set([...selected.value, ...ids])]
 }
 
+// Each time it opens: reload the list and reset everything
 watch(
   () => props.show,
   async (open) => {
@@ -179,6 +230,8 @@ watch(
     error.value = ''
     result.value = ''
     selected.value = []
+    search.value = ''
+    department.value = ''
     loadingList.value = true
     try {
       const res = await api.get('/employees/appointments-due')

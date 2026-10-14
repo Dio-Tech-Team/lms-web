@@ -51,7 +51,8 @@
               class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white"
             />
             <p class="text-xs text-slate-400 mt-1">
-              Pre-filled as 6 months; change it to match the appointment paper.
+              Pre-filled to the semester end (Jun 30 or Dec 31); change it to match the appointment
+              paper.
             </p>
           </div>
           <div>
@@ -119,12 +120,12 @@ function parseYmd(s) {
   const [y, m, d] = String(s).split('T')[0].split('-').map(Number)
   return new Date(y, m - 1, d)
 }
-// Jul 1 → Dec 31, Jan 1 → Jun 30
+// Appointments end on Jun 30 or Dec 31 of the semester the renewal falls in,
+// so a late renewal (Jan 3, Jul 4) doesn't shift the next period.
 function sixMonthsFrom(ymd) {
-  const d = parseYmd(ymd)
-  return toYmd(new Date(d.getFullYear(), d.getMonth() + 6, d.getDate() - 1))
+  const [y, m] = String(ymd).split('-').map(Number)
+  return m <= 6 ? `${y}-06-30` : `${y}-12-31`
 }
-
 const currentEndLabel = computed(() => {
   const end = props.employee?.appointment_end
   if (!end) return 'not set'

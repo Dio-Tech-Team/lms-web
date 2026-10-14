@@ -90,7 +90,8 @@
               required
             />
             <p class="text-xs text-slate-400 mt-1">
-              Pre-filled as 6 months; change it to match the appointment paper.
+              Pre-filled to the semester end (Jun 30 or Dec 31); change it if the appointment paper
+              says otherwise.
             </p>
           </div>
           <div>
@@ -175,13 +176,13 @@ function toYmd(dt) {
   return `${dt.getFullYear()}-${p(dt.getMonth() + 1)}-${p(dt.getDate())}`
 }
 
-// Casual: pre-fill 6 months from the effective date (Jul 1 → Dec 31)
+// Casual: pre-fill the semester end of the effective date (Jul 4 → Dec 31, Mar 1 → Jun 30)
 watch(
   () => [form.value.employment_status, form.value.effective_date],
   ([status, start]) => {
     if (status !== 'casual' || !start) return
-    const [y, m, d] = start.split('-').map(Number)
-    form.value.appointment_end = toYmd(new Date(y, m - 1 + 6, d - 1))
+    const [y, m] = start.split('-').map(Number)
+    form.value.appointment_end = m <= 6 ? `${y}-06-30` : `${y}-12-31`
   }
 )
 

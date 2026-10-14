@@ -218,7 +218,15 @@
       >
         <div class="flex items-center justify-between mb-4">
           <h2 class="font-serif text-lg font-semibold text-navy-deep">Casual Appointments Due</h2>
-          <span class="font-mono text-[10.5px] text-slate-400">ENDING WITHIN 30 DAYS</span>
+          <div class="flex items-center gap-3">
+            <span class="font-mono text-[10.5px] text-slate-400">ENDING WITHIN 30 DAYS</span>
+            <button
+              @click="showBulkRenew = true"
+              class="text-[12.5px] font-semibold text-white bg-teal-600 rounded-xl px-3.5 py-1.5 hover:bg-[#256F63] transition-colors"
+            >
+              Renew
+            </button>
+          </div>
         </div>
         <table class="w-full text-sm">
           <tbody>
@@ -239,7 +247,7 @@
               <td class="py-2.5 text-right">
                 <span
                   class="px-2.5 py-1 rounded-full text-[11px] font-bold"
-              :class="a.expired ? 'bg-rose-50 text-rose-700' : 'bg-amber-tint text-amber-700'"
+                  :class="a.expired ? 'bg-rose-50 text-rose-700' : 'bg-amber-tint text-amber-700'"
                 >
                   {{ a.expired ? 'Expired' : 'Ends' }} {{ prettyDate(a.appointment_end) }}
                 </span>
@@ -293,12 +301,19 @@
       @close="showLeaveEntryModal = false"
       @updated="handleLeaveFiled"
     />
+
+    <BulkRenewModal
+      :show="showBulkRenew"
+      @close="showBulkRenew = false"
+      @updated="fetchAppointmentsDue"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue'
 import LeaveEntryModal from '../modals/LeaveEntryModal.vue'
+import BulkRenewModal from '../modals/BulkRenewModal.vue'
 import api from '@/api/axios'
 import { Line, Doughnut } from 'vue-chartjs'
 import {
@@ -326,6 +341,7 @@ ChartJS.register(
 
 const showLeaveEntryModal = ref(false)
 const appointmentsDue = ref([])
+const showBulkRenew = ref(false)
 
 // Separate from the main load, so a failure here never blanks the Dashboard
 async function fetchAppointmentsDue() {

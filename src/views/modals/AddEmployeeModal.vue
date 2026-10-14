@@ -337,7 +337,7 @@
             </div>
             <div v-if="form.employment_status === 'casual'">
               <label class="block text-sm font-medium text-navy-deep mb-1.5"
-                >Appointment End<span class="text-rose-500">*</span></label
+                >Current Appointment Ends<span class="text-rose-500">*</span></label
               >
               <input
                 v-model="form.appointment_end"
@@ -346,7 +346,10 @@
                 class="w-full border border-sky-100 bg-sky/40 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-colors"
                 required
               />
-              <p class="text-xs text-slate-400 mt-1">From the appointment paper.</p>
+              <p class="text-xs text-slate-400 mt-1">
+                End of the employee's current appointment (Jun 30 or Dec 31). Change it if their
+                paper says otherwise.
+              </p>
             </div>
           </div>
 
@@ -677,15 +680,18 @@ async function closeAddModal() {
   form.value = emptyForm()
   emit('close')
 }
-// Casual: pre-fill 6 months from the hire date (Jan 1 → Jun 30); HR can change it
+// Casual: pre-fill the end of the current appointment period (Jun 30 / Dec 31),
+// counted from today for employees hired in an earlier period; HR can change it
 watch(
   () => [form.value.employment_status, form.value.date_hired],
   ([status, hired]) => {
     if (status !== 'casual' || !hired) return
-    const [y, m, d] = hired.split('-').map(Number)
-    const end = new Date(y, m - 1 + 6, d - 1)
+    const now = new Date()
     const p = (n) => String(n).padStart(2, '0')
-    form.value.appointment_end = `${end.getFullYear()}-${p(end.getMonth() + 1)}-${p(end.getDate())}`
+    const today = `${now.getFullYear()}-${p(now.getMonth() + 1)}-${p(now.getDate())}`
+    const base = hired > today ? hired : today
+    const [y, m] = base.split('-').map(Number)
+    form.value.appointment_end = m <= 6 ? `${y}-06-30` : `${y}-12-31`
   }
 )
 // Reset form state whenever the modal is reopened

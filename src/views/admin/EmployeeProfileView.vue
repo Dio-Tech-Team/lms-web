@@ -570,9 +570,6 @@
                 </td>
                 <td class="px-4 py-3 text-slate-600 capitalize">
                   {{ employment.new_employment_status?.replace('_', ' ') }}
-                  <span v-if="isRenewal(employment)" class="normal-case text-slate-400">
-                    (Renewed)</span
-                  >
                 </td>
                 <td class="px-4 py-3 text-slate-500 font-mono text-[12.5px]">
                   {{ employment.effective_date }}
@@ -1114,14 +1111,6 @@ async function onRenewed(message) {
   renewNotice.value = message
   setTimeout(() => (renewNotice.value = ''), 5000)
   await refreshAll()
-}
-// Casual → casual in the same position is an appointment renewal
-function isRenewal(h) {
-  return (
-    h.previous_employment_status === 'casual' &&
-    h.new_employment_status === 'casual' &&
-    h.previous_position === h.new_position
-  )
 }
 
 function goBack() {

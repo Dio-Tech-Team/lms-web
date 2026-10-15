@@ -3,8 +3,8 @@
     <h1 class="font-serif text-2xl font-semibold text-navy-deep mb-2">Initialize Leave Credits</h1>
     <p class="text-sm text-slate-500 mb-6 max-w-xl">
       Credits for the current year are created automatically the first time HR opens the Dashboard.
-      Use this page to initialize a year manually or in advance. Unused Forced Leave from the
-      previous year is deducted from Vacation Leave. Employees who already have credits are skipped.
+      Use this page to initialize the current year manually. Unused Forced Leave from the previous
+      year is deducted from Vacation Leave. Employees who already have credits are skipped.
     </p>
 
     <p
@@ -20,7 +20,7 @@
         v-model="selectedYear"
         class="border border-sky-200 rounded-lg px-3 py-2 text-sm font-semibold"
       >
-        <option v-for="year in [currentYear + 1, currentYear]" :key="year" :value="year">
+        <option v-for="year in [currentYear]" :key="year" :value="year">
           {{ year }}
         </option>
       </select>

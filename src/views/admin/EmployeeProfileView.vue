@@ -739,6 +739,15 @@
                   >
                     {{ balanceButtonLabel(credit) }}
                   </button>
+                  <button
+                    v-else-if="
+                      credit.grant_type === 'event_manual' && Number(credit.used_credits) === 0
+                    "
+                    @click="revokeGrant(credit)"
+                    class="text-xs text-rose-600 hover:text-rose-700 font-semibold"
+                  >
+                    Revoke
+                  </button>
                 </td>
               </tr>
             </tbody>
@@ -943,6 +952,22 @@ function openOpeningBalanceModal(credit) {
   selectedCredit.value = credit
   balanceError.value = ''
   showOpeningBalanceModal.value = true
+}
+async function revokeGrant(credit) {
+  const ok = await confirm({
+    title: `Revoke ${credit.leave_type}?`,
+    message: `This removes the ${Number(credit.total_credits)} day(s) of ${
+      credit.leave_type
+    } granted for ${credit.year}. You can grant it again afterward.`,
+  })
+  if (!ok) return
+
+  try {
+    await api.delete(`/leave-credits/${credit.id}/grant`)
+    await fetchLeaveCredits()
+  } catch (err) {
+    alert(err.response?.data?.message || 'Failed to revoke the grant.')
+  }
 }
 function balanceButtonLabel(credit) {
   if (['SPL', 'WL'].includes(credit.code)) return 'Set Remaining'

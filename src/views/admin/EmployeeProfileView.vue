@@ -1076,7 +1076,20 @@ async function initializeCredits() {
 // })
 const filteredCredits = computed(() => {
   const mainCodes = ['VL', 'SL']
-  const extraCodes = ['SPL', 'WL', 'FL', 'ML', 'PTL', 'VAWC', 'RHL', 'SLB', 'STL', 'ADL', 'CAL']
+  const extraCodes = [
+    'SPL',
+    'WL',
+    'FL',
+    'ML',
+    'PTL',
+    'SOL',
+    'VAWC',
+    'RHL',
+    'SLB',
+    'STL',
+    'ADL',
+    'CAL',
+  ]
 
   return leaveCredits.value.filter((credit) => {
     const code = String(credit.code || '')
